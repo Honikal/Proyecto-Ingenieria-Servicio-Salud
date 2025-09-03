@@ -1,0 +1,24 @@
+<div id="landing-page-board">
+    <div class="drop-down-menu">
+        <div class="menu-title" (click)="toggleMenu()" tabindex="0" >
+            ¿Qué deseas buscar?
+            <ng-icon name="ionChevronDown"></ng-icon>
+        </div>
+        @if (menuOpen) {
+            <ul class="menu-options">
+                <li (click)="selectOption('cursos')">Cursos</li>
+                <li (click)="selectOption('socios')">Socios</li>
+                <li (click)="selectOption('podcasts')">Podcasts</li>
+            </ul>
+        }
+    </div>
+
+    <div class="button-login" (click)="onLoginClick()">
+        Presiona para Login
+    </div>
+    <div class="button-login" (click)="onSignUpClick()">
+        Registrate
+    </div>
+</div>
+
+
