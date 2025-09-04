@@ -2,18 +2,18 @@
     <h1>Iniciar Sesion</h1>
 
     <div class="info-section">
-        <p>Correo</p>
+        <p>Correo*</p>
         <input class=""/>
     </div>
 
     <div class="info-section">
-        <p>Contraseña</p>
+        <p>Contraseña*</p>
         <input class=""/>
     </div>
 
-    <a>¿Olvidaste la contraseña?</a>
+    <a (click)="onForgetPassword()">¿Olvidaste la contraseña?</a>
     <div id="buttons-section">
-        <div class="button">
+        <div class="button" (click)="onLoginClick()">
             Iniciar Sesión
         </div>
         <div class="button" (click)="onCancelClick()">
@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <a>¿Eres nuevo? Regístrate acá</a>
+    <a (click)="onSignUpClick()">¿Eres nuevo? Regístrate acá</a>
 
 
 </div>
