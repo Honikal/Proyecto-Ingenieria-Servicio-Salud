@@ -3,12 +3,26 @@
 
     <div class="info-section">
         <p>Correo*</p>
-        <input class=""/>
+        <div class="input-field">
+            <input type="text" placeholder="Ingrese su correo electrónico"/>
+        </div>
     </div>
 
     <div class="info-section">
         <p>Contraseña*</p>
-        <input class=""/>
+        <div class="input-field">
+            <input
+                [type]="showPassword ? 'text' : 'password' "                
+                placeholder="Ingrese su contraseña"
+            />
+            <button class="toggle-password" (click)="onPasswordToggle()">
+                @if (showPassword){
+                    <ng-icon name="ionEye"></ng-icon>
+                } @else {
+                    <ng-icon name="ionEyeOff"></ng-icon>
+                }
+            </button>
+        </div>
     </div>
 
     <a (click)="onForgetPassword()">¿Olvidaste la contraseña?</a>

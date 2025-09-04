@@ -1,0 +1,59 @@
+<div class="register-section">
+    <h1>Registrarse</h1>
+
+    <div class="info-section">
+        <p>Nombre completo*</p>
+        <div class="input-field">
+            <input type="text" placeholder="Ingrese su nombre completo"/>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <p>Correo*</p>
+        <div class="input-field">
+            <input type="email" placeholder="Ingrese su correo electrónico"/>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <p>Contraseña*</p>
+        <div class="input-field">
+            <input
+                [type]="showPassword ? 'text' : 'password' "                
+                placeholder="Ingrese su contraseña"
+            />
+            <button class="toggle-password" (click)="onPasswordToggle()">
+                @if (showPassword){
+                    <ng-icon name="ionEye"></ng-icon>
+                } @else {
+                    <ng-icon name="ionEyeOff"></ng-icon>
+                }
+            </button>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <p>Área*</p>
+        <div class="input-field">
+            <input type="text" placeholder="Ingrese su área de trabajo"/>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <p>Número de teléfono*</p>
+        <div class="input-field">
+            <input type="tel" placeholder="Ingrese su número telefónico"/>
+        </div>
+    </div>
+
+    <div id="buttons-section">
+        <div class="button" (click)="onSignUpClick()">
+            Registrarse
+        </div>
+        <div class="button" (click)="onCancelClick()">
+            Cancelar
+        </div>
+    </div>
+
+    <a (click)="onLoginClick()">¿Usuario existente? Inicia sesión acá</a>
+</div>

@@ -24,7 +24,7 @@ export class HeaderTab {
   }
   //Al presionar el botón de Registrarse cambia a la ruta de Registro 
   onSignUpClick(){
-    alert('Se presiona y cambia a la ruta de Registro');
+    this.router.navigate(['/register'])
   }
 
   //Encargado de cambiar la sección seleccionada para cambiar la página
