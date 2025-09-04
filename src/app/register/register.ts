@@ -4,15 +4,14 @@ import { NgIconComponent, provideIcons } from '@ng-icons/core'; //Para poder inc
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons';  //Componente de icon de ionicons
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   standalone: true,
   imports: [NgIconComponent],
-  templateUrl: './login.html',
-  styleUrl: './login.css',
+  templateUrl: './register.html',
+  styleUrl: './register.css',
   providers: [provideIcons( { ionEye, ionEyeOff })]
-
 })
-export class Login {
+export class Register {
   showPassword : boolean = false; //Valor para determinar si es verdadero o falso
 
   //Injectamos el router para permitir enrutamiento
@@ -23,19 +22,15 @@ export class Login {
     this.showPassword = !this.showPassword;
   }
 
-  onLoginClick(){
-    alert("Se hace el login ... por trabajar");
-  }
-
-  onCancelClick(){
-    this.router.navigate(['/']);
-  }
 
   onSignUpClick(){
-    this.router.navigate(['/register'])
+    alert("Se hace registro del usuario... aún por trabajar");
+  }
+  onCancelClick(){ //Vuelta a la página principal
+    this.router.navigate(['/']);
+  }
+  onLoginClick(){
+    this.router.navigate(['/login']); //Navegamos a la página de Login
   }
 
-  onForgetPassword(){
-    alert("Se redirige a la página encargada de editar el password .. por trabajar")
-  }
 }
