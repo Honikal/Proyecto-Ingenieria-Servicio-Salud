@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core'; //Para poder incluir iconos
 import { ionChevronDown } from '@ng-icons/ionicons';  //Componente de icon de ionicons
 
@@ -14,9 +15,12 @@ export class HeaderTab {
   //Variables de importancia
   menuOpen : boolean = false; //Determina si el botón está activado o encendido
 
+  //Injectamos el router para permitir enrutamiento
+  constructor(private router: Router) {};
+
   //Al presionar el botón de Login cambia a la ruta de Login 
   onLoginClick() {
-    alert('Se presiona y cambia a la ruta de Login')
+    this.router.navigate(['/login']);
   }
   //Al presionar el botón de Registrarse cambia a la ruta de Registro 
   onSignUpClick(){
