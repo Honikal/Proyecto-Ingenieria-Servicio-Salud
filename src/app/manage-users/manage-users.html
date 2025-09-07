@@ -1,0 +1,35 @@
+<div id="menu-gestion">
+    @for (usuario of listaUsuarios; track $index) {
+        <div class="usuario-section">
+            <div id="usuario-logo">
+                {{ getInitials(usuario) }}
+            </div>
+            <table>
+                <tr>
+                    <td>Nombre:</td>
+                    <td>{{usuario.nombre}}</td>
+                </tr>
+                <tr>
+                    <td>Correo:</td>
+                    <td>{{usuario.correo}}</td>
+                </tr>
+                <tr>
+                    <td>Teléfono:</td>
+                    <td>{{usuario.telefono}}</td>
+                </tr>
+                <tr>
+                    <td>Área:</td>
+                    <td>{{usuario.area}}</td>
+                </tr>
+            </table>
+            <div id="button-section">
+                <div class="button" (click)="onEditClick($index)">
+                    Editar
+                </div>
+                <div class="button" (click)="onDeleteClick($index)">
+                    Delete
+                </div>
+            </div>
+        </div>
+    }
+</div>
