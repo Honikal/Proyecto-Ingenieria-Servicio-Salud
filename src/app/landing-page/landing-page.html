@@ -1,4 +1,43 @@
-<app-header-tab></app-header-tab>
+<div id="landing-page-board">
+    <div class="drop-down-menu">
+        <div class="menu-title" (click)="toggleMenu(true)" tabindex="0" >
+            ¿Qué deseas buscar?
+            <ng-icon name="ionChevronDown"></ng-icon>
+        </div>
+        @if (menuOpen) {
+            <ul class="menu-options">
+                <li (click)="selectOption('cursos')">Cursos</li>
+                <li (click)="selectOption('socios')">Socios</li>
+                <li (click)="selectOption('podcasts')">Podcasts</li>
+            </ul>
+        }
+    </div>
+
+    @if (!user){
+        <div class="button-area">
+            <div class="button" (click)="onLoginClick()">
+                Presiona para Login
+            </div>
+            <div class="button" (click)="onSignUpClick()">
+                Registrate
+            </div>
+        </div>
+    } @else {
+        <div class="button-area">
+            <div class="user-avatar" (click)="toggleMenu(false)" tabindex="0">
+                {{ getInitials() }}
+            </div>
+            @if (userMenuOpen){
+                <ul class="user-menu" tabindex="0">
+                    <li (click)="onLogoutClick()">Gestionar Usuario</li>
+                    <li (click)="onManageClick()">Cerrar Sesión</li>
+                </ul>
+            }
+        </div>
+    }
+    
+</div>
+
 <div id="section-presentation">
     <div class="section">
         <h1>¿Quiénes somos?</h1>
