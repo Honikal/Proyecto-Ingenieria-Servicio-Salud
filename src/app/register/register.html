@@ -1,59 +1,70 @@
 <div class="register-section">
-    <h1>Registrarse</h1>
+  <h1>Registrarse</h1>
 
+  <form [formGroup]="registerForm">
     <div class="info-section">
-        <p>Nombre completo*</p>
-        <div class="input-field">
-            <input type="text" placeholder="Ingrese su nombre completo"/>
-        </div>
+      <p>Nombre completo*</p>
+      <div class="input-field">
+        <input type="text" placeholder="Ingrese su nombre completo" formControlName="fullName"/>
+      </div>
+      <small *ngIf="registerForm.get('fullName')?.touched && registerForm.get('fullName')?.invalid">
+        El nombre es requerido
+      </small>
     </div>
 
     <div class="info-section">
-        <p>Correo*</p>
-        <div class="input-field">
-            <input type="email" placeholder="Ingrese su correo electrónico"/>
-        </div>
+      <p>Correo*</p>
+      <div class="input-field">
+        <input type="email" placeholder="Ingrese su correo electrónico" formControlName="email"/>
+      </div>
+      <small *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+        Correo inválido
+      </small>
     </div>
 
     <div class="info-section">
-        <p>Contraseña*</p>
-        <div class="input-field">
-            <input
-                [type]="showPassword ? 'text' : 'password' "                
-                placeholder="Ingrese su contraseña"
-            />
-            <button class="toggle-password" (click)="onPasswordToggle()">
-                @if (showPassword){
-                    <ng-icon name="ionEye"></ng-icon>
-                } @else {
-                    <ng-icon name="ionEyeOff"></ng-icon>
-                }
-            </button>
-        </div>
+      <p>Contraseña*</p>
+      <div class="input-field">
+        <input [type]="showPassword ? 'text' : 'password'" placeholder="Ingrese su contraseña" formControlName="password"/>
+        <button class="toggle-password" type="button" (click)="onPasswordToggle()">
+          @if (showPassword){
+            <ng-icon name="ionEye"></ng-icon>
+          } @else {
+            <ng-icon name="ionEyeOff"></ng-icon>
+          }
+        </button>
+      </div>
+      <small *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+        Mínimo 6 caracteres
+      </small>
     </div>
 
     <div class="info-section">
-        <p>Área*</p>
-        <div class="input-field">
-            <input type="text" placeholder="Ingrese su área de trabajo"/>
-        </div>
+      <p>Área*</p>
+      <div class="input-field">
+        <input type="text" placeholder="Ingrese su área de trabajo" formControlName="area"/>
+      </div>
     </div>
 
     <div class="info-section">
-        <p>Número de teléfono*</p>
-        <div class="input-field">
-            <input type="tel" placeholder="Ingrese su número telefónico"/>
-        </div>
+      <p>Número de teléfono*</p>
+      <div class="input-field">
+        <input type="tel" placeholder="Ingrese su número telefónico" formControlName="phone"/>
+      </div>
+      <small *ngIf="registerForm.get('phone')?.touched && registerForm.get('phone')?.invalid">
+        Ingrese un número válido (mínimo 8 dígitos)
+      </small>
     </div>
 
     <div id="buttons-section">
-        <div class="button" (click)="onSignUpClick()">
-            Registrarse
-        </div>
-        <div class="button" (click)="onCancelClick()">
-            Cancelar
-        </div>
+      <div class="button" (click)="onSignUpClick()">
+        Registrarse
+      </div>
+      <div class="button" (click)="onCancelClick()">
+        Cancelar
+      </div>
     </div>
+  </form>
 
-    <a (click)="onLoginClick()">¿Usuario existente? Inicia sesión acá</a>
+  <a (click)="onLoginClick()">¿Usuario existente? Inicia sesión acá</a>
 </div>

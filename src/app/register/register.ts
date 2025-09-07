@@ -1,36 +1,67 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgIconComponent, provideIcons } from '@ng-icons/core'; //Para poder incluir iconos
-import { ionEye, ionEyeOff } from '@ng-icons/ionicons';  //Componente de icon de ionicons
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import { ionEye, ionEyeOff } from '@ng-icons/ionicons';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FirebaseService } from '../services/firebase';  // Importa el servicio
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [NgIconComponent],
+  imports: [NgIconComponent, ReactiveFormsModule, CommonModule],
   templateUrl: './register.html',
   styleUrl: './register.css',
-  providers: [provideIcons( { ionEye, ionEyeOff })]
+  providers: [provideIcons({ ionEye, ionEyeOff })]
 })
 export class Register {
-  showPassword : boolean = false; //Valor para determinar si es verdadero o falso
+  showPassword: boolean = false;
+  registerForm: FormGroup;
 
-  //Injectamos el router para permitir enrutamiento
-  constructor(private router: Router) {};
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private firebaseService: FirebaseService   // Inyectamos el servicio
+  ) {
+    this.registerForm = this.fb.group({
+      fullName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      area: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.pattern(/^[0-9]{8,}$/)]]
+    });
+  }
 
-  //Para activar y desactivar el botón de ver contraseña
-  onPasswordToggle(){
+  onPasswordToggle() {
     this.showPassword = !this.showPassword;
   }
 
+  async onSignUpClick() {
+    if (this.registerForm.valid) {
+      const user: User = this.registerForm.value;
 
-  onSignUpClick(){
-    alert("Se hace registro del usuario... aún por trabajar");
+      try {
+        await this.firebaseService.addUser(user);
+        console.log("Usuario agregado correctamente:", user);
+
+        alert("Registro exitoso ✅");
+        this.router.navigate(['/login']); // Redirige al login o donde quieras
+      } catch (error) {
+        console.error("Error al registrar:", error);
+        alert("Error al registrar ❌");
+      }
+    } else {
+      console.log("Formulario inválido");
+      this.registerForm.markAllAsTouched();
+    }
   }
-  onCancelClick(){ //Vuelta a la página principal
+
+  onCancelClick() {
     this.router.navigate(['/']);
   }
-  onLoginClick(){
-    this.router.navigate(['/login']); //Navegamos a la página de Login
-  }
 
+  onLoginClick() {
+    this.router.navigate(['/login']);
+  }
 }
