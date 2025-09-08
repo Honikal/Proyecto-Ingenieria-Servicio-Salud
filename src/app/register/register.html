@@ -7,9 +7,9 @@
       <div class="input-field">
         <input type="text" placeholder="Ingrese su nombre completo" formControlName="fullName"/>
       </div>
-      <small *ngIf="registerForm.get('fullName')?.touched && registerForm.get('fullName')?.invalid">
-        El nombre es requerido
-      </small>
+      @if (registerForm.get('fullName')?.touched && registerForm.get('fullName')?.invalid) {
+        <small>El nombre es requerido</small>
+      }
     </div>
 
     <div class="info-section">
@@ -17,9 +17,9 @@
       <div class="input-field">
         <input type="email" placeholder="Ingrese su correo electrónico" formControlName="email"/>
       </div>
-      <small *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
-        Correo inválido
-      </small>
+      @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
+        <small>El nombre es requerido</small>
+      }
     </div>
 
     <div class="info-section">
@@ -34,9 +34,9 @@
           }
         </button>
       </div>
-      <small *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
-        Mínimo 6 caracteres
-      </small>
+      @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
+        <small>El nombre es requerido</small>
+      }
     </div>
 
     <div class="info-section">
@@ -51,9 +51,9 @@
       <div class="input-field">
         <input type="tel" placeholder="Ingrese su número telefónico" formControlName="phone"/>
       </div>
-      <small *ngIf="registerForm.get('phone')?.touched && registerForm.get('phone')?.invalid">
-        Ingrese un número válido (mínimo 8 dígitos)
-      </small>
+      @if (registerForm.get('phone')?.touched && registerForm.get('phone')?.invalid) {
+        <small>El nombre es requerido</small>
+      }
     </div>
 
     <div id="buttons-section">

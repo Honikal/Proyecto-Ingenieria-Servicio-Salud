@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgIconComponent, provideIcons } from '@ng-icons/core'; //Para poder incluir iconos
-import { ionChevronDown } from '@ng-icons/ionicons';  //Componente de icon de ionicons
+import { NgIconComponent, provideIcons } from '@ng-icons/core';  //Para poder incluir iconos
+import { ionChevronDown } from '@ng-icons/ionicons';   //Componente de icon de ionicons
 
 //Esto es para testear que espere un usuario User
 interface User {
