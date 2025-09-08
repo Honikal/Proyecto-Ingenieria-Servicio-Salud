@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgIconComponent, provideIcons } from '@ng-icons/core'; //Para poder incluir iconos
-import { ionChevronDown } from '@ng-icons/ionicons';  //Componente de icon de ionicons
+import { NgIconComponent, provideIcons } from '@ng-icons/core';  //Para poder incluir iconos
+import { ionChevronDown } from '@ng-icons/ionicons';   //Componente de icon de ionicons
 
 //Esto es para testear que espere un usuario User
 interface User {
@@ -28,8 +28,8 @@ export class LandingPage {
   userMenuOpen : boolean = false;
 
   //Espera un objeto de tipo usuario para el sistema
-  user: User | null = null; 
-  //user: User | null = { nombre:'Eduardo Jiménez', password:'1234', area:'Ing en computacion', correo:'edward128pix@gmail.com', telefono:"72096994"}; 
+  //user: User | null = null; 
+  user: User | null = { nombre:'Eduardo Jiménez', password:'1234', area:'Ing en computacion', correo:'edward128pix@gmail.com', telefono:"72096994"}; 
 
   //Injectamos el router para permitir enrutamiento
   constructor(private router: Router) {};
@@ -40,7 +40,7 @@ export class LandingPage {
   }
   //Al presionar el botón de Registrarse cambia a la ruta de Registro 
   onSignUpClick(){
-    this.router.navigate(['/register'])
+    this.router.navigate(['/register']);
   }
   //Al presionar el botón de Salir Sesión, se sale de sesión
   onLogoutClick(){
@@ -49,8 +49,7 @@ export class LandingPage {
   }
   //Al presionar el botón de Gestionar, se pasa a la página de Gestionar de Usuario
   onManageClick(){
-    alert("Acá nos dirigimos a la página de gestión de usuarios");
-    //this.router.navigate([])
+    this.router.navigate(['/users']);
   }
 
 

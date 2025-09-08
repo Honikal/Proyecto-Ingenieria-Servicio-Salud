@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgIconComponent, provideIcons } from '@ng-icons/core'; //Para poder incluir iconos
+import { NgIconsModule, provideIcons } from '@ng-icons/core'; //Para poder incluir iconos
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons';  //Componente de icon de ionicons
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [NgIconComponent],
+  imports: [NgIconsModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
   providers: [provideIcons( { ionEye, ionEyeOff })]

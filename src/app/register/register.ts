@@ -3,14 +3,13 @@ import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../services/firebase';  // Importa el servicio
 import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [NgIconComponent, ReactiveFormsModule, CommonModule],
+  imports: [NgIconComponent, ReactiveFormsModule],
   templateUrl: './register.html',
   styleUrl: './register.css',
   providers: [provideIcons({ ionEye, ionEyeOff })]
