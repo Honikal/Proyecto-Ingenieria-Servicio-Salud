@@ -1,45 +1,44 @@
-import { Component } from '@angular/core';
+// manage-users.ts
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
-interface User {
-  nombre: string;
-  correo?: string;
-  password: string;
-  telefono?: string;
-  area?: string;
-}
+import { FirebaseService } from '../services/firebase';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-manage-users',
-  imports: [],
   templateUrl: './manage-users.html',
-  styleUrl: './manage-users.css'
+  styleUrl: './manage-users.css',
+  standalone: true
 })
-export class ManageUsers {
-  //listaUsuarios : User[] = [];
-  listaUsuarios : User[] = [
-    { nombre: 'Juan Pérez', correo: 'juan@example.com', password: '1234', telefono: '8888-8888', area: 'Marketing' },
-    { nombre: 'Ana Gómez', correo: 'ana@example.com', password: '5678', telefono: '7777-7777', area: 'Finanzas' },
-    { nombre: 'Carlos López', correo: 'carlos@example.com', password: 'abcd', telefono: '6666-6666', area: 'TI' },
-  ];
+export class ManageUsers implements OnInit {
+  listaUsuarios: User[] = [];
 
-  constructor(private router: Router) {};
+  constructor(
+    private router: Router,
+    private firebaseService: FirebaseService
+  ) {}
 
-  getInitials(usuario: User ) : string {
-    if (!usuario.nombre) return '??';
-    const parts = usuario.nombre.split(' ');
-    return parts.slice(0, 2).map((p : string) => p[0].toUpperCase()).join('');
+  ngOnInit(): void {
+    this.firebaseService.getUsers().subscribe((users) => {
+      this.listaUsuarios = users;
+    });
   }
 
-  onEditClick(index: number){
-    alert(`Editamos el usuario en la ubicación: ${index}`)
+  getInitials(usuario: User): string {
+    if (!usuario.fullName) return '??';
+    const parts = usuario.fullName.split(' ');
+    return parts.slice(0, 2).map((p: string) => p[0].toUpperCase()).join('');
   }
 
-  onDeleteClick(index: number){
-    alert(`Eliminamos el usuario en la ubicación: ${index}`)
+  onEditClick(index: number) {
+    alert(`Editamos el usuario en la ubicación: ${index}`);
   }
 
-  onGoLandingPage(){
+  onDeleteClick(index: number) {
+    alert(`Eliminamos el usuario en la ubicación: ${index}`);
+  }
+
+  onGoLandingPage() {
     this.router.navigate(['/']);
   }
 }
