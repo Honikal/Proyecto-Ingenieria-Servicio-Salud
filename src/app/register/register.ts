@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { FirebaseService } from '../services/firebase'; 
+import { FirebaseService } from '../services/firebase';  // Importa el servicio
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-register',

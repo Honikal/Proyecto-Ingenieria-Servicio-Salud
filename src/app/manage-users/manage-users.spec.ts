@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HeaderTab } from './header-tab';
+import { ManageUsers } from './manage-users';
 
-describe('HeaderTab', () => {
-  let component: HeaderTab;
-  let fixture: ComponentFixture<HeaderTab>;
+describe('ManageUsers', () => {
+  let component: ManageUsers;
+  let fixture: ComponentFixture<ManageUsers>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HeaderTab]
+      imports: [ManageUsers]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(HeaderTab);
+    fixture = TestBed.createComponent(ManageUsers);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
