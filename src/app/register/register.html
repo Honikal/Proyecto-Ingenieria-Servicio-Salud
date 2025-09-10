@@ -35,7 +35,7 @@
         </button>
       </div>
       @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
-        <small>El nombre es requerido</small>
+        <small>Mínimo 6 caracteres</small>
       }
     </div>
 
@@ -52,7 +52,7 @@
         <input type="tel" placeholder="Ingrese su número telefónico" formControlName="phone"/>
       </div>
       @if (registerForm.get('phone')?.touched && registerForm.get('phone')?.invalid) {
-        <small>El nombre es requerido</small>
+        <small>Ingrese un número válido (mínimo 8 dígitos)</small>
       }
     </div>
 
