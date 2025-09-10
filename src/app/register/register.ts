@@ -4,7 +4,7 @@ import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FirebaseService } from '../services/firebase';  // Importa el servicio
+import { FirebaseService } from '../services/firebase'; 
 import { User } from '../../models/user.model';
 
 @Component({
