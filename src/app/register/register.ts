@@ -3,30 +3,28 @@ import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { FirebaseService } from '../services/firebase'; 
-import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [NgIconComponent, ReactiveFormsModule, CommonModule],
+  imports: [NgIconComponent, ReactiveFormsModule],
   templateUrl: './register.html',
   styleUrl: './register.css',
   providers: [provideIcons({ ionEye, ionEyeOff })]
 })
 export class Register {
-  showPassword: boolean = false;
+  showPassword = false;
   registerForm: FormGroup;
 
   constructor(
     private router: Router,
     private fb: FormBuilder,
-    private firebaseService: FirebaseService   // Inyectamos el servicio
+    private firebaseService: FirebaseService 
   ) {
     this.registerForm = this.fb.group({
       fullName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required,Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       area: ['', Validators.required],
       phone: ['', [Validators.required, Validators.pattern(/^[0-9]{8,}$/)]]
@@ -39,20 +37,17 @@ export class Register {
 
   async onSignUpClick() {
     if (this.registerForm.valid) {
-      const user: User = this.registerForm.value;
-
       try {
-        await this.firebaseService.addUser(user);
-        console.log("Usuario agregado correctamente:", user);
+        await this.firebaseService.addUser(this.registerForm.value);
+        console.log("Usuario agregado correctamente:");
 
-        alert("Registro exitoso ✅");
-        this.router.navigate(['/login']); // Redirige al login o donde quieras
+        alert("Registro exitoso");
+        this.router.navigate(['/login']);
       } catch (error) {
         console.error("Error al registrar:", error);
-        alert("Error al registrar ❌");
+        alert("Error al registrar");
       }
     } else {
-      console.log("Formulario inválido");
       this.registerForm.markAllAsTouched();
     }
   }

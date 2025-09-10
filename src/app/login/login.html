@@ -1,41 +1,45 @@
 <div class="login-section">
-    <h1>Iniciar Sesion</h1>
+  <h1>Iniciar Sesión</h1>
 
+  <form [formGroup]="loginForm">
     <div class="info-section">
-        <p>Correo*</p>
-        <div class="input-field">
-            <input type="text" placeholder="Ingrese su correo electrónico"/>
-        </div>
+      <p>Correo*</p>
+      <div class="input-field">
+        <input type="email" placeholder="Ingrese su correo electrónico" formControlName="email"/>
+      </div>
+      @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {<small>Correo inválido</small>}
     </div>
 
     <div class="info-section">
-        <p>Contraseña*</p>
-        <div class="input-field">
-            <input
-                [type]="showPassword ? 'text' : 'password' "                
-                placeholder="Ingrese su contraseña"
-            />
-            <button class="toggle-password" (click)="onPasswordToggle()">
-                @if (showPassword){
-                    <ng-icon name="ionEye"></ng-icon>
-                } @else {
-                    <ng-icon name="ionEyeOff"></ng-icon>
-                }
-            </button>
-        </div>
+      <p>Contraseña*</p>
+      <div class="input-field">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Ingrese su contraseña"
+          formControlName="password"
+        />
+        <button class="toggle-password" type="button" (click)="onPasswordToggle()">
+          @if (showPassword){
+            <ng-icon name="ionEye"></ng-icon>
+          } @else {
+            <ng-icon name="ionEyeOff"></ng-icon>
+          }
+        </button>
+      </div>
+      @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {<small>Contraseña requerida</small>}
     </div>
 
     <a (click)="onForgetPassword()">¿Olvidaste la contraseña?</a>
+
     <div id="buttons-section">
-        <div class="button" (click)="onLoginClick()">
-            Iniciar Sesión
-        </div>
-        <div class="button" (click)="onCancelClick()">
-            Cancelar
-        </div>
+      <div class="button" (click)="onLoginClick()">
+        Iniciar Sesión
+      </div>
+      <div class="button" (click)="onCancelClick()">
+        Cancelar
+      </div>
     </div>
+  </form>
 
-    <a (click)="onSignUpClick()">¿Eres nuevo? Regístrate acá</a>
-
-
+  <a (click)="onSignUpClick()">¿Eres nuevo? Regístrate acá</a>
 </div>
