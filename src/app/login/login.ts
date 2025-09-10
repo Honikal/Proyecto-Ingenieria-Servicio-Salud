@@ -51,12 +51,11 @@ async onLoginClick() {
     }
 
     if (user.isAdmin) {
-      alert("¡Llegó el administrador!");
+      this.router.navigate(['/administrador'])
     } else {
       alert("Bienvenido " + user.fullName);
     }
 
-    this.router.navigate(['/']); 
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     alert("Error al iniciar sesión");
