@@ -18,7 +18,7 @@ export class LandingPage {
 
   user: User | null = null;
 
-    constructor(private router: Router) {
+  constructor(private router: Router) {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       this.user = JSON.parse(storedUser);
