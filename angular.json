@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Proyecto-Trabajadores-Salud": {
+    "proyecto-trabajadores-salud": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -53,10 +53,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "Proyecto-Trabajadores-Salud:build:production"
+              "buildTarget": "proyecto-trabajadores-salud:build:production"
             },
             "development": {
-              "buildTarget": "Proyecto-Trabajadores-Salud:build:development"
+              "buildTarget": "proyecto-trabajadores-salud:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -81,5 +81,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
