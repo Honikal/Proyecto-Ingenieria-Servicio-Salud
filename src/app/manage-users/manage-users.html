@@ -3,48 +3,51 @@
         <div id="usuario-logo">
             {{ getInitials() || '??'}}
         </div>
-        <table>
-            <tr>
-                <td>Nombre:</td>
-                <td class="user-info">
-                    @if (!isEditing) {
-                        <span>{{user?.fullName}}</span>
-                    } @else {
-                        <input type="text" formControlName="fullName"/>
-                    }
-                </td>
-            </tr>
-            <tr>
-                <td>Correo:</td>
-                <td class="user-info">
-                    @if (!isEditing) {
-                        <span>{{user?.email}}</span>
-                    } @else {
-                        <input type="email" formControlName="email"/>
-                    }
-                </td>
-            </tr>
-            <tr>
-                <td>Teléfono:</td>
-                <td class="user-info">
-                    @if (!isEditing) {
-                        <span>{{user?.phone}}</span>
-                    } @else {
-                        <input type="tel" formControlName="phone"/>
-                    }
-                </td>
-            </tr>
-            <tr>
-                <td>Área:</td>
-                <td class="user-info">
-                    @if (!isEditing) {
-                        <span>{{user?.area}}</span>
-                    } @else {
-                        <input type="text" formControlName="area"/>
-                    }
-                </td>
-            </tr>
-        </table>
+        <form [formGroup]="userForm">
+            <table>
+                <tr>
+                    <td>Nombre:</td>
+                    <td class="user-info">
+                        @if (!isEditing) {
+                            <span>{{user?.fullName}}</span>
+                        } @else {
+                            <input type="text" formControlName="fullName"/>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>Correo:</td>
+                    <td class="user-info">
+                        @if (!isEditing) {
+                            <span>{{user?.email}}</span>
+                        } @else {
+                            <input type="email" formControlName="email"/>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>Teléfono:</td>
+                    <td class="user-info">
+                        @if (!isEditing) {
+                            <span>{{user?.phone}}</span>
+                        } @else {
+                            <input type="tel" formControlName="phone"/>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>Área:</td>
+                    <td class="user-info">
+                        @if (!isEditing) {
+                            <span>{{user?.area}}</span>
+                        } @else {
+                            <input type="text" formControlName="area"/>
+                        }
+                    </td>
+                </tr>
+            </table>
+        </form>
+        
         <div id="code-section">
             <p>Ingresar Código</p>
             <div id="input-field">

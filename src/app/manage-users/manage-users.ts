@@ -31,8 +31,8 @@ export class ManageUsers implements OnInit {
   async ngOnInit(){
     //Creamos el form del usuario
     this.userForm = this.fb.group({
-      fullname: ['', Validators.required],
-      email: ['', Validators.required, Validators.email],
+      fullName: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
       phone: [''],
       area: ['']
     })
@@ -46,6 +46,17 @@ export class ManageUsers implements OnInit {
         this.user = await this.firebaseService.getUser(parsed.id);
         console.log(`Usuario completo desde Firestore: ${this.user?.fullName}`);
         this.cdr.detectChanges();
+
+        if (this.user){
+          //Actualizamos los datos del formulario
+          this.userForm.patchValue({
+            fullName: this.user.fullName,
+            email: this.user.email,
+            phone: this.user.phone,
+            area: this.user.area
+          })
+        }
+
       }
     }
   }
@@ -71,9 +82,18 @@ export class ManageUsers implements OnInit {
         if (storedUser) {
         //Guardamos los cambios editados
           const parsed = JSON.parse(storedUser);
-          await this.firebaseService.updateUser(parsed.id, this.user);
+          const updatedData = this.userForm.value;
+
+          await this.firebaseService.updateUser(parsed.id, updatedData);
           alert("Cambios guardados correctamente");
+
+          //Actualizamos los datos de forma local
+          this.user = { ...this.user, ...updatedData }
+          console.log(`Usuario actualizado: ${this.user}`)
+
           this.isEditing = false; //Quitamos el modo de edición
+
+          
         }
       } else {
         alert("Por favor completa los cargos requeridos");
