@@ -10,6 +10,6 @@ export const routes: Routes = [
     {path: '', component: LandingPage},
     {path: 'login', component: Login},
     {path: 'register', component: Register},
-    {path: 'administrador', component: Administrador}
+    {path: 'administrador', component: Administrador},
     {path: 'users', component: ManageUsers}
 ];
