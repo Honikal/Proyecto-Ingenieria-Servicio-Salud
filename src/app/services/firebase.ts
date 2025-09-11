@@ -1,6 +1,6 @@
 // firebase.ts
 import { Injectable } from '@angular/core';
-import { collection, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc } from '@angular/fire/firestore';
+import { collection, collectionData, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import * as bcrypt from 'bcryptjs';
