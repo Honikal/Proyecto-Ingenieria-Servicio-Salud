@@ -1,4 +1,6 @@
+// firebase.ts
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { collection, Firestore, addDoc, query, where, getDocs, updateDoc } from '@angular/fire/firestore';
 import { User } from '../../models/user.model';
 import * as bcrypt from 'bcryptjs';
@@ -56,7 +58,6 @@ async login(email: string, password: string){
   if (snapshot.empty) {
     return null;
   }
-
   const userDoc = snapshot.docs[0];
   const user = userDoc.data() as User;
   const id = userDoc.id;
@@ -64,7 +65,12 @@ async login(email: string, password: string){
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) return null;
 
-  return { ...user, id };;
+  return { ...user, id };
 }
 
+  // 🔹 Nuevo: obtener usuarios en tiempo real
+  getUsers(): Observable<User[]> {
+    const userRef = collection(this.firestore, 'users');
+    return collectionData(userRef, { idField: 'id' }) as Observable<User[]>;
+  }
 }
