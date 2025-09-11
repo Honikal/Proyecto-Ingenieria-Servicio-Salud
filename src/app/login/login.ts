@@ -57,9 +57,10 @@ async onLoginClick() {
     };
 
     localStorage.setItem("currentUser", JSON.stringify(userData));
+    console.log(`Is usuario Admin: ${user.isAdmin}`);
 
     if (user.isAdmin) {
-      this.router.navigate(['/administrador'])
+      this.router.navigate(['/admin']);
     } else {
       alert("Bienvenido " + user.fullName);
       this.router.navigate(['/'])

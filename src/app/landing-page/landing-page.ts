@@ -41,10 +41,6 @@ export class LandingPage {
     this.router.navigate(['/users']);
   }
 
-  onAdminClick(){
-    this.router.navigate(['/admin']);
-  }
-
   //Encargado de cambiar la sección seleccionada para cambiar la página
   toggleMenu(value: boolean){
     if (value == true){
