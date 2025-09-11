@@ -1,5 +1,5 @@
 <div id="menu-gestion">
-    @for (usuario of listaUsuarios; track $index) {
+    @for (usuario of userList$ | async; track $index) {
         <div class="usuario-section">
             <div id="usuario-logo">
                 {{ getInitials(usuario) }}
