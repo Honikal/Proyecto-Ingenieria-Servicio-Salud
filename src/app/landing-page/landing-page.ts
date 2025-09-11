@@ -52,9 +52,8 @@ export class LandingPage {
     this.router.navigate(['/users']);
   }
 
-  onMembersClick(){
-    console.log("Navegamos a la lista de miembros");
-    this.router.navigate(['/members']);
+  onAdminClick(){
+    this.router.navigate(['/admin']);
   }
 
 

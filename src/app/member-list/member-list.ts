@@ -39,4 +39,8 @@ export class MemberList {
   onGoLandingPage() {
     this.router.navigate(['/']);
   }
+
+  goBackToAdmin() {
+    this.router.navigate(['/admin']);
+  }
 }
