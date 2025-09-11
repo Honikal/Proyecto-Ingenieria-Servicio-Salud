@@ -1,0 +1,48 @@
+<!-- Top Bar -->
+<div id="header-bar">
+  <div id="title">Configuración Miembros</div>
+  <div id="header-actions">
+    <input type="text" placeholder="Buscar cursos" id="search-courses"/>
+    <div id="user-initials">AE</div>
+  </div>
+</div>
+
+<!-- Members Section -->
+<div id="members-section">
+  <h2>Lista de Miembros</h2>
+
+  <!-- Search by Name -->
+  <input type="text" placeholder="Buscar socio por nombre" id="search-members"/>
+
+  <!-- Members Table -->
+  <table id="members-table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Contacto</th>
+        <th>Email</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (usuario of userList$ | async; track $index) {
+        <tr>
+          <td>{{ usuario.fullName }}</td>
+          <td>{{ usuario.phone }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>
+            <button class="delete-btn" (click)="onDeleteClick($index)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div id="pagination">
+    <span>1 / 10</span>
+    <button>&gt;</button>
+  </div>
+</div>

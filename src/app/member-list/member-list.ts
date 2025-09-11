@@ -6,13 +6,13 @@ import { Observable } from 'rxjs';
 import { NgFor, AsyncPipe } from '@angular/common'; 
 
 @Component({
-  selector: 'app-manage-users',
-  templateUrl: './manage-users.html',
-  styleUrl: './manage-users.css',
+  selector: 'app-member-list',
+  templateUrl: './member-list.html',
+  styleUrl: './member-list.css',
   standalone: true,
   imports: [NgFor, AsyncPipe] 
 })
-export class ManageUsers {
+export class MemberList {
   userList$: Observable<User[]>;
 
   constructor(
