@@ -59,11 +59,12 @@ async login(email: string, password: string){
 
   const userDoc = snapshot.docs[0];
   const user = userDoc.data() as User;
+  const id = userDoc.id;
 
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) return null;
 
-  return user;
+  return { ...user, id };;
 }
 
 }

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgIconComponent, provideIcons } from '@ng-icons/core'; //Para poder incluir iconos
-import { ionEye, ionEyeOff } from '@ng-icons/ionicons';  //Componente de icon de ionicons
+import { NgIconComponent, provideIcons } from '@ng-icons/core'; 
+import { ionEye, ionEyeOff } from '@ng-icons/ionicons'; 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FirebaseService } from '../services/firebase'; 
 
@@ -49,10 +49,20 @@ async onLoginClick() {
       return;
     }
 
+    const userData = {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      isAdmin: user.isAdmin
+    };
+
+    localStorage.setItem("currentUser", JSON.stringify(userData));
+
     if (user.isAdmin) {
       this.router.navigate(['/administrador'])
     } else {
       alert("Bienvenido " + user.fullName);
+      this.router.navigate(['/'])
     }
 
   } catch (error) {
