@@ -1,0 +1,89 @@
+/* Header Bar */
+#header-bar {
+  background-color: #0d6efd;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+#title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+#header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#search-courses {
+  padding: 5px 8px;
+}
+
+#user-initials {
+  width: 35px;
+  height: 35px;
+  background-color: #444;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+/* Members Section */
+#members-section {
+  margin: 20px auto;
+  width: 70%;
+}
+
+#members-section h2 {
+  margin-bottom: 10px;
+}
+
+#search-members {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+}
+
+/* Members Table */
+#members-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+
+#members-table th,
+#members-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+#members-table th {
+  background-color: #e9ecef;
+}
+
+.delete-btn {
+  background-color: #ff4d4f;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #d9363e;
+}
+
+/* Pagination */
+#pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}

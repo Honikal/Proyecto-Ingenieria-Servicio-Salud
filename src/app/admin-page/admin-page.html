@@ -1,0 +1,56 @@
+<!-- Top Bar -->
+<div id="top-bar">
+  <!-- Back Button -->
+  <button id="back-btn" (click)="goToLanding()">⬅ Volver</button>
+
+  <div id="title">ADMINISTRADOR</div>
+  <div id="top-actions">
+    <div id="notification">
+      <span class="bell">🔔</span>
+      <span class="badge">1</span>
+    </div>
+    <div id="user-initials">AE</div>
+  </div>
+</div>
+
+<!-- Layout Wrapper -->
+<div id="layout">
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <ul>
+      <li>Dashboard</li>
+      <li>Socios</li>
+      <li (click)="goToUsers()" style="cursor: pointer;">Usuarios</li>
+      <li>Cursos</li>
+      <li>Cerrar Sesion</li>
+    </ul>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div id="dashboard">
+    <div class="card">
+      <div class="card-title">Socios Activos</div>
+      <div class="card-value">120</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cursos Activos</div>
+      <div class="card-value">20</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cursos Finalizados</div>
+      <div class="card-value">30</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Pruebas Realizadas</div>
+      <div class="card-value">40</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Usuarios Activos</div>
+      <div class="card-value">23</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cursos Publicados</div>
+      <div class="card-value">80</div>
+    </div>
+  </div>
+</div>

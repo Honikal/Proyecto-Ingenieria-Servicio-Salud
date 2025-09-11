@@ -1,5 +1,7 @@
+// firebase.ts
 import { Injectable } from '@angular/core';
 import { collection, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import * as bcrypt from 'bcryptjs';
 //import { v4 as uuidv4 } from 'uuid';
@@ -87,4 +89,9 @@ export class FirebaseService {
     await updateDoc(userRef, updatedData);
   }
 
+  // 🔹 Nuevo: obtener usuarios en tiempo real
+  getUsers(): Observable<User[]> {
+    const userRef = collection(this.firestore, 'users');
+    return collectionData(userRef, { idField: 'id' }) as Observable<User[]>;
+  }
 }

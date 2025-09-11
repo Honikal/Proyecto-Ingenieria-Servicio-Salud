@@ -1,0 +1,96 @@
+/* Top Bar */
+#top-bar {
+  background-color: #0d6efd;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+#title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#top-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#notification {
+  position: relative;
+  font-size: 1.5rem;
+}
+
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+}
+
+#user-initials {
+  width: 35px;
+  height: 35px;
+  background-color: #444;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+/* Layout */
+#layout {
+  display: flex;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 200px;
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+#sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+#sidebar li {
+  margin: 15px 0;
+  cursor: pointer;
+}
+
+/* Dashboard */
+#dashboard {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  padding: 20px;
+  text-align: center;
+}
+
+.card-title {
+  background-color: #0d6efd;
+  color: white;
+  padding: 5px;
+  font-weight: bold;
+}
+
+.card-value {
+  font-size: 2.5rem;
+  margin-top: 15px;
+}

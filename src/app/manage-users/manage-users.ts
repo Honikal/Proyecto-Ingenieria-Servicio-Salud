@@ -112,7 +112,7 @@ export class ManageUsers implements OnInit {
     alert(`Eliminamos el usuario en la ubicación: `);
   }
 
-  onGoLandingPage(){
+  onGoLandingPage() {
     this.router.navigate(['/']);
   }
 }
