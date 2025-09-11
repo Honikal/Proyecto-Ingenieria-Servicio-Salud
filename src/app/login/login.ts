@@ -1,31 +1,76 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgIconsModule, provideIcons } from '@ng-icons/core'; //Para poder incluir iconos
-import { ionEye, ionEyeOff } from '@ng-icons/ionicons';  //Componente de icon de ionicons
+import { NgIconComponent, provideIcons } from '@ng-icons/core'; 
+import { ionEye, ionEyeOff } from '@ng-icons/ionicons'; 
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FirebaseService } from '../services/firebase'; 
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [NgIconsModule],
+  imports: [NgIconComponent, ReactiveFormsModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
   providers: [provideIcons( { ionEye, ionEyeOff })]
 
 })
 export class Login {
-  showPassword : boolean = false; //Valor para determinar si es verdadero o falso
+  showPassword = false;
+  loginForm: FormGroup;
 
-  //Injectamos el router para permitir enrutamiento
-  constructor(private router: Router) {};
+  constructor(
+    private router: Router, 
+    private fb: FormBuilder,
+    private firebaseService: FirebaseService 
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]]
+    });
+  }
 
-  //Para activar y desactivar el botón de ver contraseña
   onPasswordToggle(){
     this.showPassword = !this.showPassword;
   }
 
-  onLoginClick(){
-    alert("Se hace el login ... por trabajar");
+async onLoginClick() {
+  if (!this.loginForm.valid) {
+    this.loginForm.markAllAsTouched();
+    return;
   }
+
+  const { email, password } = this.loginForm.value;
+
+  try {
+    const user = await this.firebaseService.login(email, password);
+
+    if (!user) {
+      alert("Correo o contraseña incorrectos");
+      return;
+    }
+
+    const userData = {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      isAdmin: user.isAdmin
+    };
+
+    localStorage.setItem("currentUser", JSON.stringify(userData));
+
+    if (user.isAdmin) {
+      this.router.navigate(['/administrador'])
+    } else {
+      alert("Bienvenido " + user.fullName);
+      this.router.navigate(['/'])
+    }
+
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
+    alert("Error al iniciar sesión");
+  }
+}
+
 
   onCancelClick(){
     this.router.navigate(['/']);

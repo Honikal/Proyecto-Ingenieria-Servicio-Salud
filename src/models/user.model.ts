@@ -1,7 +1,11 @@
 export interface User {
   fullName: string;
   email: string;
-  password: string;
   area: string;
   phone: string;
+  password: string; 
+  isAdmin: boolean;  
+  createdAt: Date;     
+  //emailVerified?: boolean;
+  //verificationToken?: string;
 }
