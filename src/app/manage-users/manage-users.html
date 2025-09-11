@@ -1,37 +1,76 @@
 <div id="menu-gestion">
-    @for (usuario of listaUsuarios; track $index) {
-        <div class="usuario-section">
-            <div id="usuario-logo">
-                {{ getInitials(usuario) }}
-            </div>
-            <table>
-                <tr>
-                    <td>Nombre:</td>
-                    <td class="user-info">{{usuario.nombre}}</td>
-                </tr>
-                <tr>
-                    <td>Correo:</td>
-                    <td class="user-info">{{usuario.correo}}</td>
-                </tr>
-                <tr>
-                    <td>Teléfono:</td>
-                    <td class="user-info">{{usuario.telefono}}</td>
-                </tr>
-                <tr>
-                    <td>Área:</td>
-                    <td class="user-info">{{usuario.area}}</td>
-                </tr>
-            </table>
-            <div id="button-section">
-                <div class="button" (click)="onEditClick($index)">
-                    Editar
-                </div>
-                <div class="button" (click)="onDeleteClick($index)">
-                    Eliminar
-                </div>
+    <div class="usuario-section">
+        <div id="usuario-logo">
+            {{ getInitials() || '??'}}
+        </div>
+        <table>
+            <tr>
+                <td>Nombre:</td>
+                <td class="user-info">
+                    @if (!isEditing) {
+                        <span>{{user?.fullName}}</span>
+                    } @else {
+                        <input type="text" formControlName="fullName"/>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>Correo:</td>
+                <td class="user-info">
+                    @if (!isEditing) {
+                        <span>{{user?.email}}</span>
+                    } @else {
+                        <input type="email" formControlName="email"/>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>Teléfono:</td>
+                <td class="user-info">
+                    @if (!isEditing) {
+                        <span>{{user?.phone}}</span>
+                    } @else {
+                        <input type="tel" formControlName="phone"/>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>Área:</td>
+                <td class="user-info">
+                    @if (!isEditing) {
+                        <span>{{user?.area}}</span>
+                    } @else {
+                        <input type="text" formControlName="area"/>
+                    }
+                </td>
+            </tr>
+        </table>
+        <div id="code-section">
+            <p>Ingresar Código</p>
+            <div id="input-field">
+                <input
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="Ingrese su contraseña"
+                formControlName="password"
+                />
+                <button class="toggle-password" type="button" (click)="onPasswordToggle()">
+                @if (showPassword){
+                    <ng-icon name="ionEye"></ng-icon>
+                } @else {
+                    <ng-icon name="ionEyeOff"></ng-icon>
+                }
+                </button>
             </div>
         </div>
-    }
+        <div id="button-section">
+            <div class="button" (click)="onEditClick()">
+                {{ isEditing ? 'Guardar Cambios' : 'Editar' }}
+            </div>
+            <div class="button" (click)="onDeleteClick()">
+                Eliminar
+            </div>
+        </div>
+    </div>
 
     <div class="button" (click)="onGoLandingPage()">
         Volver a Landing Page

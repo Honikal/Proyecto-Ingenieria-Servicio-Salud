@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { collection, Firestore, addDoc, query, where, getDocs, updateDoc } from '@angular/fire/firestore';
+import { collection, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc } from '@angular/fire/firestore';
 import { User } from '../../models/user.model';
 import * as bcrypt from 'bcryptjs';
 //import { v4 as uuidv4 } from 'uuid';
@@ -48,23 +48,43 @@ export class FirebaseService {
     //await this.sendVerificationEmail(newUser.email, verificationToken);
   }
 
-async login(email: string, password: string){
-  const usersRef = collection(this.firestore, 'users');
-  const q = query(usersRef, where('email', '==', email));
-  const snapshot = await getDocs(q);
+  async login(email: string, password: string){
+    const usersRef = collection(this.firestore, 'users');
+    const q = query(usersRef, where('email', '==', email));
+    const snapshot = await getDocs(q);
 
-  if (snapshot.empty) {
-    return null;
+    if (snapshot.empty) {
+      return null;
+    }
+
+    const userDoc = snapshot.docs[0];
+    const user = userDoc.data() as User;
+    const id = userDoc.id;
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) return null;
+
+    return { ...user, id };;
   }
 
-  const userDoc = snapshot.docs[0];
-  const user = userDoc.data() as User;
-  const id = userDoc.id;
+  async getUser(userID: string){
+    //Agarramos el path directo para extraer los datos del usuario
+    const userRef = doc(this.firestore, 'users', userID);
+    const snapshot = await getDoc(userRef);
 
-  const passwordMatch = await bcrypt.compare(password, user.password);
-  if (!passwordMatch) return null;
+    //Checamos el caso que el usuario o el path directo al usuario no exista
+    if (!snapshot.exists()){
+      return null;
+    }
 
-  return { ...user, id };;
-}
+    //Retornamos el posible usuario
+    return { id: snapshot.id, ...(snapshot.data() as User) };
+  }
+
+  async updateUser(userID: string, updatedData: Partial<User>){
+    //Agarramos el path directo para extraer los datos del usuario
+    const userRef = doc(this.firestore, 'users', userID);
+    await updateDoc(userRef, updatedData);
+  }
 
 }
