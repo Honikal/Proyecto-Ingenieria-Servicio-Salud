@@ -1,0 +1,31 @@
+<div class="socios-container">
+  <!-- Encabezado -->
+  <div class="socios-header">
+    <h1>Lista de Socios</h1>
+    <div class="socios-actions">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Buscar socio por nombre"
+      />
+      <button class="button" (click)="agregarSocio()">Agregar Socio</button>
+    </div>
+  </div>
+
+  <!-- Grid de socios -->
+  <div class="socios-grid">
+    <div *ngFor="let socio of buscar()" class="socio-card">
+      <!-- Nombre -->
+      <h3>{{ socio.nombre }}</h3>
+
+      <!-- Cantidad de asociados -->
+      <p><strong>Asociados:</strong> {{ socio.asociados }}</p>
+
+      <!-- Información de contacto -->
+      <p><strong>Contacto:</strong> {{ socio.contacto }}</p>
+
+      <!-- Botón -->
+      <button class="button" (click)="verSocio(socio.id)">Ver socio</button>
+    </div>
+  </div>
+</div>

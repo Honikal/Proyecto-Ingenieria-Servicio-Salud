@@ -1,0 +1,17 @@
+<div *ngIf="socio">
+  <h2>{{ socio.nombre }}</h2>
+  <p>Cantidad de asociados: {{ socio.asociados }}</p>
+  <p>Contacto: {{ socio.contacto }}</p>
+
+  <button (click)="eliminar(socio.id)">Eliminar</button>
+  <button (click)="activar(socio.id)">Activar</button>
+
+  <div *ngIf="socio.cursos?.length">
+    <h3>Cursos asociados:</h3>
+    <div *ngFor="let curso of socio.cursos">
+      <p>{{ curso.nombre }}</p>
+      <button>Eliminar</button>
+      <button>Ingresar</button>
+    </div>
+  </div>
+</div>

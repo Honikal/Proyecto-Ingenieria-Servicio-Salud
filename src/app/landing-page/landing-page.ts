@@ -50,8 +50,15 @@ export class LandingPage {
     }
   }
 
-  selectOption(value: string){
-    alert(`Hemos cambiado al valor del selector a: ${value}`);
+  selectOption(value: string) {
+    if (value === 'socios') {
+      this.router.navigate(['/socios']);
+    } else if (value === 'cursos') {
+      this.router.navigate(['/cursos']);
+    } else if (value === 'podcasts') {
+      this.router.navigate(['/podcasts']);
+    }
+    this.menuOpen = false;
   }
 
   getInitials() : string {
