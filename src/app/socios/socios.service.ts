@@ -1,40 +1,58 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Firestore, collection, collectionData, doc, getDoc, addDoc, updateDoc, deleteDoc, docData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 export interface Socio {
-  id: string;
+  id?: string;
   nombre: string;
-  asociados: number;
-  contacto: string;
-  cursos?: any[];
+  cantidadAsociados: number;
+  email: string;
+  telefono: string;
+  cursos?: { nombre: string }[];
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class SociosService {
-  private apiUrl = 'http://localhost:3000/api/socios'; // Ajusta tu backend
+  private sociosRef;
 
-  constructor(private http: HttpClient) {}
+  constructor(private firestore: Firestore) {
+    this.sociosRef = collection(this.firestore, 'socios');
+  }
 
+  // Obtener todos los socios
   getSocios(): Observable<Socio[]> {
-    return this.http.get<Socio[]>(this.apiUrl);
+    return collectionData(this.sociosRef, { idField: 'id' }) as Observable<Socio[]>;
   }
 
-  getSocioById(id: string): Observable<Socio> {
-    return this.http.get<Socio>(`${this.apiUrl}/${id}`);
+  // Obtener un socio en tiempo real
+  getSocioById$(id: string): Observable<Socio | null> {
+    const socioDoc = doc(this.firestore, 'socios', id);
+    return docData(socioDoc, { idField: 'id' }) as Observable<Socio | null>;
   }
 
-  createSocio(socio: Socio): Observable<Socio> {
-    return this.http.post<Socio>(this.apiUrl, socio);
+  // Obtener socio solo una vez
+  async getSocioById(id: string): Promise<Socio | null> {
+    const socioDoc = doc(this.firestore, 'socios', id);
+    const snapshot = await getDoc(socioDoc);
+    return snapshot.exists() ? { ...(snapshot.data() as Socio), id: snapshot.id } : null;
   }
 
-  updateSocio(id: string, socio: Socio): Observable<Socio> {
-    return this.http.put<Socio>(`${this.apiUrl}/${id}`, socio);
+  // Crear socio
+  async createSocio(socio: Omit<Socio, 'id'>): Promise<void> {
+    await addDoc(this.sociosRef, socio);
   }
 
-  deleteSocio(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  // Actualizar socio
+  async updateSocio(id: string, socio: Partial<Socio>): Promise<void> {
+    const socioDoc = doc(this.firestore, 'socios', id);
+    await updateDoc(socioDoc, socio);
+  }
+
+  // Eliminar socio
+  async deleteSocio(id: string): Promise<void> {
+    const socioDoc = doc(this.firestore, 'socios', id);
+    await deleteDoc(socioDoc);
   }
 }

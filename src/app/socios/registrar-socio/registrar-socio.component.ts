@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { SociosService } from '../socios.service';
+import { SociosService, Socio } from '../socios.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-registrar-socio',
   standalone: true,
-  templateUrl: './registrar-socio.component.html',
   imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './registrar-socio.component.html',
   styleUrls: ['./registrar-socio.component.css']
 })
 export class RegistrarSocioComponent {
@@ -21,26 +21,18 @@ export class RegistrarSocioComponent {
   ) {
     this.socioForm = this.fb.group({
       nombre: ['', Validators.required],
-      cantidadAsociados: [0, [Validators.required, Validators.min(0)]],
+      cantidadAsociados: [0, Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{8,15}$/)]]
+      telefono: ['', Validators.required]
     });
   }
 
-  registrar() {
+  async registrar() {
     if (this.socioForm.valid) {
-      this.sociosService.createSocio(this.socioForm.value).subscribe({
-        next: () => {
-          alert('Socio registrado correctamente');
-          this.router.navigate(['/socios']);
-        },
-        error: err => {
-          console.error('Error al registrar socio', err);
-          alert('Ocurrió un error al registrar el socio');
-        }
-      });
-    } else {
-      this.socioForm.markAllAsTouched();
+      const socio: Omit<Socio, 'id'> = this.socioForm.value;
+      await this.sociosService.createSocio(socio);
+      alert('Socio registrado con éxito');
+      this.router.navigate(['/socios']);
     }
   }
 

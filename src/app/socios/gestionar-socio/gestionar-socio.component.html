@@ -1,17 +1,37 @@
-<div *ngIf="socio">
-  <h2>{{ socio.nombre }}</h2>
-  <p>Cantidad de asociados: {{ socio.asociados }}</p>
-  <p>Contacto: {{ socio.contacto }}</p>
+<div class="gestionar-socio-container">
+  <h1>Gestionar Socio</h1>
 
-  <button (click)="eliminar(socio.id)">Eliminar</button>
-  <button (click)="activar(socio.id)">Activar</button>
-
-  <div *ngIf="socio.cursos?.length">
-    <h3>Cursos asociados:</h3>
-    <div *ngFor="let curso of socio.cursos">
-      <p>{{ curso.nombre }}</p>
-      <button>Eliminar</button>
-      <button>Ingresar</button>
+  <form
+    [formGroup]="socioForm"
+    (ngSubmit)="guardarCambios()"
+    class="socio-form"
+  >
+    <div class="form-group">
+      <label>Nombre:</label>
+      <input formControlName="nombre" />
     </div>
-  </div>
+
+    <div class="form-group">
+      <label>Cantidad de Asociados:</label>
+      <input type="number" formControlName="cantidadAsociados" />
+    </div>
+
+    <div class="form-group">
+      <label>Email:</label>
+      <input type="email" formControlName="email" />
+    </div>
+
+    <div class="form-group">
+      <label>Teléfono:</label>
+      <input formControlName="telefono" />
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn save">Guardar</button>
+      <button type="button" class="btn delete" (click)="eliminarSocio()">
+        Eliminar
+      </button>
+      <button type="button" class="btn back" (click)="volver()">Volver</button>
+    </div>
+  </form>
 </div>
