@@ -10,7 +10,7 @@ import { NgFor, AsyncPipe } from '@angular/common';
   templateUrl: './member-list.html',
   styleUrl: './member-list.css',
   standalone: true,
-  imports: [NgFor, AsyncPipe] 
+  imports: [AsyncPipe]
 })
 export class MemberList {
   userList$: Observable<User[]>;
@@ -32,8 +32,12 @@ export class MemberList {
     alert(`Editamos el usuario en la ubicación: ${index}`);
   }
 
-  onDeleteClick(index: number) {
-    alert(`Eliminamos el usuario en la ubicación: ${index}`);
+  onDeleteClick(usuario: User) {
+    if (usuario.id) {
+      this.firebaseService.deleteUser(usuario.id)
+        .then(() => console.log(`Usuario eliminado: ${usuario.fullName}`))
+        .catch(err => console.error('Error eliminando usuario:', err));
+    }
   }
 
   onGoLandingPage() {

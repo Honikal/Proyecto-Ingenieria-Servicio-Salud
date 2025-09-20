@@ -4,6 +4,7 @@ import { collection, collectionData, Firestore, addDoc, doc, query, where, getDo
 import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import * as bcrypt from 'bcryptjs';
+import { deleteDoc } from '@angular/fire/firestore';
 //import { v4 as uuidv4 } from 'uuid';
 //import * as nodemailer from 'nodemailer';
 
@@ -93,5 +94,10 @@ export class FirebaseService {
   getUsers(): Observable<User[]> {
     const userRef = collection(this.firestore, 'users');
     return collectionData(userRef, { idField: 'id' }) as Observable<User[]>;
+  }
+
+  async deleteUser(id: string) {
+    const userRef = doc(this.firestore, 'users', id);
+    return await deleteDoc(userRef);
   }
 }
