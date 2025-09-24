@@ -1,8 +1,7 @@
-<div class="register-section">
+<div class="register-section" *ngIf="isAdmin; else noPermisos">
   <h1>Registrar Socio</h1>
 
   <form [formGroup]="socioForm" (ngSubmit)="registrar()">
-
     <!-- Nombre -->
     <div class="info-section">
       <p>Nombre del socio*</p>
@@ -18,9 +17,16 @@
     <div class="info-section">
       <p>Cantidad de asociados*</p>
       <div class="input-field">
-        <input formControlName="cantidadAsociados" type="number" min="0" placeholder="Ej: 80" />
+        <input
+          formControlName="cantidadAsociados"
+          type="number"
+          min="1"
+          placeholder="Ej: 80"
+        />
       </div>
-      <small *ngIf="socioForm.get('cantidadAsociados')?.invalid && socioForm.get('cantidadAsociados')?.touched">
+      <small
+        *ngIf="socioForm.get('cantidadAsociados')?.invalid && socioForm.get('cantidadAsociados')?.touched"
+      >
         Ingresa un número válido
       </small>
     </div>
@@ -29,9 +35,15 @@
     <div class="info-section">
       <p>Correo electrónico*</p>
       <div class="input-field">
-        <input formControlName="email" type="email" placeholder="ejemplo@correo.com" />
+        <input
+          formControlName="email"
+          type="email"
+          placeholder="ejemplo@correo.com"
+        />
       </div>
-      <small *ngIf="socioForm.get('email')?.invalid && socioForm.get('email')?.touched">
+      <small
+        *ngIf="socioForm.get('email')?.invalid && socioForm.get('email')?.touched"
+      >
         Ingresa un correo válido
       </small>
     </div>
@@ -40,17 +52,42 @@
     <div class="info-section">
       <p>Teléfono de contacto*</p>
       <div class="input-field">
-        <input formControlName="telefono" type="text" placeholder="8888-8888" />
+        <input
+          formControlName="telefono"
+          type="text"
+          placeholder="8888-8888"
+        />
       </div>
-      <small *ngIf="socioForm.get('telefono')?.invalid && socioForm.get('telefono')?.touched">
+      <small
+        *ngIf="socioForm.get('telefono')?.invalid && socioForm.get('telefono')?.touched"
+      >
         Ingresa un número de teléfono válido
       </small>
     </div>
 
     <!-- Botones -->
     <div id="buttons-section">
-      <button type="submit" class="button register">Registrar</button>
-      <button type="button" class="button cancel" (click)="cancelar()">Cancelar</button>
+      <button
+        type="submit"
+        class="button register"
+        [disabled]="socioForm.invalid"
+      >
+        Registrar
+      </button>
+      <button type="button" class="button cancel" (click)="cancelar()">
+        Cancelar
+      </button>
     </div>
   </form>
 </div>
+
+<!-- Acceso restringido -->
+<ng-template #noPermisos>
+  <div class="register-section">
+    <h1>Acceso Restringido</h1>
+    <p>No tienes permisos para registrar socios.</p>
+    <div id="buttons-section">
+      <button class="button cancel" (click)="cancelar()">Volver</button>
+    </div>
+  </div>
+</ng-template>

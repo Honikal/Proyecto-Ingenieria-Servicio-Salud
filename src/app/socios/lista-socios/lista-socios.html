@@ -8,7 +8,10 @@
         placeholder="Buscar socio por nombre"
         class="search-bar"
       />
-      <button class="btn add" (click)="agregarSocio()">➕ Agregar Socio</button>
+      <!-- 🔹 Solo admins ven este botón -->
+      <button *ngIf="isAdmin" class="btn add" (click)="agregarSocio()">
+        ➕ Agregar Socio
+      </button>
     </div>
   </div>
 
@@ -21,7 +24,9 @@
     <div class="cards">
       <div class="card" *ngFor="let socio of socios">
         <div class="card-header">
-          <div class="placeholder">{{ socio.nombre[0] }}</div>
+          <div class="placeholder">
+            {{ socio.nombre.charAt(0).toUpperCase() }}
+          </div>
           <h2>{{ socio.nombre }}</h2>
         </div>
 
@@ -30,7 +35,9 @@
         <p><strong>Teléfono:</strong> {{ socio.telefono }}</p>
 
         <div class="card-actions">
-          <button class="btn view" (click)="verSocio(socio.id)">Ver socio</button>
+          <button class="btn view" (click)="verSocio(socio.id)">
+            Ver socio
+          </button>
         </div>
       </div>
     </div>
