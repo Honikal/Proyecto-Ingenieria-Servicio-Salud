@@ -1,14 +1,9 @@
-// firebase.ts
 import { Injectable } from '@angular/core';
 import { collection, collectionData, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
+import { Area } from '../../models/area.model';
 import * as bcrypt from 'bcryptjs';
-//import { v4 as uuidv4 } from 'uuid';
-//import * as nodemailer from 'nodemailer';
-
-
-//const verificationToken = uuidv4();
 
 @Injectable({
   providedIn: 'root'
@@ -16,38 +11,19 @@ import * as bcrypt from 'bcryptjs';
 export class FirebaseService {
   
   constructor(private firestore: Firestore){}
-/*
-  private async sendVerificationEmail(email: string, token: string) {
-    const transporter = nodemailer.createTransport({
-      service: 'ProveedorCorreo',
-      auth: {
-        user: 'Correo',
-        pass: 'Contraseña'
-      }
-    });
-    await transporter.sendMail({
-      from: 'Correo',
-      to: email,
-      subject: 'Verificación',
-      html: `<p>Haz clic aquí para verificar tu cuenta: <a href="https://tuapp.com/verify-email?token=${token}">Verificar correo</a></p>`
-    });
-  }
-*/
+
   async addUser(user: User){
     const hashedPassword = await bcrypt.hash(user.password, 10);
     const userRef = collection(this.firestore, 'users');
-    //const verificationToken = uuidv4();
 
     const newUser: User = {
       ...user,
       password: hashedPassword,
       isAdmin: false,
       createdAt: new Date(),
-      //verificationToken
     };
     await addDoc(userRef, newUser);
 
-    //await this.sendVerificationEmail(newUser.email, verificationToken);
   }
 
   async login(email: string, password: string){
@@ -70,28 +46,29 @@ export class FirebaseService {
   }
 
   async getUser(userID: string){
-    //Agarramos el path directo para extraer los datos del usuario
     const userRef = doc(this.firestore, 'users', userID);
     const snapshot = await getDoc(userRef);
 
-    //Checamos el caso que el usuario o el path directo al usuario no exista
     if (!snapshot.exists()){
       return null;
     }
 
-    //Retornamos el posible usuario
     return { id: snapshot.id, ...(snapshot.data() as User) };
   }
 
   async updateUser(userID: string, updatedData: Partial<User>){
-    //Agarramos el path directo para extraer los datos del usuario
     const userRef = doc(this.firestore, 'users', userID);
     await updateDoc(userRef, updatedData);
   }
 
-  // 🔹 Nuevo: obtener usuarios en tiempo real
   getUsers(): Observable<User[]> {
     const userRef = collection(this.firestore, 'users');
     return collectionData(userRef, { idField: 'id' }) as Observable<User[]>;
   }
+
+  getAreas(): Observable<Area[]> {
+    const areaRef = collection(this.firestore, 'areas');
+    return collectionData(areaRef, { idField: 'id' }) as Observable<Area[]>;
+  }
+
 }
