@@ -1,0 +1,56 @@
+<div class="register-section">
+  <h1>Registrar Socio</h1>
+
+  <form [formGroup]="socioForm" (ngSubmit)="registrar()">
+
+    <!-- Nombre -->
+    <div class="info-section">
+      <p>Nombre del socio*</p>
+      <div class="input-field">
+        <input formControlName="nombre" type="text" placeholder="Ej: Intel" />
+      </div>
+      <small *ngIf="socioForm.get('nombre')?.invalid && socioForm.get('nombre')?.touched">
+        El nombre es obligatorio
+      </small>
+    </div>
+
+    <!-- Cantidad de asociados -->
+    <div class="info-section">
+      <p>Cantidad de asociados*</p>
+      <div class="input-field">
+        <input formControlName="cantidadAsociados" type="number" min="0" placeholder="Ej: 80" />
+      </div>
+      <small *ngIf="socioForm.get('cantidadAsociados')?.invalid && socioForm.get('cantidadAsociados')?.touched">
+        Ingresa un número válido
+      </small>
+    </div>
+
+    <!-- Email -->
+    <div class="info-section">
+      <p>Correo electrónico*</p>
+      <div class="input-field">
+        <input formControlName="email" type="email" placeholder="ejemplo@correo.com" />
+      </div>
+      <small *ngIf="socioForm.get('email')?.invalid && socioForm.get('email')?.touched">
+        Ingresa un correo válido
+      </small>
+    </div>
+
+    <!-- Teléfono -->
+    <div class="info-section">
+      <p>Teléfono de contacto*</p>
+      <div class="input-field">
+        <input formControlName="telefono" type="text" placeholder="8888-8888" />
+      </div>
+      <small *ngIf="socioForm.get('telefono')?.invalid && socioForm.get('telefono')?.touched">
+        Ingresa un número de teléfono válido
+      </small>
+    </div>
+
+    <!-- Botones -->
+    <div id="buttons-section">
+      <button type="submit" class="button register">Registrar</button>
+      <button type="button" class="button cancel" (click)="cancelar()">Cancelar</button>
+    </div>
+  </form>
+</div>

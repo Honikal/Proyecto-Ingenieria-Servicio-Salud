@@ -45,7 +45,7 @@ export class ManageUsers implements OnInit {
         //Obtenemos al usuario desde Firestore con el ID
         this.user = await this.firebaseService.getUser(parsed.id);
         console.log(`Usuario completo desde Firestore: ${this.user?.fullName}`);
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); 
 
         if (this.user){
           //Actualizamos los datos del formulario
@@ -89,11 +89,15 @@ export class ManageUsers implements OnInit {
 
           //Actualizamos los datos de forma local
           this.user = { ...this.user, ...updatedData }
-          console.log(`Usuario actualizado: ${this.user}`)
-
+          const userData = {
+            id: parsed.id,
+            fullName: this.user?.fullName,
+            email: this.user?.email,
+            isAdmin: this.user?.isAdmin
+          };
+          localStorage.setItem("currentUser", JSON.stringify(userData));
           this.isEditing = false; //Quitamos el modo de edición
-
-          
+          this.cdr.detectChanges();
         }
       } else {
         alert("Por favor completa los cargos requeridos");
@@ -108,7 +112,7 @@ export class ManageUsers implements OnInit {
     alert(`Eliminamos el usuario en la ubicación: `);
   }
 
-  onGoLandingPage(){
+  onGoLandingPage() {
     this.router.navigate(['/']);
   }
 }

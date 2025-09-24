@@ -1,0 +1,43 @@
+<div class="lista-container">
+  <!-- Header con barra y botón -->
+  <div class="header">
+    <h1>Configuración Socios</h1>
+    <div class="actions">
+      <input
+        type="text"
+        placeholder="Buscar socio por nombre"
+        class="search-bar"
+      />
+      <button class="btn add" (click)="agregarSocio()">➕ Agregar Socio</button>
+    </div>
+  </div>
+
+  <!-- Lista de socios -->
+  <ng-container *ngIf="socios$ | async as socios">
+    <div *ngIf="socios.length === 0" class="no-socios">
+      <p>No hay socios registrados todavía.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card" *ngFor="let socio of socios">
+        <div class="card-header">
+          <div class="placeholder">{{ socio.nombre[0] }}</div>
+          <h2>{{ socio.nombre }}</h2>
+        </div>
+
+        <p><strong>Cantidad asociados:</strong> {{ socio.cantidadAsociados }}</p>
+        <p><strong>Email:</strong> {{ socio.email }}</p>
+        <p><strong>Teléfono:</strong> {{ socio.telefono }}</p>
+
+        <div class="card-actions">
+          <button class="btn view" (click)="verSocio(socio.id)">Ver socio</button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Botón volver -->
+  <div class="footer">
+    <button class="btn back" (click)="volver()">⬅ Volver</button>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+.lista-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #004d5c;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.search-bar {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  min-width: 220px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+
+.btn.add {
+  background: #009fb7;
+  color: #fff;
+}
+
+.btn.add:hover {
+  background: #007a8c;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #009fb7;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.card p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+}
+
+.card-actions {
+  margin-top: 15px;
+}
+
+.btn.view {
+  background: #0275d8;
+  color: #fff;
+}
+
+.btn.view:hover {
+  background: #025aa5;
+}
+
+.no-socios {
+  text-align: center;
+  font-size: 1rem;
+  color: #777;
+  margin-top: 30px;
+}
+
+.footer {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.btn.back {
+  background: #6c757d;
+  color: #fff;
+}
+
+.btn.back:hover {
+  background: #565e64;
+}
