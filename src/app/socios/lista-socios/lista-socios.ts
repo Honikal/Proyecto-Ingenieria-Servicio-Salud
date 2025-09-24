@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { SociosService, Socio } from '../socios.service';
+import { SociosService } from '../../services/socios.service';
+import { Socio } from '../../../models/socio.model'; 
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 
@@ -8,10 +9,10 @@ import { Observable } from 'rxjs';
   selector: 'app-lista-socios',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './lista-socios.component.html',
-  styleUrls: ['./lista-socios.component.css']
+  templateUrl: './lista-socios.html',
+  styleUrls: ['./lista-socios.css']
 })
-export class ListaSociosComponent implements OnInit {
+export class ListaSocios implements OnInit {
   socios$!: Observable<Socio[]>;
 
   constructor(private sociosService: SociosService, private router: Router) {}

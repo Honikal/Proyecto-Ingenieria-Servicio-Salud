@@ -1,17 +1,19 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { SociosService, Socio } from '../socios.service';
+import { SociosService } from '../../services/socios.service';
+import { Socio } from '../../../models/socio.model';             
+
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-registrar-socio',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './registrar-socio.component.html',
-  styleUrls: ['./registrar-socio.component.css']
+  templateUrl: './registrar-socio.html',
+  styleUrls: ['./registrar-socio.css']
 })
-export class RegistrarSocioComponent {
+export class RegistrarSocio {
   socioForm: FormGroup;
 
   constructor(

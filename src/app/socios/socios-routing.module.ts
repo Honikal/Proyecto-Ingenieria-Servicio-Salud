@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ListaSociosComponent } from './lista-socios/lista-socios.component';
-import { GestionarSocioComponent } from './gestionar-socio/gestionar-socio.component';
-import { RegistrarSocioComponent } from './registrar-socio/registrar-socio.component';
+import { ListaSocios } from './lista-socios/lista-socios';
+import { GestionarSocio } from './gestionar-socio/gestionar-socio';
+import { RegistrarSocio } from './registrar-socio/registrar-socio';
 
 const routes: Routes = [
-  { path: '', component: ListaSociosComponent },
-  { path: 'registrar', component: RegistrarSocioComponent },
-  { path: ':id', component: GestionarSocioComponent }
+  { path: '', component: ListaSocios },
+  { path: 'registrar', component: RegistrarSocio },
+  { path: ':id', component: GestionarSocio }
 ];
 
 @NgModule({

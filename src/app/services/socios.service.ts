@@ -1,15 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, collectionData, doc, getDoc, addDoc, updateDoc, deleteDoc, docData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-
-export interface Socio {
-  id?: string;
-  nombre: string;
-  cantidadAsociados: number;
-  email: string;
-  telefono: string;
-  cursos?: { nombre: string }[];
-}
+import { Socio } from '../../models/socio.model';
 
 @Injectable({
   providedIn: 'root'

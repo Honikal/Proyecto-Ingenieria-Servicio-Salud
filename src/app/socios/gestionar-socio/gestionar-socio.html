@@ -8,29 +8,34 @@
   >
     <div class="form-group">
       <label>Nombre:</label>
-      <input formControlName="nombre" />
+      <input formControlName="nombre" [readonly]="!isAdmin" />
     </div>
 
     <div class="form-group">
       <label>Cantidad de Asociados:</label>
-      <input type="number" formControlName="cantidadAsociados" />
+      <input type="number" formControlName="cantidadAsociados" [readonly]="!isAdmin" />
     </div>
 
     <div class="form-group">
       <label>Email:</label>
-      <input type="email" formControlName="email" />
+      <input type="email" formControlName="email" [readonly]="!isAdmin" />
     </div>
 
     <div class="form-group">
       <label>Teléfono:</label>
-      <input formControlName="telefono" />
+      <input formControlName="telefono" [readonly]="!isAdmin" />
     </div>
 
     <div class="actions">
-      <button type="submit" class="btn save">Guardar</button>
-      <button type="button" class="btn delete" (click)="eliminarSocio()">
+      <!-- Botón Guardar solo si es Admin -->
+      <button *ngIf="isAdmin" type="submit" class="btn save">Guardar</button>
+
+      <!-- Botón Eliminar solo si es Admin -->
+      <button *ngIf="isAdmin" type="button" class="btn delete" (click)="eliminarSocio()">
         Eliminar
       </button>
+
+      <!-- Botón Volver siempre visible -->
       <button type="button" class="btn back" (click)="volver()">Volver</button>
     </div>
   </form>

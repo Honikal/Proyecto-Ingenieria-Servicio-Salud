@@ -5,9 +5,9 @@ import { Register } from './register/register';
 import { ManageUsers } from './manage-users/manage-users';
 import { MemberList } from './member-list/member-list';
 import { AdminPage } from './admin-page/admin-page';
-import { ListaSociosComponent } from './socios/lista-socios/lista-socios.component';
-import { RegistrarSocioComponent } from './socios/registrar-socio/registrar-socio.component';
-import { GestionarSocioComponent } from './socios/gestionar-socio/gestionar-socio.component';
+import { ListaSocios } from './socios/lista-socios/lista-socios';
+import { RegistrarSocio } from './socios/registrar-socio/registrar-socio';
+import { GestionarSocio } from './socios/gestionar-socio/gestionar-socio';
 import { Component } from '@angular/core';
 
 // dropdown sin implementar
@@ -27,9 +27,9 @@ export const routes: Routes = [
   { path: 'members', component: MemberList },
   { path: 'admin', component: AdminPage },
   { path: 'users', component: ManageUsers },
-  { path: 'socios', component: ListaSociosComponent },
-  { path: 'socios/registrar', component: RegistrarSocioComponent },
-  { path: 'socios/:id', component: GestionarSocioComponent },
+  { path: 'socios', component: ListaSocios },
+  { path: 'socios/registrar', component: RegistrarSocio },
+  { path: 'socios/:id', component: GestionarSocio},
 
   // sin implementar
   { path: 'cursos', component: PlaceholderComponent },

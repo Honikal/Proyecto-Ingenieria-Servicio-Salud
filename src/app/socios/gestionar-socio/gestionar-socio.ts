@@ -1,21 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SociosService, Socio } from '../socios.service';
+import { SociosService } from '../../services/socios.service';
+import { Socio } from '../../../models/socio.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-gestionar-socio',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './gestionar-socio.component.html',
-  styleUrls: ['./gestionar-socio.component.css']
+  templateUrl: './gestionar-socio.html',
+  styleUrls: ['./gestionar-socio.css']
 })
-export class GestionarSocioComponent implements OnInit {
+
+export class GestionarSocio implements OnInit {
   socioForm!: FormGroup;
   socioId!: string;
   cargando = true;
+  isAdmin = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -26,15 +28,22 @@ export class GestionarSocioComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Inicializar form vacío
+    // Revisa si el usuario logueado es admin
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      this.isAdmin = !!user.isAdmin;
+    }
+
+    // Form
     this.socioForm = this.fb.group({
-      nombre: [''],
-      cantidadAsociados: [0],
-      email: [''],
-      telefono: ['']
+      nombre: [{ value: '', disabled: !this.isAdmin }],
+      cantidadAsociados: [{ value: 0, disabled: !this.isAdmin }],
+      email: [{ value: '', disabled: !this.isAdmin }],
+      telefono: [{ value: '', disabled: !this.isAdmin }]
     });
 
-    // Suscripción para escuchar cambios en el id
+    // Cambios en la ruta
     this.route.paramMap.subscribe(async params => {
       const id = params.get('id');
       if (id) {
@@ -60,6 +69,7 @@ export class GestionarSocioComponent implements OnInit {
   }
 
   async guardarCambios() {
+    if (!this.isAdmin) return; 
     if (this.socioForm.valid) {
       await this.sociosService.updateSocio(this.socioId, this.socioForm.value);
       alert('Cambios guardados correctamente');
@@ -67,9 +77,12 @@ export class GestionarSocioComponent implements OnInit {
   }
 
   async eliminarSocio() {
-    await this.sociosService.deleteSocio(this.socioId);
-    alert('Socio eliminado');
-    this.router.navigate(['/socios']);
+    if (!this.isAdmin) return; 
+    if (confirm('¿Seguro que deseas eliminar este socio?')) {
+      await this.sociosService.deleteSocio(this.socioId);
+      alert('Socio eliminado');
+      this.router.navigate(['/socios']);
+    }
   }
 
   volver() {
