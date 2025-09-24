@@ -3,13 +3,15 @@ import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { FirebaseService } from '../services/firebase';  // Importa el servicio
-import { User } from '../../models/user.model';
+import { FirebaseService } from '../services/firebase'; 
+import { Observable } from 'rxjs';
+import { Area } from '../../models/area.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [NgIconComponent, ReactiveFormsModule],
+  imports: [CommonModule, NgIconComponent, ReactiveFormsModule],
   templateUrl: './register.html',
   styleUrl: './register.css',
   providers: [provideIcons({ ionEye, ionEyeOff })]
@@ -17,6 +19,7 @@ import { User } from '../../models/user.model';
 export class Register {
   showPassword = false;
   registerForm: FormGroup;
+  areas$: Observable<Area[]> = new Observable<Area[]>();
 
   constructor(
     private router: Router,
@@ -32,6 +35,10 @@ export class Register {
     });
   }
 
+  ngOnInit() {
+    this.areas$ = this.firebaseService.getAreas();
+  }
+
   onPasswordToggle() {
     this.showPassword = !this.showPassword;
   }
@@ -41,8 +48,6 @@ export class Register {
       try {
         await this.firebaseService.addUser(this.registerForm.value);
         console.log("Usuario agregado correctamente:");
-
-        alert("Registro exitoso");
         this.router.navigate(['/login']);
       } catch (error) {
         console.error("Error al registrar:", error);

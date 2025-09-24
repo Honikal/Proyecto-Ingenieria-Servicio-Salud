@@ -30,21 +30,22 @@
   font-weight: 500;
 }
 
-.input-field {
-  display: flex;
-  align-items: center;
-  border: 1px solid #aaa;
-  border-radius: 3px;
-  overflow: hidden;
-  background: #fff;
-}
-
-.input-field input {
+.input-field input,
+.input-field select {
   flex: 1;
   border: none;
   padding: 12px;
   font-size: 1rem;
   outline: none;
+}
+
+.input-field {
+  display: flex;
+  align-items: center;
+  border: 1px solid #aaa;
+  border-radius: 0;
+  overflow: hidden;
+  background: #fff;
 }
 
 .toggle-password {
@@ -99,4 +100,40 @@ small {
 
 .register-section a:hover {
   color: #004D5C;
+}
+
+.input-field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px 18px;
+  padding-right: 36px;
+}
+
+.input-field input:focus,
+.input-field select:focus {
+  border-color: #007bff;
+}
+
+.popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
