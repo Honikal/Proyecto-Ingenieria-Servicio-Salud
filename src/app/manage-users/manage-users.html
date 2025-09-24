@@ -48,23 +48,6 @@
             </table>
         </form>
         
-        <div id="code-section">
-            <p>Ingresar Código</p>
-            <div id="input-field">
-                <input
-                [type]="showPassword ? 'text' : 'password'"
-                placeholder="Ingrese su contraseña"
-                formControlName="password"
-                />
-                <button class="toggle-password" type="button" (click)="onPasswordToggle()">
-                @if (showPassword){
-                    <ng-icon name="ionEye"></ng-icon>
-                } @else {
-                    <ng-icon name="ionEyeOff"></ng-icon>
-                }
-                </button>
-            </div>
-        </div>
         <div id="button-section">
             <div class="button" (click)="onEditClick()">
                 {{ isEditing ? 'Guardar Cambios' : 'Editar' }}

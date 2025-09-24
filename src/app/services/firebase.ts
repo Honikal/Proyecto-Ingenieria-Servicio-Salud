@@ -20,6 +20,7 @@ export class FirebaseService {
       ...user,
       password: hashedPassword,
       isAdmin: false,
+      isAuto: false,
       createdAt: new Date(),
     };
     await addDoc(userRef, newUser);

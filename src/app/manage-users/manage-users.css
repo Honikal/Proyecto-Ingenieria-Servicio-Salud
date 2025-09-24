@@ -50,31 +50,6 @@ table{
     outline: none;
 }
 
-/*Sección de código*/
-#code-section{
-    margin-bottom: 20px;
-    padding: 5px 30px;
-    width: 90%;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: 1.2rem;
-}
-#input-field{
-    display: flex;
-    align-items: center;
-    border: 1px solid #aaa;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    border-radius: 3px;
-    overflow: hidden;
-    background: #fff;
-}
-#input-field input{
-    flex: 1;
-    border: none;
-    padding: 12px;
-    font-size: 1.2rem;
-    outline: none;
-}
-
 /*Sección botones*/
 #button-section{
     display: flex;
@@ -102,4 +77,14 @@ table{
   color: #444;
   display: flex;
   align-items: center;
+}
+
+.user-info select {
+  flex: 1;
+  width: 100%;
+  border: none;
+  padding: 12px;
+  font-size: 1.1rem;
+  outline: none;
+  background-color: #fff;
 }
