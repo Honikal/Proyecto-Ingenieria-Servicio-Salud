@@ -5,5 +5,6 @@ export interface User {
   phone: string;
   password: string; 
   isAdmin: boolean;  
+  isAuto: boolean;
   createdAt: Date;     
 }
