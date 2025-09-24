@@ -18,7 +18,7 @@
         <input type="email" placeholder="Ingrese su correo electrónico" formControlName="email"/>
       </div>
       @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
-        <small>El nombre es requerido</small>
+        <small>Debe ingresar un correo válido</small>
       }
     </div>
 
@@ -42,9 +42,15 @@
     <div class="info-section">
       <p>Área*</p>
       <div class="input-field">
-        <input type="text" placeholder="Ingrese su área de trabajo" formControlName="area"/>
+        <select formControlName="area">
+          <option value="">Seleccione un área</option>
+          <option *ngFor="let area of areas$ | async" [value]="area.id">
+            {{ area.nombre }}
+          </option>
+        </select>
       </div>
     </div>
+
 
     <div class="info-section">
       <p>Número de teléfono*</p>

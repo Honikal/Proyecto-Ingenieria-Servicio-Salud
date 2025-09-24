@@ -6,6 +6,4 @@ export interface User {
   password: string; 
   isAdmin: boolean;  
   createdAt: Date;     
-  //emailVerified?: boolean;
-  //verificationToken?: string;
 }
