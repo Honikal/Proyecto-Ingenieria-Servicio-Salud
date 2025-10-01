@@ -3,11 +3,13 @@ import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';  
 import { ionChevronDown } from '@ng-icons/ionicons';  
 import { User } from '../../models/user.model'; 
+import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [NgIconComponent],
+  imports: [NgIconComponent,CommonModule],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.css',
   providers: [provideIcons( { ionChevronDown })]
@@ -66,6 +68,4 @@ export class LandingPage {
     const parts = this.user.fullName.split(' ');
     return parts.slice(0, 2).map((p: string) => p[0].toUpperCase()).join('');
   }
-
-
 }
