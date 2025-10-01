@@ -57,20 +57,24 @@
 
 .card {
   background: #fff;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  text-align: center; /* centra contenido */
 }
 
 .card:hover {
   transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .card-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 15px;
+  gap: 12px;
 }
 
 .placeholder {
@@ -88,11 +92,12 @@
 }
 
 .card h2 {
+  text-align: center;    /* centra el nombre */
+  font-size: 1.4rem;     /* nombre más grande */
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 500;
+  color: #004d5c;
+  word-wrap: break-word; /* evita que nombres largos salgan de la card */
 }
-
 .card p {
   margin: 6px 0;
   font-size: 0.95rem;
@@ -131,3 +136,22 @@
 .btn.back:hover {
   background: #565e64;
 }
+
+.card-header {
+  display: flex;
+  flex-direction: column; /* pone imagen arriba, nombre abajo */
+  align-items: center;
+  gap: 10px; /* espacio entre imagen y nombre */
+  margin-bottom: 15px;
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px; /* esquinas más suaves */
+  object-fit: contain;   /* ajusta la imagen sin recortarla */
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 10px;         /* espacio interno si la imagen es pequeña */
+}
+

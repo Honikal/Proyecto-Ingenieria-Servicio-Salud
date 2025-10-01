@@ -1,8 +1,11 @@
 export interface Socio {
-  id?: string;
+  id: string;
   nombre: string;
   cantidadAsociados: number;
   email: string;
+  password: string;
   telefono: string;
-  cursos?: { nombre: string }[];
+  logo:string;
+  isActive:boolean;
+  //cursos?: { nombre: string }[];
 }

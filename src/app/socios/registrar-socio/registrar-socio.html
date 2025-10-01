@@ -14,17 +14,6 @@
       }
     </div>
 
-    <!-- Cantidad de asociados -->
-    <div class="info-section">
-      <p>Cantidad de asociados*</p>
-      <div class="input-field">
-        <input formControlName="cantidadAsociados" type="number" min="0" placeholder="Ej: 80" />
-      </div>
-      @if (socioForm.get('cantidadAsociados')?.touched && socioForm.get('cantidadAsociados')?.invalid) {
-        <small>Ingresa un número válido</small>
-      }
-    </div>
-
     <!-- Email -->
     <div class="info-section">
       <p>Correo electrónico*</p>
@@ -44,6 +33,35 @@
       </div>
       @if (socioForm.get('telefono')?.touched && socioForm.get('telefono')?.invalid) {
         <small>Ingresa un número de teléfono válido</small>
+      }
+    </div>
+
+    <!-- Contraseña -->
+    <div class="info-section">
+      <p>Contraseña*</p>
+      <div class="input-field">
+        <input [type]="showPassword ? 'text' : 'password'" placeholder="Ingrese su contraseña" formControlName="password" />
+        <button class="toggle-password" type="button" (click)="onPasswordToggle()">
+          @if (showPassword){
+            <ng-icon name="ionEye"></ng-icon>
+          } @else {
+            <ng-icon name="ionEyeOff"></ng-icon>
+          }
+        </button>
+      </div>
+      @if (socioForm.get('password')?.touched && socioForm.get('password')?.invalid) {
+        <small>La contraseña debe tener al menos 6 caracteres</small>
+      }
+    </div>
+
+    <!-- URL del logo -->
+    <div class="info-section">
+      <p>URL del logo*</p>
+      <div class="input-field">
+        <input formControlName="logo" type="text" placeholder="https://ejemplo.com/logo.png" />
+      </div>
+      @if (socioForm.get('logo')?.touched && socioForm.get('logo')?.invalid) {
+        <small>El URL del logo es obligatorio</small>
       }
     </div>
 

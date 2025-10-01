@@ -81,8 +81,54 @@
   background: #565e64;
 }
 
-.loading {
-  text-align: center;
-  font-size: 1.1rem;
-  color: #555;
+.socio-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: border 0.2s;
+  background: #fff;
+  color: #333;
+}
+
+
+.socio-input:focus {
+  border-color: #009fb7;
+  outline: none;
+}
+
+.toggle-password {
+  border: none;
+  background: transparent;
+  padding: 0 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #444;
+}
+
+.input-field {
+  display: flex;
+  align-items: center;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  transition: border 0.2s;
+  position: relative;
+}
+
+.input-field:focus-within {
+  border-color: #0096a5; /* resalta al hacer focus */
+}
+
+.input-field input {
+  flex: 1;
+  border: none;
+  padding: 12px;
+  font-size: 1rem;
+  outline: none;
 }

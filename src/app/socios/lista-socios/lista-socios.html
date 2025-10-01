@@ -1,13 +1,20 @@
 <div class="lista-container">
   <div class="header">
-    <h1>Configuración Socios</h1>
+    <div class="title-back">
+      <h1>Listado de Socios</h1>
+      <button class="btn back" (click)="volver()">⬅ Volver</button>
+    </div>
+
     <div class="actions">
       <input
         type="text"
         placeholder="Buscar socio por nombre"
         class="search-bar"
+        (input)="actualizarFiltro($event.target.value)"
       />
-      @if (isAdmin) {<button class="btn add" (click)="agregarSocio()">➕ Agregar Socio</button>}
+      @if (isAdmin) {
+        <button class="btn add" (click)="agregarSocio()">➕ Agregar Socio</button>
+      }
     </div>
   </div>
 
@@ -18,27 +25,21 @@
       </div>
     } @else {
       <div class="cards">
-        @for (socio of socios; track socio.id) {
-          <div class="card">
-            <div class="card-header">
-              <div class="placeholder">{{ socio.nombre[0] }}</div>
-              <h2>{{ socio.nombre }}</h2>
-            </div>
-
-            <p><strong>Cantidad asociados:</strong> {{ socio.cantidadAsociados }}</p>
-            <p><strong>Email:</strong> {{ socio.email }}</p>
-            <p><strong>Teléfono:</strong> {{ socio.telefono }}</p>
-
-            <div class="card-actions">
-              <button class="btn view" (click)="verSocio(socio.id)">Ver socio</button>
-            </div>
+  @for (socio of socios; track socio.id) {
+    <div class="card" (click)="verSocio(socio.id)">
+          <div class="card-header">
+            <img 
+              class="logo" 
+              [src]="socio.logo" 
+              alt="{{ socio.nombre }}" 
+              (error)="$event.target.src='assets/default-logo.png'" 
+            />
+            <h2>{{ socio.nombre }}</h2>
           </div>
-        }
-      </div>
+        </div>
+      }
+    </div>
+
     }
   }
-
-  <div class="footer">
-    <button class="btn back" (click)="volver()">⬅ Volver</button>
-  </div>
 </div>
