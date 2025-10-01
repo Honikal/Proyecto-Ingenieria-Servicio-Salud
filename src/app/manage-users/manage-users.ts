@@ -113,8 +113,12 @@ export class ManageUsers implements OnInit {
     alert(`Eliminamos el usuario en la ubicación: `);
   }
 
-  onGoLandingPage() {
-    this.router.navigate(['/']);
+  volver() {
+    if (this.user?.isAdmin) {
+      this.router.navigate(['/admin']);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   getAreaName(areaId: string | undefined): string {

@@ -1,15 +1,18 @@
-<!-- Top Bar -->
+<!-- Cuadro superior -->
 <div id="top-bar">
-  <!-- Back Button -->
-  <button id="back-btn" (click)="goToLanding()">⬅ Volver</button>
-
   <div id="title">ADMINISTRADOR</div>
-  <div id="top-actions">
-    <div id="notification">
-      <span class="bell">🔔</span>
-      <span class="badge">1</span>
+
+  <div class="button-area">
+    <div class="user-avatar" 
+         [ngClass]="{'open': userMenuOpen}" 
+         (click)="toggleMenu(false)" 
+         tabindex="0">
+      {{ getInitials() }}
     </div>
-    <div id="user-initials">AE</div>
+    <ul *ngIf="userMenuOpen" class="user-menu" tabindex="0">
+      <li (click)="onManageClick()">Gestionar Usuario</li>
+      <li (click)="onLogoutClick()">Cerrar Sesión</li>
+    </ul>
   </div>
 </div>
 
@@ -22,7 +25,6 @@
       <li (click)="goToSocios()" style="cursor: pointer;">Socios</li>
       <li (click)="goToUsers()" style="cursor: pointer;">Usuarios</li>
       <li>Cursos</li>
-      <li>Cerrar Sesion</li>
     </ul>
   </div>
 

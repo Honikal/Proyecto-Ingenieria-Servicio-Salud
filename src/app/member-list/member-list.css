@@ -1,89 +1,267 @@
-/* Header Bar */
-#header-bar {
-  background-color: #0d6efd;
-  color: white;
+body, #layout, #dashboard, #sidebar {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/*Diseño superior*/
+#top-bar {
+  background-color: #009FB7;     
+  color: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
+  padding: 1rem 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 #title {
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 
-#header-actions {
+/* Avatar y menú usuario */
+.button-area {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 15px;
 }
 
-#search-courses {
-  padding: 5px 8px;
+.user-avatar {
+    background: #004D5C;    
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;       
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: width 0.3s ease, border-radius 0.3s ease, background 0.3s ease;
 }
 
-#user-initials {
-  width: 35px;
-  height: 35px;
-  background-color: #444;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
+.user-avatar:hover {
+    background: #006A80;       /* cambio de hover */
 }
 
-/* Members Section */
+.user-avatar.open {
+    border-radius: 8px;
+    width: 200px;
+    height: 45px;
+}
+
+.user-menu {
+    list-style: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: #004D5C;
+    border-radius: 0 0 8px 8px;
+    padding: 0.5rem 0;
+    min-width: 200px;  
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 20;
+    text-align: center;
+}
+
+.user-menu li {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    color: #ffffff;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.user-menu li:hover {
+    background: #006A80;
+}
+
+/* ====== MEMBERS SECTION ====== */
 #members-section {
   margin: 20px auto;
-  width: 70%;
+  width: 90%;
+  max-width: 1000px;
 }
 
 #members-section h2 {
-  margin-bottom: 10px;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: #004D5C;
 }
 
-#search-members {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 15px;
-}
-
-/* Members Table */
+/* ====== TABLE ====== */
 #members-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 #members-table th,
 #members-table td {
   border: 1px solid #ddd;
-  padding: 10px;
+  padding: 12px 15px;
   text-align: center;
+  font-size: 0.95rem;
 }
 
 #members-table th {
-  background-color: #e9ecef;
+  background-color: #009FB7;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+#members-table tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+#members-table tr:hover {
+  background-color: #e0f7fa;
+}
+
+/* ====== BOTONES ====== */
+.edit-btn,
+.delete-btn {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0 2px;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background-color: #006A80;
+  color: #ffffff;
+}
+
+.edit-btn:hover {
+  background-color: #004D5C;
 }
 
 .delete-btn {
   background-color: #ff4d4f;
-  border: none;
-  color: white;
-  padding: 5px 10px;
-  cursor: pointer;
+  color: #ffffff;
 }
 
 .delete-btn:hover {
   background-color: #d9363e;
+  transform: translateY(-2px);
 }
 
-/* Pagination */
+/* ====== PAGINATION ====== */
 #pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+#pagination span {
+  font-weight: 600;
+}
+
+#pagination button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: #009FB7;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+#pagination button:hover {
+  background-color: #006A80;
+}
+
+/* ====== CARDS MOBILE ====== */
+@media (max-width: 768px) {
+  #members-table, #members-table thead, #members-table tbody, #members-table th, #members-table td, #members-table tr {
+    display: block;
+  }
+
+  #members-table tr {
+    margin-bottom: 1rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 10px;
+  }
+
+  #members-table td {
+    text-align: left;
+    padding: 8px 12px;
+    border: none;
+    position: relative;
+  }
+
+  #members-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #004D5C;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  #members-table th {
+    display: none;
+  }
+
+  .edit-btn, .delete-btn {
+    margin-top: 5px;
+  }
+}
+
+.authorized-btn {
+  background-color: #009FB7;
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.authorized-btn:hover {
+  background-color: #006A80;
+}
+
+.unauthorized-btn {
+  background-color: #FF4D4F;
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.unauthorized-btn:hover {
+  background-color: #D9363E;
+}
+
+#back-btn {
+  margin-bottom: 16px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #6c757d;
+  color: #fff;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+#back-btn:hover {
+  background: #565e64;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
