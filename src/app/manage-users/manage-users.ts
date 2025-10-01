@@ -1,14 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgIconComponent, provideIcons } from '@ng-icons/core'; 
+import { provideIcons } from '@ng-icons/core'; 
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons'; 
 import { User } from '../../models/user.model'; 
 import { FirebaseService } from '../services/firebase';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { Area } from '../../models/area.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-manage-users',
-  imports: [NgIconComponent, ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './manage-users.html',
   styleUrl: './manage-users.css',
   providers: [provideIcons( { ionEye, ionEyeOff })]
@@ -18,6 +20,7 @@ export class ManageUsers implements OnInit {
   showPassword = false;
   user: User | null = null;
   userForm!: FormGroup;
+  areas: Area[] = [];
 
   //Creamos nuestro constructor y de acá extraemos al usuario
   constructor(
@@ -37,18 +40,18 @@ export class ManageUsers implements OnInit {
       area: ['']
     })
 
+    this.firebaseService.getAreas().subscribe(areas => {
+      this.areas = areas;
+    });
+
     const storedUser = localStorage.getItem('currentUser');
-    //Checamos la existencia de un usuario guardado
     if (storedUser){
       const parsed = JSON.parse(storedUser);
       if (parsed.id){
-        //Obtenemos al usuario desde Firestore con el ID
         this.user = await this.firebaseService.getUser(parsed.id);
-        console.log(`Usuario completo desde Firestore: ${this.user?.fullName}`);
         this.cdr.detectChanges(); 
 
         if (this.user){
-          //Actualizamos los datos del formulario
           this.userForm.patchValue({
             fullName: this.user.fullName,
             email: this.user.email,
@@ -72,10 +75,8 @@ export class ManageUsers implements OnInit {
   }
 
   async onEditClick(){
-    //Checamos que el usuario exista
     if (!this.user) return;
 
-    //Checamos que se encuentre en el lado de editar (o sea que va a guardar los datos)
     if (this.isEditing){
       if (this.userForm.valid){
         const storedUser = localStorage.getItem('currentUser');
@@ -114,5 +115,11 @@ export class ManageUsers implements OnInit {
 
   onGoLandingPage() {
     this.router.navigate(['/']);
+  }
+
+  getAreaName(areaId: string | undefined): string {
+    if (!areaId || !this.areas) return 'Sin área';
+    const area = this.areas.find(a => a.id === areaId);
+    return area ? area.nombre : 'Sin área';
   }
 }

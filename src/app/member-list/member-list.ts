@@ -3,14 +3,14 @@ import { Router } from '@angular/router';
 import { FirebaseService } from '../services/firebase';
 import { User } from '../../models/user.model';
 import { Observable } from 'rxjs';
-import { NgFor, AsyncPipe } from '@angular/common'; 
+import { AsyncPipe } from '@angular/common'; 
 
 @Component({
   selector: 'app-member-list',
   templateUrl: './member-list.html',
   styleUrl: './member-list.css',
   standalone: true,
-  imports: [NgFor, AsyncPipe] 
+  imports: [AsyncPipe] 
 })
 export class MemberList {
   userList$: Observable<User[]>;

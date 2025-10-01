@@ -39,9 +39,13 @@
                     <td>Área:</td>
                     <td class="user-info">
                         @if (!isEditing) {
-                            <span>{{user?.area}}</span>
+                        <span>{{ getAreaName(user?.area) }}</span>
                         } @else {
-                            <input type="text" formControlName="area"/>
+                        <select formControlName="area">
+                            <option *ngFor="let area of areas" [value]="area.id">
+                            {{ area.nombre }}
+                            </option>
+                        </select>
                         }
                     </td>
                 </tr>
