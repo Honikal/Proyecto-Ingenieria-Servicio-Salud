@@ -15,6 +15,10 @@ export class AdminPage {
     this.router.navigate(['/members']);
   }
 
+  goToSocios(): void {
+    this.router.navigate(['/socios']);
+  }
+
   goToCourses(): void {
     this.router.navigate(['/courses']);
   }

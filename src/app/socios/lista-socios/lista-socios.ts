@@ -14,11 +14,18 @@ import { Observable } from 'rxjs';
 })
 export class ListaSocios implements OnInit {
   socios$!: Observable<Socio[]>;
+  isAdmin = false;
 
   constructor(private sociosService: SociosService, private router: Router) {}
 
   ngOnInit(): void {
     this.socios$ = this.sociosService.getSocios();
+
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      const user = JSON.parse(currentUser);
+      this.isAdmin = user.isAdmin === true;
+    }
   }
 
   verSocio(id?: string) {

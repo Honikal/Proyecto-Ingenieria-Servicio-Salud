@@ -1,5 +1,5 @@
 <div class="gestionar-socio-container">
-  <h1>Gestionar Socio</h1>
+  <h1>Información Socio</h1>
 
   <form
     [formGroup]="socioForm"
@@ -27,13 +27,15 @@
     </div>
 
     <div class="actions">
-      <!-- Botón Guardar solo si es Admin -->
-      <button *ngIf="isAdmin" type="submit" class="btn save">Guardar</button>
+      @if (isAdmin) {
+        <!-- Botón Guardar solo si es Admin -->
+        <button type="submit" class="btn save">Guardar</button>
 
-      <!-- Botón Eliminar solo si es Admin -->
-      <button *ngIf="isAdmin" type="button" class="btn delete" (click)="eliminarSocio()">
-        Eliminar
-      </button>
+        <!-- Botón Eliminar solo si es Admin -->
+        <button type="button" class="btn delete" (click)="eliminarSocio()">
+          Eliminar
+        </button>
+      }
 
       <!-- Botón Volver siempre visible -->
       <button type="button" class="btn back" (click)="volver()">Volver</button>
