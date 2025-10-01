@@ -1,8 +1,7 @@
-<div class="register-section">
+<div class="register-section" *ngIf="isAdmin; else noPermisos">
   <h1>Registrar Socio</h1>
 
   <form [formGroup]="socioForm" (ngSubmit)="registrar()">
-
     <!-- Nombre -->
     <div class="info-section">
       <p>Nombre del socio*</p>
@@ -14,11 +13,17 @@
       }
     </div>
 
+    </div>
+
     <!-- Email -->
     <div class="info-section">
       <p>Correo electrónico*</p>
       <div class="input-field">
-        <input formControlName="email" type="email" placeholder="ejemplo@correo.com" />
+        <input
+          formControlName="email"
+          type="email"
+          placeholder="ejemplo@correo.com"
+        />
       </div>
       @if (socioForm.get('email')?.touched && socioForm.get('email')?.invalid) {
         <small>Ingresa un correo válido</small>
@@ -29,13 +34,18 @@
     <div class="info-section">
       <p>Teléfono de contacto*</p>
       <div class="input-field">
-        <input formControlName="telefono" type="text" placeholder="8888-8888" />
+        <input
+          formControlName="telefono"
+          type="text"
+          placeholder="8888-8888"
+        />
       </div>
+
       @if (socioForm.get('telefono')?.touched && socioForm.get('telefono')?.invalid) {
         <small>Ingresa un número de teléfono válido</small>
       }
     </div>
-
+  
     <!-- Contraseña -->
     <div class="info-section">
       <p>Contraseña*</p>
@@ -53,7 +63,7 @@
         <small>La contraseña debe tener al menos 6 caracteres</small>
       }
     </div>
-
+  
     <!-- URL del logo -->
     <div class="info-section">
       <p>URL del logo*</p>
@@ -63,12 +73,33 @@
       @if (socioForm.get('logo')?.touched && socioForm.get('logo')?.invalid) {
         <small>El URL del logo es obligatorio</small>
       }
+
     </div>
 
     <!-- Botones -->
     <div id="buttons-section">
-      <button type="submit" class="button register">Registrar</button>
-      <button type="button" class="button cancel" (click)="cancelar()">Cancelar</button>
+      <button
+        type="submit"
+        class="button register"
+        [disabled]="socioForm.invalid"
+      >
+        Registrar
+      </button>
+      <button type="button" class="button cancel" (click)="cancelar()">
+        Cancelar
+      </button>
     </div>
   </form>
 </div>
+
+
+<!-- Acceso restringido -->
+<ng-template #noPermisos>
+  <div class="register-section">
+    <h1>Acceso Restringido</h1>
+    <p>No tienes permisos para registrar socios.</p>
+    <div id="buttons-section">
+      <button class="button cancel" (click)="cancelar()">Volver</button>
+    </div>
+  </div>
+</ng-template>
