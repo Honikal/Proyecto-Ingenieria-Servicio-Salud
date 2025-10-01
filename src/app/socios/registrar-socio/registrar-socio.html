@@ -8,27 +8,11 @@
       <div class="input-field">
         <input formControlName="nombre" type="text" placeholder="Ej: Intel" />
       </div>
-      <small *ngIf="socioForm.get('nombre')?.invalid && socioForm.get('nombre')?.touched">
-        El nombre es obligatorio
-      </small>
+      @if (socioForm.get('nombre')?.touched && socioForm.get('nombre')?.invalid) {
+        <small>El nombre es obligatorio</small>
+      }
     </div>
 
-    <!-- Cantidad de asociados -->
-    <div class="info-section">
-      <p>Cantidad de asociados*</p>
-      <div class="input-field">
-        <input
-          formControlName="cantidadAsociados"
-          type="number"
-          min="1"
-          placeholder="Ej: 80"
-        />
-      </div>
-      <small
-        *ngIf="socioForm.get('cantidadAsociados')?.invalid && socioForm.get('cantidadAsociados')?.touched"
-      >
-        Ingresa un número válido
-      </small>
     </div>
 
     <!-- Email -->
@@ -41,11 +25,9 @@
           placeholder="ejemplo@correo.com"
         />
       </div>
-      <small
-        *ngIf="socioForm.get('email')?.invalid && socioForm.get('email')?.touched"
-      >
-        Ingresa un correo válido
-      </small>
+      @if (socioForm.get('email')?.touched && socioForm.get('email')?.invalid) {
+        <small>Ingresa un correo válido</small>
+      }
     </div>
 
     <!-- Teléfono -->
@@ -58,11 +40,40 @@
           placeholder="8888-8888"
         />
       </div>
-      <small
-        *ngIf="socioForm.get('telefono')?.invalid && socioForm.get('telefono')?.touched"
-      >
-        Ingresa un número de teléfono válido
-      </small>
+
+      @if (socioForm.get('telefono')?.touched && socioForm.get('telefono')?.invalid) {
+        <small>Ingresa un número de teléfono válido</small>
+      }
+    </div>
+  
+    <!-- Contraseña -->
+    <div class="info-section">
+      <p>Contraseña*</p>
+      <div class="input-field">
+        <input [type]="showPassword ? 'text' : 'password'" placeholder="Ingrese su contraseña" formControlName="password" />
+        <button class="toggle-password" type="button" (click)="onPasswordToggle()">
+          @if (showPassword){
+            <ng-icon name="ionEye"></ng-icon>
+          } @else {
+            <ng-icon name="ionEyeOff"></ng-icon>
+          }
+        </button>
+      </div>
+      @if (socioForm.get('password')?.touched && socioForm.get('password')?.invalid) {
+        <small>La contraseña debe tener al menos 6 caracteres</small>
+      }
+    </div>
+  
+    <!-- URL del logo -->
+    <div class="info-section">
+      <p>URL del logo*</p>
+      <div class="input-field">
+        <input formControlName="logo" type="text" placeholder="https://ejemplo.com/logo.png" />
+      </div>
+      @if (socioForm.get('logo')?.touched && socioForm.get('logo')?.invalid) {
+        <small>El URL del logo es obligatorio</small>
+      }
+
     </div>
 
     <!-- Botones -->
@@ -80,6 +91,7 @@
     </div>
   </form>
 </div>
+
 
 <!-- Acceso restringido -->
 <ng-template #noPermisos>

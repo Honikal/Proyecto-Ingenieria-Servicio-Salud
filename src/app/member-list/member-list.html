@@ -1,40 +1,60 @@
-<!-- Top Bar -->
-<div id="header-bar">
-  <!-- Back Button -->
-  <button id="back-btn" (click)="goBackToAdmin()">⬅ Volver</button>
+<!-- Cuadro superior -->
+<div id="top-bar">
+  <div id="title">Configuración Usuarios</div>
 
-  <div id="title">Configuración Miembros</div>
-  <div id="header-actions">
-    <input type="text" placeholder="Buscar cursos" id="search-courses"/>
-    <div id="user-initials">AE</div>
+  <div class="button-area">
+    <div class="user-avatar" 
+         [ngClass]="{'open': userMenuOpen}" 
+         (click)="toggleMenu(false)" 
+         tabindex="0">
+      {{ getInitials() }}
+    </div>
+    <ul *ngIf="userMenuOpen" class="user-menu" tabindex="0">
+      <li (click)="onManageClick()">Gestionar Usuario</li>
+      <li (click)="onLogoutClick()">Cerrar Sesión</li>
+    </ul>
   </div>
 </div>
 
 <!-- Members Section -->
 <div id="members-section">
-  <h2>Lista de Miembros</h2>
+    <h2>Lista de Miembros</h2>
+    <button id="back-btn" (click)="goBackToAdmin()">⬅ Volver</button>
 
-  <!-- Search by Name -->
-  <input type="text" placeholder="Buscar socio por nombre" id="search-members"/>
-
-  <!-- Members Table -->
+<!-- Members Table -->
   <table id="members-table">
     <thead>
       <tr>
         <th>Nombre</th>
         <th>Contacto</th>
         <th>Email</th>
-        <th></th>
+        <th>Fecha de Creación</th> 
+        <th>Autorización</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       @for (usuario of userList$ | async; track $index) {
         <tr>
-          <td>{{ usuario.fullName }}</td>
-          <td>{{ usuario.phone }}</td>
-          <td>{{ usuario.email }}</td>
-          <td>
-            <button class="delete-btn" (click)="onDeleteClick($index)">
+          <td data-label="Nombre">{{ usuario.fullName }}</td>
+          <td data-label="Contacto">{{ usuario.phone }}</td>
+          <td data-label="Email">{{ usuario.email }}</td>
+          <td data-label="Fecha de Creación">
+            {{ formatDate(usuario.createdAt) }}
+          </td>
+          <td data-label="Autorización">
+            <button 
+              [ngClass]="usuario.isAuto ? 'authorized-btn' : 'unauthorized-btn'"
+              (click)="toggleAuthorization(usuario)"
+              [disabled]="usuario.isAdmin">
+              {{ usuario.isAuto ? 'Autorizado' : 'No Autorizado' }}
+            </button>
+          </td>
+          <td data-label="Acciones">
+            <button 
+              class="delete-btn" 
+              (click)="onDeleteClick(usuario)"
+              [disabled]="usuario.isAdmin">
               Eliminar
             </button>
           </td>
