@@ -4,42 +4,39 @@
       <h1>Listado de Socios</h1>
       <button class="btn back" (click)="volver()">⬅ Volver</button>
     </div>
-
     <div class="actions">
-      <input
-        type="text"
-        placeholder="Buscar socio por nombre"
-        class="search-bar"
-        (input)="actualizarFiltro($event.target.value)"
-      />
-      @if (isAdmin) {
-        <button class="btn add" (click)="agregarSocio()">➕ Agregar Socio</button>
-      }
-    </div>
-  </div>
-
-  @if (socios$ | async; as socios) {
-    @if (socios.length === 0) {
-      <div class="no-socios">
-        <p>No hay socios registrados todavía.</p>
+        <input
+          type="text"
+          placeholder="Buscar socio por nombre"
+          class="search-bar"
+          (input)="actualizarFiltro($event.target.value)"
+        />
+        @if (isAdmin) {
+          <button class="btn add" (click)="agregarSocio()">➕ Agregar Socio</button>
+        }
       </div>
-    } @else {
-      <div class="cards">
-  @for (socio of socios; track socio.id) {
-    <div class="card" (click)="verSocio(socio.id)">
-          <div class="card-header">
-            <img 
-              class="logo" 
-              [src]="socio.logo" 
-              alt="{{ socio.nombre }}" 
-              (error)="$event.target.src='assets/default-logo.png'" 
-            />
-            <h2>{{ socio.nombre }}</h2>
-          </div>
+    </div>
+    @if (socios$ | async; as socios) {
+      @if (socios.length === 0) {
+        <div class="no-socios">
+          <p>No hay socios registrados todavía.</p>
+        </div>
+      } @else {
+        <div class="cards">
+          @for (socio of socios; track socio.id) {
+            <div class="card" (click)="verSocio(socio.id)">
+                  <div class="card-header">
+                    <img 
+                      class="logo" 
+                      [src]="socio.logo" 
+                      alt="{{ socio.nombre }}" 
+                      (error)="$event.target.src='assets/default-logo.png'" 
+                    />
+                    <h2>{{ socio.nombre }}</h2>
+                  </div>  
+            </div>
+          }
         </div>
       }
-    </div>
-
     }
-  }
 </div>

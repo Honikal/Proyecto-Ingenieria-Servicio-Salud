@@ -49,15 +49,6 @@ export class ListaSocios implements OnInit {
 
   actualizarFiltro(texto: string) {
     this.filtroNombre$.next(texto);
-    // Verificar si el usuario es admin
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      this.isAdmin = !!user.isAdmin;
-    }
-
-    // Cargar socios como observable
-    this.socios$ = this.sociosService.getSocios();
   }
 
   verSocio(id?: string) {
@@ -66,7 +57,6 @@ export class ListaSocios implements OnInit {
   }
 
   agregarSocio() {
-    if (!this.isAdmin) return; // Seguridad extra
     this.router.navigate(['/socios/registrar']);
   }
   

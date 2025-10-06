@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SociosService } from '../../services/socios.service';
@@ -18,6 +18,8 @@ import { ionEye, ionEyeOff } from '@ng-icons/ionicons';
 export class RegistrarSocio {
   socioForm: FormGroup;
   showPassword = false;
+  ionEye = ionEye;
+  ionEyeOff = ionEyeOff;
 
   constructor(
     private fb: FormBuilder,
@@ -30,7 +32,7 @@ export class RegistrarSocio {
       telefono: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
       logo: ['', Validators.required],
-      cantidadAsociados: [0] 
+      cantidadAsociados: [0] // siempre inicia en 0 y no editable
     });
   }
 
@@ -39,7 +41,6 @@ export class RegistrarSocio {
   }
 
   async registrar() {
-    if (!this.isAdmin) return; // seguridad extra
     if (this.socioForm.valid) {
       const socio: Omit<Socio, 'id'> = {
         ...this.socioForm.value,
