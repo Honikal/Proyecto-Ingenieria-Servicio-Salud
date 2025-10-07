@@ -3,6 +3,7 @@ import { collection, collectionData, Firestore, addDoc, doc, query, where, getDo
 import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import { Area } from '../../models/area.model';
+import { Curso } from '../../models/curso.model';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable({
@@ -75,5 +76,11 @@ export class FirebaseService {
   async deleteUser(userID: string) {
     const userRef = doc(this.firestore, 'users', userID);
     await deleteDoc(userRef);
+  }
+
+  getCursosActivos(): Observable<Curso[]> {
+    const cursosRef = collection(this.firestore, 'cursos');
+    const q = query(cursosRef, where('isActive', '==', true));
+    return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
   }
 }

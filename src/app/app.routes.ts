@@ -9,7 +9,7 @@ import { ListaSocios } from './socios/lista-socios/lista-socios';
 import { RegistrarSocio } from './socios/registrar-socio/registrar-socio';
 import { GestionarSocio } from './socios/gestionar-socio/gestionar-socio';
 import { Component } from '@angular/core';
-import { Cursos } from './cursos/cursos';
+import { ListaCursos } from './cursos/lista-cursos/lista-cursos';
 
 // dropdown sin implementar
 @Component({
@@ -33,6 +33,6 @@ export const routes: Routes = [
   { path: 'socios/:id', component: GestionarSocio},
 
   // sin implementar
-  { path: 'cursos', component: Cursos },
+  { path: 'cursos', component: ListaCursos },
   { path: 'podcasts', component: PlaceholderComponent }
 ];
