@@ -3,9 +3,11 @@ export interface Curso {
   area: string;
   cantPersonas: number;
   codigo: string;
-  descripcion: string;
+  cupos:number;
+  descrip: string;
   idUser: string;
   imagen: string;
+  infoGeneral: string;
   isActive: boolean;
   nombre: string;
   tema: string;

@@ -45,7 +45,7 @@ export class ListaCursos implements OnInit {
   }
 
   verCurso(id: string) {
-    this.router.navigate(['/cursos', id]);
+    this.router.navigate(['/ver-curso', id]);
   }
 
   volver() {

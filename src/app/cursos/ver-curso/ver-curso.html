@@ -1,0 +1,46 @@
+<div class="curso-container" *ngIf="!cargando && curso; else loading">
+  <div class="curso-header">
+    <div class="curso-info">
+      <h1>{{ curso.nombre }}</h1>
+      <p class="descripcion">{{ curso.descrip}}</p>
+
+      <div class="botones">
+        <button class="btn volver" (click)="volver()">⬅ Volver a los cursos</button>
+        <button class="btn blanco" (click)="descargarCertificado()">Descargar Certificado</button>
+        <button class="btn azul" (click)="ingresarLeccion()">Ingresar a lección</button>
+      </div>
+    </div>
+
+    <div class="curso-imagen">
+      <img [src]="curso.imagen" alt="{{ curso.nombre }}" (error)="$event.target.src='assets/default-logo.png'"/>
+      <table>
+        <tr>
+          <td><strong>Personas Inscritas</strong></td>
+          <td>{{ curso.cantPersonas }}</td>
+        </tr>
+        <tr>
+          <td><strong>Cupos totales</strong></td>
+          <td>{{ curso.cupos }}</td>
+        </tr>
+        <tr>
+          <td><strong>Cupos disponibles</strong></td>
+          <td>{{ cuposRestantes }}</td>
+        </tr>     
+      </table>
+    </div>
+  </div>
+
+  <div class="curso-footer">
+    <h2>Información General del Curso</h2>
+    <h3>Tema:</h3>
+    <p>{{ curso.tema }}</p>
+    <h3>Duración estimada:</h3>
+    <p>{{ curso.time }}</p>
+    <h3>Descripción del Curso:</h3>
+    <p>{{ curso.infoGeneral }}</p>
+  </div>
+</div>
+
+<ng-template #loading>
+  <p class="loading">Cargando información del curso...</p>
+</ng-template>
