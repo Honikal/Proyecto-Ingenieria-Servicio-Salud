@@ -110,7 +110,6 @@ export class FirebaseService {
       idUser,
       idCurso,
       finalizado: false,
-      pantallasCompletadas: [],       
       fechaMatricula: new Date(),     
       fechaFinalizacion: null,       
       calificacion: -1               
