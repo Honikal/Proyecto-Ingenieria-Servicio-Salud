@@ -4,6 +4,6 @@ export interface Matricula {
   finalizado: boolean;
   pantallasCompletadas: string[];
   fechaMatricula: Date;
-  fechaFinalizacion?: Date;
-  calificacion?: number; 
+  fechaFinalizacion: Date;
+  calificacion: number; 
 }

@@ -105,15 +105,19 @@ export class FirebaseService {
 
   async matricularUsuario(idUser: string, idCurso: string) {
     const matriculasRef = collection(this.firestore, 'matricula');
+
     const nuevaMatricula = {
       idUser,
       idCurso,
-      finalizado: false
+      finalizado: false,
+      pantallasCompletadas: [],       
+      fechaMatricula: new Date(),     
+      fechaFinalizacion: null,       
+      calificacion: -1               
     };
 
     await addDoc(matriculasRef, nuevaMatricula);
 
-    // Actualiza el contador de personas inscritas en el curso
     const cursoRef = doc(this.firestore, 'cursos', idCurso);
     const cursoSnap = await getDoc(cursoRef);
     if (cursoSnap.exists()) {
