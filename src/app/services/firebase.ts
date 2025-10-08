@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import { Area } from '../../models/area.model';
 import { Curso } from '../../models/curso.model';
+import { Pantalla } from '../../models/pantalla.model';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable({
@@ -124,4 +125,8 @@ export class FirebaseService {
     return true;
   }
 
+  getPantallasCurso(idCurso: string): Observable<Pantalla[]> {
+    const pantallasRef = collection(this.firestore, `cursos/${idCurso}/pantalla`);
+    return collectionData(pantallasRef, { idField: 'id' }) as Observable<Pantalla[]>;
+  }
 }

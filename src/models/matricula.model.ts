@@ -1,5 +1,9 @@
 export interface Matricula {
-  finalizado: boolean;
   idCurso: string;
   idUser: string;
+  finalizado: boolean;
+  pantallasCompletadas: string[];
+  fechaMatricula: Date;
+  fechaFinalizacion?: Date;
+  calificacion?: number; 
 }

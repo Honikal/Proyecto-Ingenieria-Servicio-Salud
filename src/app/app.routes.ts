@@ -11,6 +11,7 @@ import { GestionarSocio } from './socios/gestionar-socio/gestionar-socio';
 import { VerCurso } from './cursos/ver-curso/ver-curso';
 import { Component } from '@angular/core';
 import { ListaCursos } from './cursos/lista-cursos/lista-cursos';
+import { RealizarCurso } from './cursos/realizar-curso/realizar-curso';
 
 // dropdown sin implementar
 @Component({
@@ -33,6 +34,7 @@ export const routes: Routes = [
   { path: 'socios/registrar', component: RegistrarSocio },
   { path: 'socios/:id', component: GestionarSocio},
   { path: 'ver-curso/:id',component: VerCurso},
+  { path: 'realizar-curso/:id',component: RealizarCurso},
 
   // sin implementar
   { path: 'cursos', component: ListaCursos },

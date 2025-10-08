@@ -89,14 +89,7 @@ export class VerCurso implements OnInit {
       const matricula = await this.firebaseService.getMatriculaPorUsuarioYCurso(user.id, this.curso.id);
 
       if (matricula) {
-        await Swal.fire({
-          icon: 'info',
-          title: 'Ya está matriculado',
-          html: `
-            <p>Estado del curso: <b>${matricula.finalizado ? 'Finalizado' : 'En progreso'}</b></p>`,
-          confirmButtonText: 'Aceptar',
-          confirmButtonColor: '#009fb7'
-        });
+        this.router.navigate(['/realizar-curso', this.curso.id]);
         return;
       }
 
