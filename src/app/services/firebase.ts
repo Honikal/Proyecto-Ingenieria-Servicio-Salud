@@ -3,6 +3,7 @@ import { collection, collectionData, Firestore, addDoc, doc, query, where, getDo
 import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import { Area } from '../../models/area.model';
+import { Curso } from '../../models/curso.model';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable({
@@ -76,4 +77,51 @@ export class FirebaseService {
     const userRef = doc(this.firestore, 'users', userID);
     await deleteDoc(userRef);
   }
+
+  getCursosActivos(): Observable<Curso[]> {
+    const cursosRef = collection(this.firestore, 'cursos');
+    const q = query(cursosRef, where('isActive', '==', true));
+    return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
+  }
+
+  async getMatriculaPorUsuarioYCurso(idUser: string, idCurso: string) {
+    const matriculasRef = collection(this.firestore, 'matricula');
+    const q = query(
+      matriculasRef,
+      where('idUser', '==', idUser),
+      where('idCurso', '==', idCurso)
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return null; // no está matriculado
+    }
+
+    const docMatricula = snapshot.docs[0];
+    return { id: docMatricula.id, ...(docMatricula.data() as any) };
+  }
+
+  async matricularUsuario(idUser: string, idCurso: string) {
+    const matriculasRef = collection(this.firestore, 'matricula');
+    const nuevaMatricula = {
+      idUser,
+      idCurso,
+      finalizado: false
+    };
+
+    await addDoc(matriculasRef, nuevaMatricula);
+
+    // Actualiza el contador de personas inscritas en el curso
+    const cursoRef = doc(this.firestore, 'cursos', idCurso);
+    const cursoSnap = await getDoc(cursoRef);
+    if (cursoSnap.exists()) {
+      const cursoData = cursoSnap.data() as any;
+      const nuevoConteo = (cursoData.cantPersonas || 0) + 1;
+      await updateDoc(cursoRef, { cantPersonas: nuevoConteo });
+    }
+
+    return true;
+  }
+
 }

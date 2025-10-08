@@ -8,8 +8,9 @@ import { AdminPage } from './admin-page/admin-page';
 import { ListaSocios } from './socios/lista-socios/lista-socios';
 import { RegistrarSocio } from './socios/registrar-socio/registrar-socio';
 import { GestionarSocio } from './socios/gestionar-socio/gestionar-socio';
+import { VerCurso } from './cursos/ver-curso/ver-curso';
 import { Component } from '@angular/core';
-import { Cursos } from './cursos/cursos';
+import { ListaCursos } from './cursos/lista-cursos/lista-cursos';
 
 // dropdown sin implementar
 @Component({
@@ -31,8 +32,9 @@ export const routes: Routes = [
   { path: 'socios', component: ListaSocios },
   { path: 'socios/registrar', component: RegistrarSocio },
   { path: 'socios/:id', component: GestionarSocio},
+  { path: 'ver-curso/:id',component: VerCurso},
 
   // sin implementar
-  { path: 'cursos', component: Cursos },
+  { path: 'cursos', component: ListaCursos },
   { path: 'podcasts', component: PlaceholderComponent }
 ];

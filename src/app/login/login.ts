@@ -61,7 +61,6 @@ async onLoginClick() {
     if (user.isAdmin) {
       this.router.navigate(['/admin']);
     } else {
-      alert("Bienvenido " + user.fullName);
       this.router.navigate(['/'])
     }
 

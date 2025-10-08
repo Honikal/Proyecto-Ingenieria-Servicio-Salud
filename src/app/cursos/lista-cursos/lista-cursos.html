@@ -1,0 +1,42 @@
+<div class="lista-container">
+  <div class="header">
+    <div class="title-back">
+      <h1>Cursos Disponibles</h1>
+      <button class="btn back" (click)="volver()">⬅ Volver</button>
+    </div>
+    <div class="actions">
+      <input
+        type="text"
+        placeholder="Buscar curso por nombre"
+        class="search-bar"
+        (input)="actualizarFiltro($event.target.value)"
+      />
+    </div>
+  </div>
+
+  @if (cursos$ | async; as cursos) {
+    @if (cursos.length === 0) {
+      <div class="no-socios">
+        <p>No hay cursos disponibles en este momento.</p>
+      </div>
+    } @else {
+      <div class="cards">
+        @for (curso of cursos; track curso.id) {
+          <div class="card" (click)="verCurso(curso.id)">
+            <div class="card-header">
+              <img
+                class="logo"
+                [src]="curso.imagen"
+                alt="{{ curso.nombre }}"
+                (error)="$event.target.src='assets/default-logo.png'"
+              />
+              <h2>{{ curso.nombre }}</h2>
+              <p><strong>Área:</strong> {{ curso.area }}</p>
+              <p><strong>Tema:</strong> {{ curso.tema }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
