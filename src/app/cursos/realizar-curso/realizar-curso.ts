@@ -20,6 +20,7 @@ export class RealizarCurso implements OnInit {
   posiciones: number[] = [];
   pantallaSeleccionada?: Pantalla;
   cargando: boolean = true;
+  progreso: number = 0; 
 
   constructor(
     private route: ActivatedRoute,
@@ -42,26 +43,23 @@ export class RealizarCurso implements OnInit {
               next: (pantallas) => {
                 this.pantallas = pantallas.sort((a, b) => a.pos - b.pos || a.ubi - b.ubi);
 
-                // 🔹 Agrupar por pos
                 this.gruposPantallas = this.pantallas.reduce((acc, p) => {
                   if (!acc[p.pos]) acc[p.pos] = [];
                   acc[p.pos].push(p);
                   return acc;
                 }, {} as { [pos: number]: Pantalla[] });
 
-                // 🔹 Ordenar cada grupo por ubi
                 for (const pos in this.gruposPantallas) {
                   this.gruposPantallas[pos].sort((a, b) => a.ubi - b.ubi);
                 }
 
-                // 🔹 Lista de posiciones únicas (ordenadas)
                 this.posiciones = Object.keys(this.gruposPantallas)
                   .map(Number)
                   .sort((a, b) => a - b);
 
-                // 🔹 Mostrar la primera pantalla
                 const primeraPos = this.posiciones[0];
                 this.pantallaSeleccionada = this.gruposPantallas[primeraPos][0];
+                this.actualizarProgreso();
 
                 this.cargando = false;
                 this.cdRef.detectChanges();
@@ -90,10 +88,10 @@ export class RealizarCurso implements OnInit {
     const grupo = this.gruposPantallas[pos];
     if (grupo && grupo.length > 0) {
       this.pantallaSeleccionada = grupo[0];
+      this.actualizarProgreso();
     }
   }
 
-  /** 🔹 Determinar texto del botón Continuar */
   get textoContinuar(): string {
     if (!this.pantallaSeleccionada) return '';
     const { pos, ubi } = this.pantallaSeleccionada;
@@ -105,55 +103,57 @@ export class RealizarCurso implements OnInit {
 
     if (haySiguienteEnGrupo) return 'Continuar >';
     if (haySiguienteGrupo) return 'Ir a siguiente sección >';
-    return 'Finalizar curso 🎉';
+    return 'Finalizar curso';
   }
 
-  /** 🔹 Botón Continuar */
   continuar() {
     if (!this.pantallaSeleccionada) return;
 
     const { pos, ubi } = this.pantallaSeleccionada;
     const grupo = this.gruposPantallas[pos];
 
-    // Buscar siguiente en el mismo grupo
     const siguiente = grupo.find(p => p.ubi === ubi + 1);
     if (siguiente) {
       this.pantallaSeleccionada = siguiente;
-      return;
-    }
-
-    // Si no hay más en este grupo → siguiente grupo
-    const indicePosActual = this.posiciones.indexOf(pos);
-    const siguientePos = this.posiciones[indicePosActual + 1];
-
-    if (siguientePos !== undefined) {
-      this.pantallaSeleccionada = this.gruposPantallas[siguientePos][0];
     } else {
-      alert('🎉 ¡Curso completado!');
+      const indicePosActual = this.posiciones.indexOf(pos);
+      const siguientePos = this.posiciones[indicePosActual + 1];
+      if (siguientePos !== undefined) {
+        this.pantallaSeleccionada = this.gruposPantallas[siguientePos][0];
+      } else {
+        alert('¡Curso completado!');
+      }
     }
+    this.actualizarProgreso();
   }
 
-  /** 🔹 Botón Volver (pantalla anterior) */
   retroceder() {
     if (!this.pantallaSeleccionada) return;
 
     const { pos, ubi } = this.pantallaSeleccionada;
     const grupo = this.gruposPantallas[pos];
 
-    // Buscar anterior en el mismo grupo
     const anterior = grupo.find(p => p.ubi === ubi - 1);
     if (anterior) {
       this.pantallaSeleccionada = anterior;
+    } else {
+      const indicePosActual = this.posiciones.indexOf(pos);
+      const posAnterior = this.posiciones[indicePosActual - 1];
+      if (posAnterior !== undefined) {
+        const grupoAnterior = this.gruposPantallas[posAnterior];
+        this.pantallaSeleccionada = grupoAnterior[grupoAnterior.length - 1];
+      }
+    }
+    this.actualizarProgreso();
+  }
+
+  actualizarProgreso() {
+    if (!this.pantallaSeleccionada || this.pantallas.length === 0) {
+      this.progreso = 0;
       return;
     }
-
-    // Si no hay anterior en este grupo → grupo anterior
-    const indicePosActual = this.posiciones.indexOf(pos);
-    const posAnterior = this.posiciones[indicePosActual - 1];
-    if (posAnterior !== undefined) {
-      const grupoAnterior = this.gruposPantallas[posAnterior];
-      this.pantallaSeleccionada = grupoAnterior[grupoAnterior.length - 1];
-    }
+    const indiceActual = this.pantallas.findIndex(p => p.id === this.pantallaSeleccionada?.id);
+    this.progreso = Math.round(((indiceActual + 1) / this.pantallas.length) * 100);
   }
 
   get htmlPantalla(): SafeHtml {

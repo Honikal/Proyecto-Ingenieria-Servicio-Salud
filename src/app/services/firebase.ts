@@ -129,4 +129,5 @@ export class FirebaseService {
     const pantallasRef = collection(this.firestore, `cursos/${idCurso}/pantalla`);
     return collectionData(pantallasRef, { idField: 'id' }) as Observable<Pantalla[]>;
   }
+  
 }

@@ -5,8 +5,10 @@
     <button class="btn back" (click)="volver()">⬅ Volver</button>
     <h2>{{ curso.nombre }}</h2>
     <div class="progreso">
-      <span>Progreso: 0%</span>
-      <div class="barra"></div>
+      <span>Progreso: {{ progreso }}%</span>
+      <div class="barra">
+        <div class="barra-progreso" [style.width.%]="progreso"></div>
+      </div>
     </div>
   </div>
 
