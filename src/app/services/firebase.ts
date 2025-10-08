@@ -83,4 +83,45 @@ export class FirebaseService {
     const q = query(cursosRef, where('isActive', '==', true));
     return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
   }
+
+  async getMatriculaPorUsuarioYCurso(idUser: string, idCurso: string) {
+    const matriculasRef = collection(this.firestore, 'matricula');
+    const q = query(
+      matriculasRef,
+      where('idUser', '==', idUser),
+      where('idCurso', '==', idCurso)
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return null; // no está matriculado
+    }
+
+    const docMatricula = snapshot.docs[0];
+    return { id: docMatricula.id, ...(docMatricula.data() as any) };
+  }
+
+  async matricularUsuario(idUser: string, idCurso: string) {
+    const matriculasRef = collection(this.firestore, 'matricula');
+    const nuevaMatricula = {
+      idUser,
+      idCurso,
+      finalizado: false
+    };
+
+    await addDoc(matriculasRef, nuevaMatricula);
+
+    // Actualiza el contador de personas inscritas en el curso
+    const cursoRef = doc(this.firestore, 'cursos', idCurso);
+    const cursoSnap = await getDoc(cursoRef);
+    if (cursoSnap.exists()) {
+      const cursoData = cursoSnap.data() as any;
+      const nuevoConteo = (cursoData.cantPersonas || 0) + 1;
+      await updateDoc(cursoRef, { cantPersonas: nuevoConteo });
+    }
+
+    return true;
+  }
+
 }
