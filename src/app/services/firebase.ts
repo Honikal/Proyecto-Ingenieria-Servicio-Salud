@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { collection, collectionData, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc, deleteDoc} from '@angular/fire/firestore';
+import { collection, collectionData, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc, deleteDoc, docData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import { Area } from '../../models/area.model';
 import { Curso } from '../../models/curso.model';
+import { Pantalla } from '../../models/pantalla.model';
+import { Plantilla } from '../../models/plantilla.model';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable({
@@ -104,15 +106,18 @@ export class FirebaseService {
 
   async matricularUsuario(idUser: string, idCurso: string) {
     const matriculasRef = collection(this.firestore, 'matricula');
+
     const nuevaMatricula = {
       idUser,
       idCurso,
-      finalizado: false
+      finalizado: false,
+      fechaMatricula: new Date(),     
+      fechaFinalizacion: null,       
+      calificacion: -1               
     };
 
     await addDoc(matriculasRef, nuevaMatricula);
 
-    // Actualiza el contador de personas inscritas en el curso
     const cursoRef = doc(this.firestore, 'cursos', idCurso);
     const cursoSnap = await getDoc(cursoRef);
     if (cursoSnap.exists()) {
@@ -124,4 +129,23 @@ export class FirebaseService {
     return true;
   }
 
+  getPantallasCurso(idCurso: string): Observable<Pantalla[]> {
+    const pantallasRef = collection(this.firestore, `cursos/${idCurso}/pantalla`);
+    return collectionData(pantallasRef, { idField: 'id' }) as Observable<Pantalla[]>;
+  }
+
+  getPlantillas(): Observable<Plantilla[]> {
+    const plantillasRef = collection(this.firestore, 'plantillas');
+    return collectionData(plantillasRef, { idField: 'id' }) as Observable<Plantilla[]>;
+  }
+  
+  async isUserAuto(userId: string): Promise<boolean> {
+    const user = await this.getUser(userId);
+    return user?.isAuto === true;
+  }
+
+  getUserRealtime(userId: string): Observable<User | null> {
+    const userRef = doc(this.firestore, 'users', userId);
+    return docData(userRef, { idField: 'id' }) as Observable<User | null>;
+  }
 }

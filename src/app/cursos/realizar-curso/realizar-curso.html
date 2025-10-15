@@ -1,1 +1,41 @@
-<p>realizar-curso works!</p>
+<div *ngIf="!cargando && curso" class="contenedor-curso">
+  
+  <!-- Encabezado -->
+  <div class="header">
+    <button class="btn back" (click)="volver()">⬅ Volver</button>
+    <h2>{{ curso.nombre }}</h2>
+    <div class="progreso">
+      <span>Progreso: {{ progreso }}%</span>
+      <div class="barra">
+        <div class="barra-progreso" [style.width.%]="progreso"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="contenido">
+    <!-- Panel lateral -->
+    <div class="sidebar">
+      <img [src]="curso.imagen" alt="Imagen del curso" class="imagen-curso">
+      
+      <div *ngFor="let pos of posiciones"
+           class="pantalla-item"
+           [class.activa]="pantallaSeleccionada?.pos === pos"
+           (click)="seleccionarPosicion(pos)">
+        Sección {{ pos }}
+      </div>
+    </div>
+
+    <!-- Panel principal -->
+    <div class="pantalla-info">
+      <div class="contenido-info" *ngIf="pantallaSeleccionada">
+        <h3>{{ pantallaSeleccionada.nombre }}</h3>
+        <div [innerHTML]="htmlPantalla"></div>
+      </div>
+
+      <div class="botones-navegacion">
+        <button class="volver-btn" (click)="retroceder()">< Volver</button>
+        <button class="continuar-btn" (click)="continuar()">{{ textoContinuar }}</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,162 @@
+<div class="crear-curso-container">
+  <div class="header-step" *ngIf="paso === 1 || paso === 2">
+    <h1 *ngIf="paso === 1">Crear nuevo curso</h1>
+    <h2 *ngIf="paso === 2">Selecciona una plantilla</h2>
+
+    <div class="acciones">
+      <button class="btn back" (click)="paso === 1 ? volver() : paso = 1">Volver</button>
+      <button class="btn add" 
+          [disabled]="(paso === 1 ? cursoForm.invalid : !plantillaSeleccionada)" 
+          (click)="continuar()">Continuar</button>
+    </div>
+  </div>
+
+<!-- Paso 1 -->
+  <div *ngIf="paso === 1" class="paso">
+    <form [formGroup]="cursoForm" class="curso-form">
+
+      <div class="form-grid">
+
+        <!-- Columna izquierda -->
+        <div class="form-col">
+          <div class="input-group">
+            <label>Nombre del curso:</label>
+            <input type="text" placeholder="Ingrese el nombre del curso" formControlName="nombre"/>
+            <small *ngIf="cursoForm.get('nombre')?.touched && cursoForm.get('nombre')?.invalid">
+              Nombre requerido
+            </small>
+          </div>
+
+          <div class="input-group">
+            <label>Tema:</label>
+            <input type="text" placeholder="Ingrese el tema del curso" formControlName="tema"/>
+            <small *ngIf="cursoForm.get('tema')?.touched && cursoForm.get('tema')?.invalid">
+              Tema requerido
+            </small>
+          </div>
+
+          <div class="input-group">
+            <label>Área:</label>
+            <select formControlName="area">
+              <option value="">Seleccione un área</option>
+              <option *ngFor="let area of areas$ | async" [value]="area.nombre">{{ area.nombre }}</option>
+            </select>
+            <small *ngIf="cursoForm.get('area')?.touched && cursoForm.get('area')?.invalid">
+              Área requerida
+            </small>
+          </div>
+
+          <div class="input-group">
+            <label>Código del curso:</label>
+            <input type="text" placeholder="Código único del curso" formControlName="codigo"/>
+            <small *ngIf="cursoForm.get('codigo')?.touched && cursoForm.get('codigo')?.invalid">
+              Código requerido
+            </small>
+          </div>
+
+          <div class="input-group">
+            <label>Cupos:</label>
+            <input type="number" min="1" formControlName="cupos"/>
+            <small *ngIf="cursoForm.get('cupos')?.touched && cursoForm.get('cupos')?.invalid">
+              Debe ser mayor a 0
+            </small>
+          </div>
+
+          <div class="input-group">
+            <label>Duración:</label>
+            <input type="text" placeholder="Ej. 3h, 2 semanas" formControlName="duracion"/>
+          </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="form-col">
+          <div class="input-group">
+            <label>Descripción:</label>
+            <textarea placeholder="Breve descripción del curso" formControlName="descripcion"></textarea>
+          </div>
+
+          <div class="input-group">
+            <label>Info general:</label>
+            <textarea placeholder="Información adicional" formControlName="infoGeneral"></textarea>
+          </div>
+
+          <div class="input-group">
+            <label>Imagen URL:</label>
+            <input type="text" placeholder="URL de la imagen" formControlName="imagen"/>
+          </div>
+
+          <div class="input-group">
+            <label>Estado del Curso:</label>
+            <select formControlName="isActive">
+              <option [value]="true">Activo</option>
+              <option [value]="false">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+  <!-- Paso 2 -->
+  <div *ngIf="paso === 2" class="paso">
+    <div class="plantillas">
+      <div class="plantilla-card" 
+          *ngFor="let plantilla of plantillas$ | async"
+          (click)="seleccionarPlantilla(plantilla)"
+          [class.seleccionada]="plantilla.id === plantillaSeleccionada?.id">
+
+        <div class="preview-wrapper">
+          <iframe 
+            [srcdoc]="plantillasPreview[plantilla.id]" 
+            class="preview" 
+            scrolling="no">
+          </iframe>
+        </div>
+
+        <div class="plantilla-info">
+          <h3>{{ plantilla.nombre }}</h3>
+          <span class="preview-label">Vista previa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Paso 3: Editar plantilla -->   
+<div *ngIf="paso === 3" class="paso editor-layout">
+  <h2>Editor de curso</h2>
+  <div class="editor-contenido">
+    
+    <div class="panel-edicion">
+      <h3>Elementos del curso</h3>
+      
+      <div *ngFor="let campo of camposEditable; let i = index" class="campo">
+        <label>{{ campo.nombre }}</label>
+
+      <ng-container *ngIf="campo.tipo === 'texto'">
+        <textarea [(ngModel)]="campo.valor" (input)="actualizarCampo(i)"></textarea>
+      </ng-container>
+
+        <ng-container *ngIf="campo.tipo === 'img'">
+          <input type="text" [(ngModel)]="campo.valor" (input)="actualizarCampo(i)" placeholder="URL o base64 de la imagen" />
+        </ng-container>
+
+        <ng-container *ngIf="campo.tipo === 'fondo'">
+          <input type="text" [(ngModel)]="campo.valor" (input)="actualizarCampo(i)" placeholder="URL del fondo (ej: https://...jpg)" />
+        </ng-container>
+      </div>
+
+    </div>
+
+    <!-- Vista previa -->
+    <div class="preview-container">
+      <iframe #previewFrame class="preview-frame"></iframe>
+    </div>
+  </div>
+
+  <div class="acciones">
+    <button class="btn back" (click)="paso = 2">Volver</button>
+    <button class="btn add" (click)="guardarCurso()">Guardar Curso</button>
+  </div>
+</div>
