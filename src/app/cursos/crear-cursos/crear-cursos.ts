@@ -19,6 +19,7 @@ export class CrearCursos implements OnInit {
   nombreCurso = '';
   cursoForm: FormGroup;
   areas$: Observable<Area[]> = new Observable<Area[]>();
+  
   plantillaSeleccionada: Plantilla | null = null;
   plantillas$!: Observable<Plantilla[]>;
   plantillasPreview: { [id: string]: SafeHtml } = {};
@@ -201,10 +202,6 @@ export class CrearCursos implements OnInit {
         });
       }
     };
-
-    doc.open();
-    doc.write(htmlCompleto);
-    doc.close();
   }
 
 
