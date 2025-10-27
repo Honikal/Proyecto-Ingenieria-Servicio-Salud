@@ -4,7 +4,7 @@
     <h2 *ngIf="paso === 2">Selecciona una plantilla</h2>
 
     <div class="acciones">
-      <button class="btn back" (click)="paso === 1 ? volver() : paso = 1">Volver</button>
+      <button class="btn back" (click)="paso === 1 ? volver() : (paso === 2 ? paso = 1.5 : paso = 1)">Volver</button>
       <button class="btn add" 
           [disabled]="(paso === 1 ? cursoForm.invalid : !plantillaSeleccionada)" 
           (click)="continuar()">Continuar</button>
@@ -39,7 +39,7 @@
             <label>Área:</label>
             <select formControlName="area">
               <option value="">Seleccione un área</option>
-              <option *ngFor="let area of areas$ | async" [value]="area.nombre">{{ area.nombre }}</option>
+              <option *ngFor="let area of areas$ | async" [value]="area.id">{{ area.nombre }}</option>
             </select>
             <small *ngIf="cursoForm.get('area')?.touched && cursoForm.get('area')?.invalid">
               Área requerida
@@ -98,6 +98,33 @@
     </form>
   </div>
 
+<!-- Paso 1.5: Gestión de módulos -->
+<div *ngIf="paso === 1.5" class="paso">
+  <h2>Agregar módulos</h2>
+  <div class="input-group modulo-input">
+    <h3>Nombre del módulo:</h3>
+    <div class="input-btn-wrapper">
+      <input type="text" [(ngModel)]="moduloNombre" placeholder="Nombre del módulo"/>
+      <button class="btn add" (click)="agregarModuloTemporal()">Agregar módulo</button>
+    </div>
+  </div>
+
+  <div *ngIf="modulos.length > 0" class="lista-modulos">
+    <h3>Módulos agregados:</h3>
+    <ul>
+      <li *ngFor="let modulo of modulos; let i = index">
+        {{ modulo.nombre }}
+        <button class="btn eliminar" (click)="eliminarModulo(i)">×</button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="acciones">
+    <button class="btn back" (click)="volverDesdeModulo()">Volver</button>
+    <button class="btn add" (click)="continuar()">Continuar</button>
+  </div>
+</div>
+
   <!-- Paso 2 -->
   <div *ngIf="paso === 2" class="paso">
     <div class="plantillas">
@@ -126,17 +153,49 @@
 <!-- Paso 3: Editar plantilla -->   
 <div *ngIf="paso === 3" class="paso editor-layout">
   <h2>Editor de curso</h2>
+
+  <!-- 🔹 Selección de módulo y pantalla -->
+  <div class="panel-seleccion">
+    <div class="input-group">
+      <label>Seleccionar módulo:</label>
+      <select [(ngModel)]="moduloSeleccionadoId" (change)="actualizarModuloSeleccionado()">
+        <option value="">Seleccione un módulo</option>
+        <option *ngFor="let m of modulos" [value]="m.nombre">{{ m.nombre }}</option>
+      </select>
+    </div>
+
+    <div *ngIf="moduloSeleccionado" class="input-group">
+      <label>Pantallas en {{ moduloSeleccionado.nombre }}:</label>
+      <select [(ngModel)]="pantallaSeleccionada" (change)="cargarPantallaSeleccionada()">
+        <option [ngValue]="null">Nueva Pantalla</option>
+        <option *ngFor="let p of moduloSeleccionado.pantallas" [ngValue]="p">{{ p.nombre }}</option>
+      </select>
+    </div>
+  </div>
+
   <div class="editor-contenido">
-    
+
     <div class="panel-edicion">
+
+      <!-- 🔹 Botones solo si la pantalla ya está guardada -->
+      <div *ngIf="pantallaSeleccionada" class="botones-superiores">
+        <button class="btn eliminar" (click)="eliminarPantalla()">Eliminar</button>
+        <button class="btn add" (click)="editarPantalla()">Guardar Cambios</button>
+      </div>
+
       <h3>Elementos del curso</h3>
-      
+
+      <div class="campo">
+        <label>Título de la pantalla:</label>
+        <input type="text" [(ngModel)]="tituloPantalla" placeholder="Ingrese el título de la pantalla" />
+      </div>
+
       <div *ngFor="let campo of camposEditable; let i = index" class="campo">
         <label>{{ campo.nombre }}</label>
 
-      <ng-container *ngIf="campo.tipo === 'texto'">
-        <textarea [(ngModel)]="campo.valor" (input)="actualizarCampo(i)"></textarea>
-      </ng-container>
+        <ng-container *ngIf="campo.tipo === 'texto'">
+          <textarea [(ngModel)]="campo.valor" (input)="actualizarCampo(i)"></textarea>
+        </ng-container>
 
         <ng-container *ngIf="campo.tipo === 'img'">
           <input type="text" [(ngModel)]="campo.valor" (input)="actualizarCampo(i)" placeholder="URL o base64 de la imagen" />
@@ -155,8 +214,11 @@
     </div>
   </div>
 
+  <!-- Acciones: Volver, Guardar y nuevos botones -->
   <div class="acciones">
     <button class="btn back" (click)="paso = 2">Volver</button>
     <button class="btn add" (click)="guardarCurso()">Guardar Curso</button>
+    <button class="btn add" (click)="agregarPlantilla()">Agregar pantalla</button>
+    <button class="btn add" (click)="agregarModulo()">Agregar módulo</button>
   </div>
 </div>

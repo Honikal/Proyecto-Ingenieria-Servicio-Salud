@@ -1,7 +1,6 @@
 export interface Pantalla {
-  id: string;
-  info: string;
+  css: string;
+  html: string;
   nombre: string;
   pos:number;
-  ubi:number;
 }

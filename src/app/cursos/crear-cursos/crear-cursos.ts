@@ -1,11 +1,14 @@
 import { Component, ElementRef, OnInit, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';import { FirebaseService } from '../../services/firebase';
+import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FirebaseService } from '../../services/firebase';
 import { Router } from '@angular/router';
 import { Plantilla } from '../../../models/plantilla.model';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { map, Observable } from 'rxjs';
 import { Area } from '../../../models/area.model';
+import { Modulo } from '../../../models/modulo.model';
+import { Pantalla } from '../../../models/pantalla.model';
 
 @Component({
   selector: 'app-crear-cursos',
@@ -17,12 +20,21 @@ import { Area } from '../../../models/area.model';
 export class CrearCursos implements OnInit {
   paso = 1;
   nombreCurso = '';
+  tituloPantalla = '';
+  moduloNombre = '';
+
+  modulos: Modulo[] = []; // ✅ uso del modelo
   cursoForm: FormGroup;
   areas$: Observable<Area[]> = new Observable<Area[]>();
-  
+  moduloSeleccionado: Modulo | null = null; // ✅ tipado correcto
+  pantallaSeleccionada: Pantalla | null = null; // ✅ tipado correcto
   plantillaSeleccionada: Plantilla | null = null;
+  plantillaOriginal: Plantilla | null = null;
   plantillas$!: Observable<Plantilla[]>;
   plantillasPreview: { [id: string]: SafeHtml } = {};
+  pasoAnterior: number | null = null;
+  moduloSeleccionadoId: string = '';
+
   camposEditable: {
     tipo: 'texto' | 'img' | 'fondo';
     valor: string;
@@ -72,40 +84,43 @@ export class CrearCursos implements OnInit {
     );
 
     this.areas$ = this.firebaseService.getAreas();
+
+    const modulosGuardados = JSON.parse(localStorage.getItem('modulosTemporales') || '[]');
+    this.modulos = Array.isArray(modulosGuardados) ? modulosGuardados as Modulo[] : [];
   }
 
   volver() {
+    localStorage.removeItem('cursoTemporal');
+    localStorage.removeItem('modulosTemporales');
+    localStorage.removeItem('plantillaSeleccionada');
     this.router.navigate(['/cursos']);
   }
 
   continuar() {
     if (this.paso === 1) {
-      // Validar formulario del paso 1
       if (this.cursoForm.valid) {
         const usuario = JSON.parse(localStorage.getItem('currentUser') || '{}');
-
         const cursoTemp = {
           ...this.cursoForm.value,
-          idUser: usuario?.id || '',         
-          plantillaSeleccionada: this.plantillaSeleccionada || null,
-          time: new Date().toISOString()  
+          idUser: usuario?.id || '',
+          time: new Date().toISOString()
         };
-
         localStorage.setItem('cursoTemporal', JSON.stringify(cursoTemp));
-
-        this.paso = 2;
+        this.paso = 1.5;
       } else {
         this.cursoForm.markAllAsTouched();
       }
-
+    } else if (this.paso === 1.5) {
+      if (this.modulos.length === 0) {
+        alert('Debe agregar al menos un módulo antes de continuar.');
+        return;
+      }
+      this.pasoAnterior = null;
+      this.paso = 2;
     } else if (this.paso === 2) {
       if (this.plantillaSeleccionada) {
         this.paso = 3;
-
-        // Esperar a que Angular renderice el iframe
-        setTimeout(() => {
-          this.cargarPlantilla();
-        }, 0);
+        setTimeout(() => this.cargarPlantilla(), 0);
       }
     }
   }
@@ -131,24 +146,18 @@ export class CrearCursos implements OnInit {
           </style>
           <style>${plantilla.css}</style>
         </head>
-        <body>
-          ${plantilla.html}
-        </body>
+        <body>${plantilla.html}</body>
       </html>
     `;
-
     return this.sanitizer.bypassSecurityTrustHtml(htmlPreview);
   }
 
   seleccionarPlantilla(p: Plantilla) {
     this.plantillaSeleccionada = p;
+    this.plantillaOriginal = p;
   }
 
   cargarPlantilla() {
-    if (this.previewFrame?.nativeElement) {
-      this.previewFrame.nativeElement.onload = null;
-    }
-
     if (!this.previewFrame || !this.plantillaSeleccionada) return;
 
     const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
@@ -163,31 +172,27 @@ export class CrearCursos implements OnInit {
     `;
 
     const htmlCompleto = `
-    <html>
-      <head>
-        <style>
-          ${this.plantillaSeleccionada.css}
-          ${cssTransparencia}
-          
-          /* Limitar ancho del contenido y centrar */
-          body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center; /* centra horizontal */
-          }
-          .contenido-principal {
-            max-width: 800px; /* igual que el panel principal */
-            width: 100%;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="contenido-principal">
-          ${this.plantillaSeleccionada.html}
-        </div>
-      </body>
-    </html>
+      <html>
+        <head>
+          <style>
+            ${this.plantillaSeleccionada.css}
+            ${cssTransparencia}
+            body {
+              margin: 0;
+              padding: 0;
+              display: flex;
+              justify-content: center;
+            }
+            .contenido-principal {
+              max-width: 800px;
+              width: 100%;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="contenido-principal">${this.plantillaSeleccionada.html}</div>
+        </body>
+      </html>
     `;
 
     doc.open();
@@ -197,13 +202,10 @@ export class CrearCursos implements OnInit {
     iframe.onload = () => {
       const contenido = iframe.contentDocument || iframe.contentWindow?.document;
       if (contenido) {
-        this.zone.run(() => {
-          this.activarEdicion(contenido);
-        });
+        this.zone.run(() => this.activarEdicion(contenido));
       }
     };
   }
-
 
   activarEdicion(doc: Document) {
     if (!doc || !doc.body) {
@@ -279,7 +281,6 @@ export class CrearCursos implements OnInit {
     });
   }
 
-
   actualizarCampo(index: number) {
     const campo = this.camposEditable[index];
     if (!campo) return;
@@ -316,12 +317,299 @@ export class CrearCursos implements OnInit {
       this.plantillaSeleccionada.html = nuevoHTML;
     }
   }
+  
+  agregarModuloTemporal() {
+    if (!this.moduloNombre.trim()) {
+      alert('Debe ingresar un nombre para el módulo.');
+      return;
+    }
 
-  guardarCurso() {
-    console.log('HTML final:', this.plantillaSeleccionada?.html);
-    alert(`Curso "${this.nombreCurso}" guardado con plantilla "${this.plantillaSeleccionada?.nombre}"`);
-    this.router.navigate(['/lista-cursos']);
+    const nuevoModulo: Modulo = {
+      id: this.modulos.length + 1,
+      nombre: this.moduloNombre.trim(),
+      pantallas: []
+    };
+
+    this.modulos.push(nuevoModulo);
+    localStorage.setItem('modulosTemporales', JSON.stringify(this.modulos));
+    this.moduloNombre = '';
   }
 
+  eliminarModulo(index: number) {
+    if (index >= 0 && index < this.modulos.length) {
+      this.modulos.splice(index, 1);
+      localStorage.setItem('modulosTemporales', JSON.stringify(this.modulos));
+    }
+  }
+
+  agregarPlantilla() {
+    if (!this.tituloPantalla.trim()) {
+      alert('Debe ingresar un título para la pantalla.');
+      return;
+    }
+    if (!this.plantillaSeleccionada) {
+      alert('No hay plantilla seleccionada.');
+      return;
+    }
+
+    const modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]') as Modulo[];
+    if (!modulos.length) {
+      alert('Debe crear un módulo antes de agregar una pantalla.');
+      return;
+    }
+
+    const moduloActual = modulos.find(m => m.id === this.moduloSeleccionado?.id);
+    if (!moduloActual) {
+      alert('Debe seleccionar un módulo antes de agregar una pantalla.');
+      return;
+    }
+
+    const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
+    const doc = iframe.contentDocument;
+    const htmlActual = doc ? doc.body.innerHTML : '';
+
+    const nuevaPantalla: Pantalla = {
+      nombre: this.tituloPantalla.trim(),
+      css: this.plantillaSeleccionada.css,
+      html: htmlActual,
+      pos: (moduloActual.pantallas?.length || 0) + 1
+    };
+
+    moduloActual.pantallas.push(nuevaPantalla);
+
+    const indiceModulo = modulos.findIndex(m => m.id === moduloActual.id);
+    modulos[indiceModulo] = moduloActual;
+
+    localStorage.setItem('modulosTemporales', JSON.stringify(modulos));
+
+    console.log('📌 Módulos actuales y sus pantallas:');
+    modulos.forEach(m => {
+      console.log(`Módulo: ${m.nombre}`);
+      m.pantallas?.forEach(p => console.log(` - Pantalla: ${p.nombre}`));
+    });
+
+    if (this.moduloSeleccionado?.id === moduloActual.id) {
+      this.moduloSeleccionado.pantallas = moduloActual.pantallas;
+    }
+
+    this.pantallaSeleccionada = null;
+    this.tituloPantalla = '';
+    this.plantillaSeleccionada = this.plantillaOriginal;
+    setTimeout(() => this.cargarPlantilla(), 0);
+    
+    alert(`Pantalla "${nuevaPantalla.nombre}" agregada al módulo "${moduloActual.nombre}".`);
+  }
+
+  agregarModulo() {
+    this.pasoAnterior = this.paso; 
+    this.modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]');
+    this.moduloNombre = '';
+
+    if (this.paso === 3) {
+      localStorage.setItem('plantillaSeleccionada', JSON.stringify(this.plantillaSeleccionada));
+    }
+
+    this.paso = 1.5;
+  }
+
+
+  volverDesdeModulo() {
+    if (this.pasoAnterior === 3) {
+      const plantillaGuardada = localStorage.getItem('plantillaSeleccionada');
+      if (plantillaGuardada) {
+        this.plantillaSeleccionada = JSON.parse(plantillaGuardada);
+      }
+      this.paso = 3;
+      setTimeout(() => this.cargarPlantilla(), 0);
+    } else {
+      this.paso = 1;
+    }
+  }
+
+actualizarPantallasDisponibles() {
+  this.pantallaSeleccionada = null;
+  this.modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]');
+
+  if (this.moduloSeleccionado) {
+    const moduloActualizado = this.modulos.find(
+      m => m.nombre === this.moduloSeleccionado!.nombre
+    );
+    if (moduloActualizado) {
+      this.moduloSeleccionado!.pantallas = moduloActualizado.pantallas || [];
+    }
+  }
+}
+
+  cargarPantallaSeleccionada() {
+    if (!this.pantallaSeleccionada) {
+      if (this.plantillaOriginal) {
+        this.tituloPantalla = "";
+        this.plantillaSeleccionada = this.plantillaOriginal;
+      }
+    } else {
+      this.tituloPantalla = this.pantallaSeleccionada.nombre;
+      this.plantillaSeleccionada = {
+        id: '',
+        nombre: this.pantallaSeleccionada.nombre,
+        html: this.pantallaSeleccionada.html,
+        css: this.pantallaSeleccionada.css
+      };
+    }
+
+    setTimeout(() => this.cargarPlantilla(), 0);
+  }
+
+
+  actualizarModuloSeleccionado() {
+    const modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]') as Modulo[];
+    this.modulos = modulos;
+    this.moduloSeleccionado = this.modulos.find(m => m.nombre === this.moduloSeleccionadoId) || null;
+    this.pantallaSeleccionada = null;
+  }
+
+  eliminarPantalla() {
+    if (!this.pantallaSeleccionada || !this.moduloSeleccionado) return;
+
+    const modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]') as Modulo[];
+    const moduloActual = modulos.find(m => m.nombre === this.moduloSeleccionado!.nombre);
+    if (!moduloActual || !moduloActual.pantallas) return;
+
+    // Eliminar la pantalla seleccionada
+    moduloActual.pantallas = moduloActual.pantallas.filter(
+      p => p.nombre !== this.pantallaSeleccionada!.nombre
+    );
+
+    // Actualizar localStorage
+    const indiceModulo = modulos.findIndex(m => m.nombre === moduloActual.nombre);
+    modulos[indiceModulo] = moduloActual;
+    localStorage.setItem('modulosTemporales', JSON.stringify(modulos));
+
+    // Limpiar selección y volver a "Nueva Pantalla"
+    this.pantallaSeleccionada = null;
+    this.tituloPantalla = '';
+    this.plantillaSeleccionada = this.plantillaOriginal;
+    this.cargarPlantilla();
+
+    // Actualizar módulo seleccionado en UI
+    this.actualizarPantallasDisponibles();
+
+    alert('Pantalla eliminada. Ahora puede crear una nueva.');
+  }
+
+  editarPantalla() {
+    if (!this.moduloSeleccionado) {
+      alert('Debe seleccionar un módulo para editar la pantalla.');
+      return;
+    }
+    if (!this.pantallaSeleccionada) {
+      alert('Debe seleccionar una pantalla para editar.');
+      return;
+    }
+
+    const modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]') as Modulo[];
+    const moduloActual = modulos.find(m => m.id === this.moduloSeleccionado!.id);
+    if (!moduloActual) {
+      alert('No se encontró el módulo seleccionado.');
+      return;
+    }
+
+    const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
+    const doc = iframe.contentDocument;
+    if (!doc) {
+      alert('El contenido de la pantalla aún no está cargado.');
+      return;
+    }
+
+    // Obtener el HTML y CSS actualizado
+    const htmlActualizado = doc.body.innerHTML;
+    const cssActualizado = this.plantillaSeleccionada?.css || '';
+
+    // Actualizar la pantalla seleccionada dentro del módulo
+    const indexPantalla = moduloActual.pantallas.findIndex(
+      p => p.nombre === this.pantallaSeleccionada!.nombre
+    );
+
+    if (indexPantalla !== -1) {
+      moduloActual.pantallas[indexPantalla] = {
+        ...moduloActual.pantallas[indexPantalla],
+        nombre: this.tituloPantalla.trim() || this.pantallaSeleccionada!.nombre,
+        html: htmlActualizado,
+        css: cssActualizado
+      };
+    }
+
+    // Guardar cambios en localStorage
+    const indiceModulo = modulos.findIndex(m => m.id === moduloActual.id);
+    modulos[indiceModulo] = moduloActual;
+    localStorage.setItem('modulosTemporales', JSON.stringify(modulos));
+
+    // Actualizar módulo seleccionado en UI
+    this.moduloSeleccionado.pantallas = moduloActual.pantallas;
+
+    this.pantallaSeleccionada = null;
+    this.tituloPantalla = '';
+    this.plantillaSeleccionada = this.plantillaOriginal;
+    setTimeout(() => this.cargarPlantilla(), 0);
+
+    alert(`Pantalla "${this.tituloPantalla}" editada correctamente.`);
+  }
+
+  async guardarCurso() {
+    try {
+      const cursoTemp = JSON.parse(localStorage.getItem('cursoTemporal') || '{}');
+      if (!cursoTemp) {
+        alert('No se encontró información del curso. Por favor, complete los pasos anteriores.');
+        return;
+      }
+
+      if (!this.modulos.length) {
+        alert('Debe agregar al menos un módulo con pantallas.');
+        return;
+      }
+
+      const cursoData = {
+        nombre: cursoTemp.nombre,
+        tema: cursoTemp.tema,
+        area: cursoTemp.area,
+        codigo: cursoTemp.codigo,
+        cantPersonas: 0,
+        cupos: Number(cursoTemp.cupos),
+        descrip: cursoTemp.descripcion,
+        infoGeneral: cursoTemp.infoGeneral,
+        idUser: cursoTemp.idUser,
+        imagen: cursoTemp.imagen,
+        isActive: Boolean(cursoTemp.isActive),
+        time: cursoTemp.time
+      };
+
+      const cursoRef = await this.firebaseService.addDoc('cursos', cursoData);
+
+      for (const modulo of this.modulos) {
+        const moduloRef = await this.firebaseService.addDoc(`cursos/${cursoRef.id}/modulo`, { nombre: modulo.nombre });
+
+        let posCounter = 1;
+        if (modulo.pantallas && modulo.pantallas.length) {
+          for (const pantalla of modulo.pantallas) {
+            await this.firebaseService.addDoc(`cursos/${cursoRef.id}/modulo/${moduloRef.id}/pantalla`, {
+              nombre: pantalla.nombre,
+              html: pantalla.html,
+              css: pantalla.css,
+              pos: posCounter
+            });
+            posCounter++;
+          }
+        }
+      }
+
+      localStorage.removeItem('cursoTemporal');
+      localStorage.removeItem('modulosTemporales');
+      localStorage.removeItem('plantillaSeleccionada');
+      alert('✅ Curso guardado correctamente en Firebase.');
+      this.router.navigate(['/cursos']);
+    } catch (error) {
+      console.error('Error guardando el curso:', error);
+      alert('Ocurrió un error al guardar el curso. Revise la consola.');
+    }
+  }
 
 }
