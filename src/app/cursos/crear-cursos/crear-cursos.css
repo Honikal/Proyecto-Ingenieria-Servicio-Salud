@@ -298,3 +298,60 @@ textarea {
     padding: 0; 
   }
 }
+
+.modulo-input .input-btn-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0 !important;
+}
+
+/* Ajuste fino del input dentro del paso 1.5 */
+.modulo-input .input-btn-wrapper input[type="text"] {
+  flex: 1;
+  margin-top: 0 !important; /* elimina el salto vertical */
+  height: 42px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+/* Alineación exacta del botón con el input */
+.modulo-input .input-btn-wrapper .btn.add {
+  height: 42px;
+  margin-top: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 0 20px;
+}
+
+.lista-modulos ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+}
+
+.lista-modulos li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f1f1f1;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+}
+
+.lista-modulos .btn.eliminar {
+  background: transparent;
+  color: red;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+}

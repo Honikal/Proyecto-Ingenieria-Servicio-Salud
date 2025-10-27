@@ -148,4 +148,10 @@ export class FirebaseService {
     const userRef = doc(this.firestore, 'users', userId);
     return docData(userRef, { idField: 'id' }) as Observable<User | null>;
   }
+
+  async addDoc(ruta: string, data: any) {
+    const ref = collection(this.firestore, ruta);
+    const docRef = await addDoc(ref, data);
+    return docRef; 
+  }
 }
