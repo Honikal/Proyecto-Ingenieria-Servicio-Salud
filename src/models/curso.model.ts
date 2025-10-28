@@ -6,6 +6,7 @@ export interface Curso {
   cupos:number;
   descrip: string;
   idUser: string;
+  idSocio: string;
   imagen: string;
   infoGeneral: string;
   isActive: boolean;

@@ -92,6 +92,17 @@
               <option [value]="false">Inactivo</option>
             </select>
           </div>
+
+          <div class="input-group">
+            <label>Socio:</label>
+            <select formControlName="idSocio">
+              <option value="">Seleccione un socio</option>
+              <option *ngFor="let socio of socios" [value]="socio.id">{{ socio.nombre }}</option>
+            </select>
+            <small *ngIf="cursoForm.get('idSocio')?.touched && cursoForm.get('idSocio')?.invalid">
+              Debe seleccionar un socio
+            </small>
+          </div>
         </div>
 
       </div>

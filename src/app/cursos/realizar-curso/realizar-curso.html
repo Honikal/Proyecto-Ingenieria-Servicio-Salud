@@ -17,11 +17,14 @@
     <div class="sidebar">
       <img [src]="curso.imagen" alt="Imagen del curso" class="imagen-curso">
       
-      <div *ngFor="let pos of posiciones"
-           class="pantalla-item"
-           [class.activa]="pantallaSeleccionada?.pos === pos"
-           (click)="seleccionarPosicion(pos)">
-        Sección {{ pos }}
+      <div *ngFor="let modulo of modulos">
+        <h4>{{ modulo.nombre }}</h4>
+        <div *ngFor="let p of modulo.pantallas"
+             class="pantalla-item"
+             [class.activa]="pantallaSeleccionada === p"
+             (click)="seleccionarPantalla(p)">
+          {{ p.nombre }}
+        </div>
       </div>
     </div>
 
@@ -34,7 +37,7 @@
 
       <div class="botones-navegacion">
         <button class="volver-btn" (click)="retroceder()">< Volver</button>
-        <button class="continuar-btn" (click)="continuar()">{{ textoContinuar }}</button>
+        <button class="continuar-btn" (click)="continuar()">Continuar ></button>
       </div>
     </div>
   </div>

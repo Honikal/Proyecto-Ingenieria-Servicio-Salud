@@ -6,6 +6,7 @@ import { Area } from '../../models/area.model';
 import { Curso } from '../../models/curso.model';
 import { Pantalla } from '../../models/pantalla.model';
 import { Plantilla } from '../../models/plantilla.model';
+import { Modulo } from '../../models/modulo.model';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable({
@@ -154,4 +155,41 @@ export class FirebaseService {
     const docRef = await addDoc(ref, data);
     return docRef; 
   }
+
+  async getSociosByUser(idUser: string) {
+    const relRef = collection(this.firestore, 'usersxsocios');
+    const q = query(relRef, where('idUser', '==', idUser));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return [];
+
+    const sociosIds = snapshot.docs.map(doc => (doc.data() as any).idSocio);
+    const socios: any[] = [];
+
+    for (const id of sociosIds) {
+      const socioRef = doc(this.firestore, 'socios', id);
+      const socioSnap = await getDoc(socioRef);
+      if (socioSnap.exists()) {
+        socios.push({ id: socioSnap.id, ...(socioSnap.data() as any) });
+      }
+    }
+
+    return socios;
+  }
+
+  async getModulosCurso(idCurso: string): Promise<Modulo[]> {
+    const modulosRef = collection(this.firestore, `cursos/${idCurso}/modulo`);
+    const snapshot = await getDocs(modulosRef);
+    const modulos: Modulo[] = [];
+    for (const docSnap of snapshot.docs) {
+      const modData = docSnap.data() as Modulo;
+      // Obtener pantallas dentro del módulo
+      const pantRef = collection(this.firestore, `cursos/${idCurso}/modulo/${docSnap.id}/pantalla`);
+      const pantSnap = await getDocs(pantRef);
+      const pantallas: Pantalla[] = pantSnap.docs.map(d => ({ id: d.id, ...(d.data() as Pantalla) }));
+      modulos.push({ ...modData, pantallas });
+    }
+    return modulos;
+  }
+
+
 }
