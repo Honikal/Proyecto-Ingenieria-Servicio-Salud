@@ -7,5 +7,4 @@ export interface Socio {
   telefono: string;
   logo:string;
   isActive:boolean;
-  //cursos?: { nombre: string }[];
 }

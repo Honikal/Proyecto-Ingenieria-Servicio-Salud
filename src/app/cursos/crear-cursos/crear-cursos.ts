@@ -9,6 +9,7 @@ import { map, Observable } from 'rxjs';
 import { Area } from '../../../models/area.model';
 import { Modulo } from '../../../models/modulo.model';
 import { Pantalla } from '../../../models/pantalla.model';
+import { Socio } from '../../../models/socio.model';
 
 @Component({
   selector: 'app-crear-cursos',
@@ -23,17 +24,19 @@ export class CrearCursos implements OnInit {
   tituloPantalla = '';
   moduloNombre = '';
 
-  modulos: Modulo[] = []; // ✅ uso del modelo
+  modulos: Modulo[] = [];
+  socios: Socio[] = [];
   cursoForm: FormGroup;
   areas$: Observable<Area[]> = new Observable<Area[]>();
-  moduloSeleccionado: Modulo | null = null; // ✅ tipado correcto
-  pantallaSeleccionada: Pantalla | null = null; // ✅ tipado correcto
+  moduloSeleccionado: Modulo | null = null; 
+  pantallaSeleccionada: Pantalla | null = null; 
   plantillaSeleccionada: Plantilla | null = null;
   plantillaOriginal: Plantilla | null = null;
   plantillas$!: Observable<Plantilla[]>;
   plantillasPreview: { [id: string]: SafeHtml } = {};
   pasoAnterior: number | null = null;
   moduloSeleccionadoId: string = '';
+  usuarioActual: any;
 
   camposEditable: {
     tipo: 'texto' | 'img' | 'fondo';
@@ -62,11 +65,20 @@ export class CrearCursos implements OnInit {
       descripcion: [''],
       infoGeneral: [''],
       imagen: [''],
-      isActive: [false]
+      isActive: [false],
+      idSocio: ['', Validators.required]
     });
   }
 
   async ngOnInit() {
+    this.usuarioActual = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (this.usuarioActual?.id) {
+      this.firebaseService.getSociosByUser(this.usuarioActual.id).then((socios) => {
+        this.zone.run(() => {
+          this.socios = socios;
+        });
+      });
+    }
     this.plantillas$ = this.firebaseService.getPlantillas().pipe(
       map((plantillas) => {
         this.plantillasPreview = {};
@@ -153,8 +165,8 @@ export class CrearCursos implements OnInit {
   }
 
   seleccionarPlantilla(p: Plantilla) {
-    this.plantillaSeleccionada = p;
-    this.plantillaOriginal = p;
+    this.plantillaSeleccionada = { ...p }; 
+    this.plantillaOriginal = structuredClone(p); 
   }
 
   cargarPlantilla() {
@@ -577,6 +589,7 @@ actualizarPantallasDisponibles() {
         descrip: cursoTemp.descripcion,
         infoGeneral: cursoTemp.infoGeneral,
         idUser: cursoTemp.idUser,
+        idSocio: cursoTemp.idSocio,
         imagen: cursoTemp.imagen,
         isActive: Boolean(cursoTemp.isActive),
         time: cursoTemp.time
