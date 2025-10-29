@@ -20,6 +20,7 @@ export class RealizarCurso implements OnInit {
   pantallaSeleccionada?: Pantalla;
   cargando: boolean = true;
   progreso: number = 0;
+  htmlPantalla: SafeHtml = '';
   posicionesPantallas: Pantalla[] = []; // Lista lineal de todas las pantallas ordenadas por pos
 
   constructor(
@@ -60,6 +61,7 @@ export class RealizarCurso implements OnInit {
         // Seleccionar primera pantalla
         if (this.posicionesPantallas.length > 0) {
           this.pantallaSeleccionada = this.posicionesPantallas[0];
+          this.actualizarHtmlPantalla();
         }
 
         this.actualizarProgreso();
@@ -76,6 +78,7 @@ export class RealizarCurso implements OnInit {
 
   seleccionarPantalla(p: Pantalla) {
     this.pantallaSeleccionada = p;
+    this.actualizarHtmlPantalla();
     this.actualizarProgreso();
   }
 
@@ -87,6 +90,7 @@ export class RealizarCurso implements OnInit {
     } else {
       alert('¡Curso completado!');
     }
+    this.actualizarHtmlPantalla();
     this.actualizarProgreso();
   }
 
@@ -96,6 +100,7 @@ export class RealizarCurso implements OnInit {
     if (idx > 0) {
       this.pantallaSeleccionada = this.posicionesPantallas[idx - 1];
     }
+    this.actualizarHtmlPantalla();
     this.actualizarProgreso();
   }
 
@@ -108,18 +113,39 @@ export class RealizarCurso implements OnInit {
     this.progreso = Math.round(((idx + 1) / this.posicionesPantallas.length) * 100);
   }
 
-  get htmlPantalla(): SafeHtml {
-    if (!this.pantallaSeleccionada) return '';
-
-    let html = this.pantallaSeleccionada.html || '';
-    const css = this.pantallaSeleccionada.css || '';
-
-    if (css) {
-      html = `<style>${css}</style>` + html;
+  private actualizarHtmlPantalla() {
+    if (!this.pantallaSeleccionada) {
+      this.htmlPantalla = '';
+      return;
     }
 
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    const html = this.pantallaSeleccionada.html || '';
+    const css = this.pantallaSeleccionada.css || '';
+
+    const contenido = `
+      <html>
+        <head>
+          <style>
+            html, body {
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              height: 100%;
+              overflow: auto;
+            }
+            ${css}
+          </style>
+        </head>
+        <body>
+          ${html}
+        </body>
+      </html>
+    `;
+
+    this.htmlPantalla = this.sanitizer.bypassSecurityTrustHtml(contenido);
+    this.cdRef.detectChanges();
   }
+
 
   volver() {
     if (this.curso) {

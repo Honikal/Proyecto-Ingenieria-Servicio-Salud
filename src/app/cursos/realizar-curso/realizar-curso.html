@@ -32,7 +32,11 @@
     <div class="pantalla-info">
       <div class="contenido-info" *ngIf="pantallaSeleccionada">
         <h3>{{ pantallaSeleccionada.nombre }}</h3>
-        <div [innerHTML]="htmlPantalla"></div>
+        <iframe
+          class="pantalla-frame"
+          *ngIf="htmlPantalla"
+          [srcdoc]="htmlPantalla"
+        ></iframe>
       </div>
 
       <div class="botones-navegacion">
