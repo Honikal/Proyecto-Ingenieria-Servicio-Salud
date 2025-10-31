@@ -626,9 +626,9 @@ export class CrearCursos implements OnInit {
       const examenGuardado = JSON.parse(localStorage.getItem('examenTemporal') || '[]') as Pregunta[];
       for (const pregunta of examenGuardado) {
         await this.firebaseService.addDoc(`cursos/${cursoRef.id}/preguntas`, {
-          texto: pregunta.text,
-          opciones: pregunta.ops,
-          respuesta: pregunta.res
+          text: pregunta.text,
+          ops: pregunta.ops,
+          res: pregunta.res
         });
       }
       
