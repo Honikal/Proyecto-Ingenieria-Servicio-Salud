@@ -10,6 +10,7 @@ import { Area } from '../../../models/area.model';
 import { Modulo } from '../../../models/modulo.model';
 import { Pantalla } from '../../../models/pantalla.model';
 import { Socio } from '../../../models/socio.model';
+import { Pregunta } from '../../../models/pregunta.model';
 
 @Component({
   selector: 'app-crear-cursos',
@@ -37,6 +38,10 @@ export class CrearCursos implements OnInit {
   pasoAnterior: number | null = null;
   moduloSeleccionadoId: string = '';
   usuarioActual: any;
+  preguntas: Pregunta[] = [];
+  preguntaActual: Pregunta = { text: '', ops: [''], res: '' };
+  preguntaSeleccionada: Pregunta | null = null;
+  indicePreguntaSeleccionada: number | null = null;
 
   camposEditable: {
     tipo: 'texto' | 'img' | 'fondo';
@@ -105,6 +110,7 @@ export class CrearCursos implements OnInit {
     localStorage.removeItem('cursoTemporal');
     localStorage.removeItem('modulosTemporales');
     localStorage.removeItem('plantillaSeleccionada');
+    localStorage.removeItem('examenTemporal');
     this.router.navigate(['/cursos']);
   }
 
@@ -438,25 +444,25 @@ export class CrearCursos implements OnInit {
     }
   }
 
-actualizarPantallasDisponibles() {
-  this.pantallaSeleccionada = null;
-  this.modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]');
+  actualizarPantallasDisponibles() {
+    this.pantallaSeleccionada = null;
+    this.modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]');
 
-  if (this.moduloSeleccionado) {
-    const moduloActualizado = this.modulos.find(
-      m => m.nombre === this.moduloSeleccionado!.nombre
-    );
-    if (moduloActualizado) {
-      this.moduloSeleccionado!.pantallas = moduloActualizado.pantallas || [];
+    if (this.moduloSeleccionado) {
+      const moduloActualizado = this.modulos.find(
+        m => m.nombre === this.moduloSeleccionado!.nombre
+      );
+      if (moduloActualizado) {
+        this.moduloSeleccionado!.pantallas = moduloActualizado.pantallas || [];
+      }
     }
   }
-}
 
   cargarPantallaSeleccionada() {
     if (!this.pantallaSeleccionada) {
       if (this.plantillaOriginal) {
         this.tituloPantalla = "";
-        this.plantillaSeleccionada = this.plantillaOriginal;
+        this.plantillaSeleccionada = structuredClone(this.plantillaOriginal);
       }
     } else {
       this.tituloPantalla = this.pantallaSeleccionada.nombre;
@@ -595,8 +601,10 @@ actualizarPantallasDisponibles() {
         time: cursoTemp.time
       };
 
+      // Guardar curso
       const cursoRef = await this.firebaseService.addDoc('cursos', cursoData);
 
+      // Guardar módulos y pantallas
       for (const modulo of this.modulos) {
         const moduloRef = await this.firebaseService.addDoc(`cursos/${cursoRef.id}/modulo`, { nombre: modulo.nombre });
 
@@ -614,14 +622,92 @@ actualizarPantallasDisponibles() {
         }
       }
 
+      // Guardar preguntas del examen
+      const examenGuardado = JSON.parse(localStorage.getItem('examenTemporal') || '[]') as Pregunta[];
+      for (const pregunta of examenGuardado) {
+        await this.firebaseService.addDoc(`cursos/${cursoRef.id}/preguntas`, {
+          texto: pregunta.text,
+          opciones: pregunta.ops,
+          respuesta: pregunta.res
+        });
+      }
+      
       localStorage.removeItem('cursoTemporal');
       localStorage.removeItem('modulosTemporales');
       localStorage.removeItem('plantillaSeleccionada');
+      localStorage.removeItem('examenTemporal');
       alert('✅ Curso guardado correctamente en Firebase.');
       this.router.navigate(['/cursos']);
     } catch (error) {
       console.error('Error guardando el curso:', error);
       alert('Ocurrió un error al guardar el curso. Revise la consola.');
+    }
+  }
+  
+  volverDesdeExamen() {
+    this.paso = 3;
+    setTimeout(() => {
+      this.cargarPlantilla();
+    }, 100);
+  }
+
+  generarExamen() {
+    this.paso = 4;
+    const guardadas = localStorage.getItem('examenTemporal');
+    this.preguntas = guardadas ? JSON.parse(guardadas) : [];
+  }
+
+  agregarOpcion() {
+    this.preguntaActual.ops.push('');
+  }
+
+  agregarPregunta() {
+    const { text, ops, res } = this.preguntaActual;
+    if (!text.trim() || ops.length === 0 || !res.trim()) {
+      alert('Complete todos los campos antes de agregar la pregunta.');
+      return;
+    }
+
+    this.preguntas.push({
+      text: text.trim(),
+      ops: ops.filter(o => o.trim() !== ''),
+      res: res.trim()
+    });
+
+    localStorage.setItem('examenTemporal', JSON.stringify(this.preguntas));
+
+    this.preguntaActual = { text: '', ops: [''], res: '' };
+    alert('Pregunta agregada correctamente.');
+  }
+  trackByIndex(index: number, item: any): any {
+    return index;
+  }
+
+  seleccionarPregunta(p: Pregunta, index: number) {
+    this.preguntaSeleccionada = { ...p }; 
+    this.indicePreguntaSeleccionada = index;
+    this.preguntaActual = { ...p }; 
+  }
+  cancelarEdicionPregunta() {
+    this.preguntaSeleccionada = null;
+    this.indicePreguntaSeleccionada = null;
+    this.preguntaActual = { text: '', ops: [''], res: '' };
+  }
+  eliminarPregunta() {
+    if (this.indicePreguntaSeleccionada !== null) {
+      this.preguntas.splice(this.indicePreguntaSeleccionada, 1);
+      localStorage.setItem('examenTemporal', JSON.stringify(this.preguntas));
+      this.cancelarEdicionPregunta(); // limpia el panel
+      alert('Pregunta eliminada correctamente.');
+    }
+  }
+
+  editarPregunta() {
+    if (this.indicePreguntaSeleccionada !== null) {
+      this.preguntas[this.indicePreguntaSeleccionada] = { ...this.preguntaActual };
+      localStorage.setItem('examenTemporal', JSON.stringify(this.preguntas));
+      this.cancelarEdicionPregunta(); // limpia el panel
+      alert('Pregunta editada correctamente.');
     }
   }
 
