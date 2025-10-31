@@ -191,7 +191,7 @@
       <!-- 🔹 Botones solo si la pantalla ya está guardada -->
       <div *ngIf="pantallaSeleccionada" class="botones-superiores">
         <button class="btn eliminar" (click)="eliminarPantalla()">Eliminar</button>
-        <button class="btn add" (click)="editarPantalla()">Guardar Cambios</button>
+        <button class="btn edit" (click)="editarPantalla()">Guardar Cambios</button>
       </div>
 
       <h3>Elementos del curso</h3>
@@ -231,5 +231,77 @@
     <button class="btn add" (click)="guardarCurso()">Guardar Curso</button>
     <button class="btn add" (click)="agregarPlantilla()">Agregar pantalla</button>
     <button class="btn add" (click)="agregarModulo()">Agregar módulo</button>
+    <button class="btn add" (click)="generarExamen()">Generar Examen</button> <!-- 🆕 -->
   </div>
+</div>
+
+<!-- Paso 4: Generador de examen -->
+<div *ngIf="paso === 4" class="paso examen-layout">
+  <h2>Generador de Examen</h2>
+
+  <div class="editor-contenido">
+  <!-- Panel izquierdo: Crear pregunta -->
+  <div class="panel-edicion">
+    <h3>Agregar pregunta</h3>
+    <div *ngIf="preguntaSeleccionada" class="botones-superiores">
+      <button class="btn back" (click)="cancelarEdicionPregunta()">Cancelar</button>
+      <button class="btn eliminar" (click)="eliminarPregunta()" >Eliminar Pregunta</button>
+      <button class="btn edit" (click)="editarPregunta()">Editar Pregunta</button>
+    </div>
+
+    <div class="campo">
+      <label>Texto de la pregunta:</label>
+      <textarea [(ngModel)]="preguntaActual.text" placeholder="Escriba la pregunta"></textarea>
+    </div>
+
+    <div class="campo" *ngFor="let op of preguntaActual.ops; let i = index; trackBy: trackByIndex">
+      <label>Opción {{ i + 1 }}:</label>
+      <input
+        type="text"
+        [(ngModel)]="preguntaActual.ops[i]"
+        placeholder="Opción {{ i + 1 }}"
+      />
+    </div>
+    
+    <button class="btn add" (click)="agregarOpcion()">+ Agregar opción</button>
+
+    <div class="campo">
+      <label>Respuesta correcta:</label>
+      <select [(ngModel)]="preguntaActual.res">
+        <option *ngFor="let op of preguntaActual.ops" [value]="op">{{ op }}</option>
+      </select>
+    </div>
+
+    <button class="btn add" (click)="agregarPregunta()">Agregar Pregunta</button>
+  </div>
+
+  <!-- Panel derecho: Vista previa preguntas -->
+  <div class="preview-container">
+    <h3 class="titulo-preview">Vista previa del examen</h3>
+
+    <div class="scroll-preguntas">
+      <div *ngIf="preguntas.length === 0" class="sin-preguntas">
+        No hay preguntas agregadas.
+      </div>
+
+      <div *ngFor="let p of preguntas; let i = index" 
+          class="pregunta-preview" 
+          [class.seleccionada]="preguntaSeleccionada === p"
+          (click)="seleccionarPregunta(p, i)">
+
+        <h4>{{ i + 1 }}. {{ p.text }}</h4>
+        <ul>
+          <li *ngFor="let o of p.ops">
+            <label>
+              <input type="radio" name="pregunta{{ i }}" disabled [checked]="o === p.res" />
+              {{ o }}
+            </label>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="acciones">
+  <button class="btn back" (click)="volverDesdeExamen()">Volver</button>
 </div>
