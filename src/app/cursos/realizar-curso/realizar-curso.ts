@@ -6,6 +6,7 @@ import { FirebaseService } from '../../services/firebase';
 import { Curso } from '../../../models/curso.model';
 import { Modulo } from '../../../models/modulo.model';
 import { Pantalla } from '../../../models/pantalla.model';
+import { Pregunta } from '../../../models/pregunta.model';
 
 @Component({
   selector: 'app-realizar-curso',
@@ -21,7 +22,10 @@ export class RealizarCurso implements OnInit {
   cargando: boolean = true;
   progreso: number = 0;
   htmlPantalla: SafeHtml = '';
-  posicionesPantallas: Pantalla[] = []; // Lista lineal de todas las pantallas ordenadas por pos
+  posicionesPantallas: Pantalla[] = [];
+  mostrandoExamen: boolean = false; // indica si se está mostrando el examen
+  preguntasExamen: Pregunta[] = []; // preguntas del examen
+  respuestasUsuario: { [idPregunta: string]: string } = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -55,6 +59,16 @@ export class RealizarCurso implements OnInit {
           mod.pantallas.sort((a, b) => a.pos - b.pos);
         });
 
+        if (curso) {
+          // Aquí obtienes las preguntas del examen desde Firebase
+          this.firebaseService.getExamenCurso(curso.id).then(preguntas => {
+            this.preguntasExamen = preguntas;
+            console.log('Preguntas obtenidas del examen:', this.preguntasExamen);
+            console.log('Cantidad de preguntas:', this.preguntasExamen.length);
+          }).catch(err => {
+            console.error('Error al obtener preguntas del examen:', err);
+          });
+        }
         // Crear lista lineal de pantallas para navegación
         this.posicionesPantallas = this.modulos.flatMap(mod => mod.pantallas);
 
@@ -77,6 +91,7 @@ export class RealizarCurso implements OnInit {
   }
 
   seleccionarPantalla(p: Pantalla) {
+    this.mostrandoExamen = false; 
     this.pantallaSeleccionada = p;
     this.actualizarHtmlPantalla();
     this.actualizarProgreso();
@@ -146,6 +161,35 @@ export class RealizarCurso implements OnInit {
     this.cdRef.detectChanges();
   }
 
+  mostrarExamen() {
+    this.mostrandoExamen = true;
+    this.pantallaSeleccionada = undefined; // ocultar pantallas normales
+  }
+  
+  seleccionarRespuesta(preguntaId: string, opcion: string) {
+    this.respuestasUsuario[preguntaId] = opcion;
+  }
+
+  enviarExamen() {
+    if (this.preguntasExamen.length === 0) {
+      alert('No hay preguntas para calificar.');
+      return;
+    }
+
+    let correctas = 0;
+
+    for (const pregunta of this.preguntasExamen) {
+      const respuestaUsuario = this.respuestasUsuario[pregunta.id!];
+      if (respuestaUsuario && respuestaUsuario === pregunta.res) {
+        correctas++;
+      }
+    }
+
+    const totalPreguntas = this.preguntasExamen.length;
+    const nota = Math.round((correctas / totalPreguntas) * 100);
+
+    alert(`Examen enviado.\nTu calificación: ${nota}%`);
+  }
 
   volver() {
     if (this.curso) {

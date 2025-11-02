@@ -7,6 +7,7 @@ import { Curso } from '../../models/curso.model';
 import { Pantalla } from '../../models/pantalla.model';
 import { Plantilla } from '../../models/plantilla.model';
 import { Modulo } from '../../models/modulo.model';
+import { Pregunta } from '../../models/pregunta.model';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable({
@@ -191,5 +192,12 @@ export class FirebaseService {
     return modulos;
   }
 
-
+  async getExamenCurso(idCurso: string): Promise<Pregunta[]> {
+    const preguntasRef = collection(this.firestore, `cursos/${idCurso}/preguntas`);
+    const snapshot = await getDocs(preguntasRef);
+    return snapshot.docs.map(d => {
+      const data = d.data() as Omit<Pregunta, 'id'>; 
+      return { id: d.id, ...data };
+    });
+  }
 }
