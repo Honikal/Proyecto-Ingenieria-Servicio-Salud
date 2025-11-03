@@ -266,3 +266,26 @@
     max-height: 400px;
   }
 }
+
+.resultado-examen {
+  text-align: center;
+  padding: 40px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.resultado-examen h3 {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+}
+
+.resultado-examen .aprobado {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.resultado-examen .reprobado {
+  color: #dc3545;
+  font-weight: bold;
+}

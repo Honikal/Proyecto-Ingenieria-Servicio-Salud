@@ -81,6 +81,7 @@ export class CrearCursos implements OnInit {
       this.firebaseService.getSociosByUser(this.usuarioActual.id).then((socios) => {
         this.zone.run(() => {
           this.socios = socios;
+          this.cdr.detectChanges();
         });
       });
     }

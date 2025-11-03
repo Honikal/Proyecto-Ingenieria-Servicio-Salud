@@ -1,203 +1,245 @@
-import { Injectable } from '@angular/core';
-import { collection, collectionData, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc, deleteDoc, docData } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
-import { User } from '../../models/user.model';
-import { Area } from '../../models/area.model';
-import { Curso } from '../../models/curso.model';
-import { Pantalla } from '../../models/pantalla.model';
-import { Plantilla } from '../../models/plantilla.model';
-import { Modulo } from '../../models/modulo.model';
-import { Pregunta } from '../../models/pregunta.model';
-import * as bcrypt from 'bcryptjs';
+  import { Injectable } from '@angular/core';
+  import { collection, collectionData, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc, deleteDoc, docData } from '@angular/fire/firestore';
+  import { Observable } from 'rxjs';
+  import { User } from '../../models/user.model';
+  import { Area } from '../../models/area.model';
+  import { Curso } from '../../models/curso.model';
+  import { Pantalla } from '../../models/pantalla.model';
+  import { Plantilla } from '../../models/plantilla.model';
+  import { Modulo } from '../../models/modulo.model';
+  import { Pregunta } from '../../models/pregunta.model';
+  import * as bcrypt from 'bcryptjs';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class FirebaseService {
-  
-  constructor(private firestore: Firestore){}
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class FirebaseService {
+    
+    constructor(private firestore: Firestore){}
 
-  async addUser(user: User){
-    const hashedPassword = await bcrypt.hash(user.password, 10);
-    const userRef = collection(this.firestore, 'users');
+    async addUser(user: User){
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      const userRef = collection(this.firestore, 'users');
 
-    const newUser: User = {
-      ...user,
-      password: hashedPassword,
-      isAdmin: false,
-      isAuto: false,
-      createdAt: new Date(),
-    };
-    await addDoc(userRef, newUser);
+      const newUser: User = {
+        ...user,
+        password: hashedPassword,
+        isAdmin: false,
+        isAuto: false,
+        createdAt: new Date(),
+      };
+      await addDoc(userRef, newUser);
 
-  }
-
-  async login(email: string, password: string){
-    const usersRef = collection(this.firestore, 'users');
-    const q = query(usersRef, where('email', '==', email));
-    const snapshot = await getDocs(q);
-
-    if (snapshot.empty) {
-      return null;
     }
 
-    const userDoc = snapshot.docs[0];
-    const user = userDoc.data() as User;
-    const id = userDoc.id;
+    async login(email: string, password: string){
+      const usersRef = collection(this.firestore, 'users');
+      const q = query(usersRef, where('email', '==', email));
+      const snapshot = await getDocs(q);
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) return null;
+      if (snapshot.empty) {
+        return null;
+      }
 
-    return { ...user, id };;
-  }
+      const userDoc = snapshot.docs[0];
+      const user = userDoc.data() as User;
+      const id = userDoc.id;
 
-  async getUser(userID: string){
-    const userRef = doc(this.firestore, 'users', userID);
-    const snapshot = await getDoc(userRef);
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) return null;
 
-    if (!snapshot.exists()){
-      return null;
+      return { ...user, id };;
     }
 
-    return { id: snapshot.id, ...(snapshot.data() as User) };
-  }
+    async getUser(userID: string){
+      const userRef = doc(this.firestore, 'users', userID);
+      const snapshot = await getDoc(userRef);
 
-  async updateUser(userID: string, updatedData: Partial<User>){
-    const userRef = doc(this.firestore, 'users', userID);
-    await updateDoc(userRef, updatedData);
-  }
+      if (!snapshot.exists()){
+        return null;
+      }
 
-  getUsers(): Observable<User[]> {
-    const userRef = collection(this.firestore, 'users');
-    return collectionData(userRef, { idField: 'id' }) as Observable<User[]>;
-  }
-
-  getAreas(): Observable<Area[]> {
-    const areaRef = collection(this.firestore, 'areas');
-    return collectionData(areaRef, { idField: 'id' }) as Observable<Area[]>;
-  }
-
-  async deleteUser(userID: string) {
-    const userRef = doc(this.firestore, 'users', userID);
-    await deleteDoc(userRef);
-  }
-
-  getCursosActivos(): Observable<Curso[]> {
-    const cursosRef = collection(this.firestore, 'cursos');
-    const q = query(cursosRef, where('isActive', '==', true));
-    return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
-  }
-
-  async getMatriculaPorUsuarioYCurso(idUser: string, idCurso: string) {
-    const matriculasRef = collection(this.firestore, 'matricula');
-    const q = query(
-      matriculasRef,
-      where('idUser', '==', idUser),
-      where('idCurso', '==', idCurso)
-    );
-
-    const snapshot = await getDocs(q);
-
-    if (snapshot.empty) {
-      return null; // no está matriculado
+      return { id: snapshot.id, ...(snapshot.data() as User) };
     }
 
-    const docMatricula = snapshot.docs[0];
-    return { id: docMatricula.id, ...(docMatricula.data() as any) };
-  }
-
-  async matricularUsuario(idUser: string, idCurso: string) {
-    const matriculasRef = collection(this.firestore, 'matricula');
-
-    const nuevaMatricula = {
-      idUser,
-      idCurso,
-      finalizado: false,
-      fechaMatricula: new Date(),     
-      fechaFinalizacion: null,       
-      calificacion: -1               
-    };
-
-    await addDoc(matriculasRef, nuevaMatricula);
-
-    const cursoRef = doc(this.firestore, 'cursos', idCurso);
-    const cursoSnap = await getDoc(cursoRef);
-    if (cursoSnap.exists()) {
-      const cursoData = cursoSnap.data() as any;
-      const nuevoConteo = (cursoData.cantPersonas || 0) + 1;
-      await updateDoc(cursoRef, { cantPersonas: nuevoConteo });
+    async updateUser(userID: string, updatedData: Partial<User>){
+      const userRef = doc(this.firestore, 'users', userID);
+      await updateDoc(userRef, updatedData);
     }
 
-    return true;
-  }
+    getUsers(): Observable<User[]> {
+      const userRef = collection(this.firestore, 'users');
+      return collectionData(userRef, { idField: 'id' }) as Observable<User[]>;
+    }
 
-  getPantallasCurso(idCurso: string): Observable<Pantalla[]> {
-    const pantallasRef = collection(this.firestore, `cursos/${idCurso}/pantalla`);
-    return collectionData(pantallasRef, { idField: 'id' }) as Observable<Pantalla[]>;
-  }
+    getAreas(): Observable<Area[]> {
+      const areaRef = collection(this.firestore, 'areas');
+      return collectionData(areaRef, { idField: 'id' }) as Observable<Area[]>;
+    }
 
-  getPlantillas(): Observable<Plantilla[]> {
-    const plantillasRef = collection(this.firestore, 'plantillas');
-    return collectionData(plantillasRef, { idField: 'id' }) as Observable<Plantilla[]>;
-  }
-  
-  async isUserAuto(userId: string): Promise<boolean> {
-    const user = await this.getUser(userId);
-    return user?.isAuto === true;
-  }
+    async deleteUser(userID: string) {
+      const userRef = doc(this.firestore, 'users', userID);
+      await deleteDoc(userRef);
+    }
 
-  getUserRealtime(userId: string): Observable<User | null> {
-    const userRef = doc(this.firestore, 'users', userId);
-    return docData(userRef, { idField: 'id' }) as Observable<User | null>;
-  }
+    getCursosActivos(): Observable<Curso[]> {
+      const cursosRef = collection(this.firestore, 'cursos');
+      const q = query(cursosRef, where('isActive', '==', true));
+      return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
+    }
 
-  async addDoc(ruta: string, data: any) {
-    const ref = collection(this.firestore, ruta);
-    const docRef = await addDoc(ref, data);
-    return docRef; 
-  }
+    async getMatricula(idUser: string, idCurso: string) {
+      const matriculasRef = collection(this.firestore, 'matricula');
+      const q = query(
+        matriculasRef,
+        where('idUser', '==', idUser),
+        where('idCurso', '==', idCurso)
+      );
 
-  async getSociosByUser(idUser: string) {
-    const relRef = collection(this.firestore, 'usersxsocios');
-    const q = query(relRef, where('idUser', '==', idUser));
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) return [];
+      const snapshot = await getDocs(q);
 
-    const sociosIds = snapshot.docs.map(doc => (doc.data() as any).idSocio);
-    const socios: any[] = [];
+      if (snapshot.empty) {
+        return null; // no está matriculado
+      }
 
-    for (const id of sociosIds) {
-      const socioRef = doc(this.firestore, 'socios', id);
-      const socioSnap = await getDoc(socioRef);
-      if (socioSnap.exists()) {
-        socios.push({ id: socioSnap.id, ...(socioSnap.data() as any) });
+      const docMatricula = snapshot.docs[0];
+      return { id: docMatricula.id, ...(docMatricula.data() as any) };
+    }
+
+    async matricularUsuario(idUser: string, idCurso: string) {
+      const matriculasRef = collection(this.firestore, 'matricula');
+
+      const nuevaMatricula = {
+        idUser,
+        idCurso,
+        finalizado: false,
+        fechaMatricula: new Date(),     
+        fechaFinalizacion: null,       
+        calificacion: -1               
+      };
+
+      await addDoc(matriculasRef, nuevaMatricula);
+
+      const cursoRef = doc(this.firestore, 'cursos', idCurso);
+      const cursoSnap = await getDoc(cursoRef);
+      if (cursoSnap.exists()) {
+        const cursoData = cursoSnap.data() as any;
+        const nuevoConteo = (cursoData.cantPersonas || 0) + 1;
+        await updateDoc(cursoRef, { cantPersonas: nuevoConteo });
+      }
+
+      return true;
+    }
+
+    getPantallasCurso(idCurso: string): Observable<Pantalla[]> {
+      const pantallasRef = collection(this.firestore, `cursos/${idCurso}/pantalla`);
+      return collectionData(pantallasRef, { idField: 'id' }) as Observable<Pantalla[]>;
+    }
+
+    getPlantillas(): Observable<Plantilla[]> {
+      const plantillasRef = collection(this.firestore, 'plantillas');
+      return collectionData(plantillasRef, { idField: 'id' }) as Observable<Plantilla[]>;
+    }
+    
+    async isUserAuto(userId: string): Promise<boolean> {
+      const user = await this.getUser(userId);
+      return user?.isAuto === true;
+    }
+
+    getUserRealtime(userId: string): Observable<User | null> {
+      const userRef = doc(this.firestore, 'users', userId);
+      return docData(userRef, { idField: 'id' }) as Observable<User | null>;
+    }
+
+    async addDoc(ruta: string, data: any) {
+      const ref = collection(this.firestore, ruta);
+      const docRef = await addDoc(ref, data);
+      return docRef; 
+    }
+
+    async getSociosByUser(idUser: string) {
+      const relRef = collection(this.firestore, 'usersxsocios');
+      const q = query(relRef, where('idUser', '==', idUser));
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) return [];
+
+      const sociosIds = snapshot.docs.map(doc => (doc.data() as any).idSocio);
+      const socios: any[] = [];
+
+      for (const id of sociosIds) {
+        const socioRef = doc(this.firestore, 'socios', id);
+        const socioSnap = await getDoc(socioRef);
+        if (socioSnap.exists()) {
+          socios.push({ id: socioSnap.id, ...(socioSnap.data() as any) });
+        }
+      }
+
+      return socios;
+    }
+
+    async getModulosCurso(idCurso: string): Promise<Modulo[]> {
+      const modulosRef = collection(this.firestore, `cursos/${idCurso}/modulo`);
+      const snapshot = await getDocs(modulosRef);
+      const modulos: Modulo[] = [];
+      for (const docSnap of snapshot.docs) {
+        const modData = docSnap.data() as Modulo;
+        // Obtener pantallas dentro del módulo
+        const pantRef = collection(this.firestore, `cursos/${idCurso}/modulo/${docSnap.id}/pantalla`);
+        const pantSnap = await getDocs(pantRef);
+        const pantallas: Pantalla[] = pantSnap.docs.map(d => ({ id: d.id, ...(d.data() as Pantalla) }));
+        modulos.push({ ...modData, pantallas });
+      }
+      return modulos;
+    }
+
+    async getExamenCurso(idCurso: string): Promise<Pregunta[]> {
+      const preguntasRef = collection(this.firestore, `cursos/${idCurso}/preguntas`);
+      const snapshot = await getDocs(preguntasRef);
+      return snapshot.docs.map(d => {
+        const data = d.data() as Omit<Pregunta, 'id'>; 
+        return { id: d.id, ...data };
+      });
+    }
+
+  async enviarExamen(idUser: string, idCurso: string, respuestasUsuario: { [idPregunta: string]: string }) {
+
+    const preguntasRef = collection(this.firestore, `cursos/${idCurso}/preguntas`);
+    const snapshot = await getDocs(preguntasRef);
+    const preguntas = snapshot.docs.map(d => ({ id: d.id, ...(d.data() as Pregunta) }));
+
+    if (preguntas.length === 0) {
+      throw new Error('No hay preguntas disponibles para este examen.');
+    }
+    // Calcular nota en servidor
+    let correctas = 0;
+    for (const pregunta of preguntas) {
+      const respuestaUsuario = respuestasUsuario[pregunta.id];
+      if (respuestaUsuario && respuestaUsuario === pregunta.res) {
+        correctas++;
       }
     }
 
-    return socios;
-  }
+    const nota = Math.round((correctas / preguntas.length) * 100);
 
-  async getModulosCurso(idCurso: string): Promise<Modulo[]> {
-    const modulosRef = collection(this.firestore, `cursos/${idCurso}/modulo`);
-    const snapshot = await getDocs(modulosRef);
-    const modulos: Modulo[] = [];
-    for (const docSnap of snapshot.docs) {
-      const modData = docSnap.data() as Modulo;
-      // Obtener pantallas dentro del módulo
-      const pantRef = collection(this.firestore, `cursos/${idCurso}/modulo/${docSnap.id}/pantalla`);
-      const pantSnap = await getDocs(pantRef);
-      const pantallas: Pantalla[] = pantSnap.docs.map(d => ({ id: d.id, ...(d.data() as Pantalla) }));
-      modulos.push({ ...modData, pantallas });
+    const matriculaRef = collection(this.firestore, 'matricula');
+    const q = query(matriculaRef, where('idUser', '==', idUser), where('idCurso', '==', idCurso));
+    const snapshotMatricula = await getDocs(q);
+
+    if (!snapshotMatricula.empty) {
+      const docMatricula = snapshotMatricula.docs[0];
+      const ref = doc(this.firestore, 'matricula', docMatricula.id);
+
+      await updateDoc(ref, {
+        finalizado: true,
+        calificacion: nota,
+        fechaFinalizacion: new Date()
+      });
+    } else {
+      console.warn('Usuario no matriculado en el curso'); 
     }
-    return modulos;
+
+    return nota;
   }
 
-  async getExamenCurso(idCurso: string): Promise<Pregunta[]> {
-    const preguntasRef = collection(this.firestore, `cursos/${idCurso}/preguntas`);
-    const snapshot = await getDocs(preguntasRef);
-    return snapshot.docs.map(d => {
-      const data = d.data() as Omit<Pregunta, 'id'>; 
-      return { id: d.id, ...data };
-    });
+
   }
-}
