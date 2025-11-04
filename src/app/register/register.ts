@@ -4,6 +4,7 @@ import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FirebaseService } from '../services/firebase'; 
+import { EmailService } from '../services/email.service';
 import { Observable } from 'rxjs';
 import { Area } from '../../models/area.model';
 import { CommonModule } from '@angular/common';
@@ -24,7 +25,8 @@ export class Register {
   constructor(
     private router: Router,
     private fb: FormBuilder,
-    private firebaseService: FirebaseService 
+    private firebaseService: FirebaseService,
+    private emailService: EmailService
   ) {
     this.registerForm = this.fb.group({
       fullName: ['', Validators.required],
@@ -47,6 +49,14 @@ export class Register {
     if (this.registerForm.valid) {
       try {
         await this.firebaseService.addUser(this.registerForm.value);
+
+        //Correo de notificación de ingreso al sistema
+        await this.emailService.sendEmailNotification(
+          this.registerForm.value.email,
+          "Bienvenido a la Aplicación de Salud Ocupacional del TEC",
+          "Este es un correo de prueba, si funciona, entonces estaremos salvados"
+        );
+
         console.log("Usuario agregado correctamente:");
         this.router.navigate(['/login']);
       } catch (error) {
