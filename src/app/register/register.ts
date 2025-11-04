@@ -51,11 +51,14 @@ export class Register {
         await this.firebaseService.addUser(this.registerForm.value);
 
         //Correo de notificación de ingreso al sistema
-        await this.emailService.sendEmailNotification(
+        this.emailService.sendEmailNotification(
           this.registerForm.value.email,
           "Bienvenido a la Aplicación de Salud Ocupacional del TEC",
           "Este es un correo de prueba, si funciona, entonces estaremos salvados"
-        );
+        ).subscribe({
+          next: (resp) => console.log("✅ Email enviado desde Angular", resp),
+          error: (err) => console.error("❌ Error enviando email desde Angular", err) 
+        });
 
         console.log("Usuario agregado correctamente:");
         this.router.navigate(['/login']);
