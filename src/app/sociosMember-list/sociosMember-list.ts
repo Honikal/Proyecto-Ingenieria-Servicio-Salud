@@ -13,7 +13,7 @@ import { Timestamp } from '@angular/fire/firestore';
   imports: [AsyncPipe, CommonModule]
 })
 export class SociosMemberList {
-  userList$: Observable<any[]>; // 🔹 Ahora contiene relaciones users-socios
+  userList$: Observable<any[]>; 
   userMenuOpen: boolean = false;
   user: any | null = null;
 

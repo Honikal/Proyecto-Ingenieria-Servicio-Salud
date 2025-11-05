@@ -9,7 +9,6 @@
   import { Modulo } from '../../models/modulo.model';
   import { Pregunta } from '../../models/pregunta.model';
   import * as bcrypt from 'bcryptjs';
-import { Socio } from '../../models/socio.model';
 
   @Injectable({
     providedIn: 'root'
@@ -125,6 +124,35 @@ import { Socio } from '../../models/socio.model';
       );
     }
 
+    getUsersXSocioFull(idSocio: string): Observable<any[]> {
+      const relRef = collection(this.firestore, 'usersxsocios');
+      const q = query(relRef, where('idSocio', '==', idSocio));
+
+      return collectionData(q, { idField: 'id' }).pipe(
+        mergeMap((relations: any[]) =>
+          from(relations).pipe(
+            mergeMap(async (rel) => {
+              const userSnap = await getDoc(doc(this.firestore, `users/${rel.idUser}`));
+              const socioSnap = await getDoc(doc(this.firestore, `socios/${rel.idSocio}`));
+
+              const userData = userSnap.exists() ? userSnap.data() : {};
+              const socioData = socioSnap.exists() ? socioSnap.data() : {};
+
+              return {
+                id: rel.id,
+                idUser: rel.idUser,
+                idSocio: rel.idSocio,
+                userName: userData ? userData['fullName'] || userData['nombre'] || '(sin nombre)' : '(sin usuario)',
+                socioName: socioData ? socioData['nombre'] || socioData['nombreSocio'] || '(sin socio)' : '(sin socio)',
+                fechaAsociacion: rel['fechaAsociacion'] || null
+              };
+            }),
+            toArray()
+          )
+        )
+      );
+    }
+
     async getUserByEmail(email: string) {
       try {
         const usersRef = collection(this.firestore, 'users');
@@ -146,7 +174,7 @@ import { Socio } from '../../models/socio.model';
 
     async addUserXSocio(relacion: { idUsuario: string; idSocio: string }) {
       try {
-        const userXSociosRef = collection(this.firestore, 'userxsocios');
+        const userXSociosRef = collection(this.firestore, 'usersxsocios');
         await addDoc(userXSociosRef, {
           idUsuario: relacion.idUsuario,
           idSocio: relacion.idSocio,

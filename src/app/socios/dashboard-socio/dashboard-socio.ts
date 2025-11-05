@@ -47,6 +47,10 @@ export class DashboardSocio {
     this.router.navigate(['/asociar-miembro']);
   }
 
+  goToAsociados() {
+    this.router.navigate(['/lista-asociados']);
+  }
+
   goToCertificates() {
     this.router.navigate(['/certificados']);
   }

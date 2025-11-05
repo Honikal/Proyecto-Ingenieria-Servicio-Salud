@@ -22,13 +22,11 @@ export class AsociarMiembro {
     private firebaseService: FirebaseService,
     private router: Router
   ) {
-    // Cargar socio actual desde localStorage
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      this.socioActual = JSON.parse(storedUser);
-      console.log('Socio actual cargado:', this.socioActual);
-    }
-    else {
+    const storedSocio = localStorage.getItem('currentSocio');
+    if (storedSocio) {
+      this.socioActual = JSON.parse(storedSocio);
+      console.log('Socio actual cargado desde localStorage:', this.socioActual);
+    } else {
       console.warn('No se encontró socio actual en localStorage.');
     }
   }
@@ -53,20 +51,19 @@ export class AsociarMiembro {
         return;
       }
 
-      console.log(usuario.id)
+      console.log('Usuario encontrado:', usuario);
 
-      if (!this.socioActual?.id) {
+      if (!this.socioActual?.email) {
         this.mensaje = 'No se encontró la sesión del socio actual.';
         this.error = true;
         return;
       }
 
-      console.log(this.socioActual.id)
+      console.log('Socio confirmado:', this.socioActual.id);
 
       const nuevaRelacion = {
         idUsuario: usuario.id,
-        idSocio: this.socioActual.id,
-        fechaAsociacion: new Date()
+        idSocio: this.socioActual.id
       };
 
       await this.firebaseService.addUserXSocio(nuevaRelacion);
@@ -74,6 +71,7 @@ export class AsociarMiembro {
       this.mensaje = 'Usuario vinculado exitosamente.';
       this.error = false;
       this.correoUsuario = '';
+
     } catch (err) {
       console.error('Error al asociar usuario:', err);
       this.mensaje = 'Ocurrió un error al asociar el usuario.';
