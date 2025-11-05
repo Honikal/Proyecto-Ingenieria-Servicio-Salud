@@ -1,0 +1,7 @@
+.lista-cursos { display: grid; gap: 12px; }
+.curso-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+}
+button { cursor: pointer; }

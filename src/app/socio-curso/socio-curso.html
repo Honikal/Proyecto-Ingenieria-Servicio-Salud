@@ -1,0 +1,11 @@
+<div *ngIf="cargando">Cargando curso...</div>
+
+<div *ngIf="!cargando && curso">
+  <h2>{{ curso?.nombre || curso?.id || $any(curso)?._id || 'Curso' }}</h2>
+
+  <div class="solo-lectura-aviso">
+    Modo lectura: puedes ver pantallas y examen, pero no responder.
+  </div>
+
+  <button (click)="verExamenSoloLectura()">Ver examen (solo lectura)</button>
+</div>
