@@ -100,7 +100,7 @@
         mergeMap((relations: any[]) =>
           from(relations).pipe(
             mergeMap(async (rel) => {
-              const userSnap = await getDoc(doc(this.firestore, `usuarios/${rel.idUser}`));
+              const userSnap = await getDoc(doc(this.firestore, `users/${rel.idUser}`));
               const socioSnap = await getDoc(doc(this.firestore, `socios/${rel.idSocio}`));
 
               const userData = userSnap.exists() ? userSnap.data() : {};

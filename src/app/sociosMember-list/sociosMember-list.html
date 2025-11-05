@@ -26,16 +26,12 @@
       <tr>
         <th>Nombre de Usuario</th>
         <th>Nombre del Socio</th>
-        <th>ID Usuario</th>
-        <th>ID Socio</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let item of userList$ | async">
         <td>{{ item.userName }}</td>
         <td>{{ item.socioName }}</td>
-        <td>{{ item.idUser }}</td>
-        <td>{{ item.idSocio }}</td>
       </tr>
     </tbody>
   </table>
