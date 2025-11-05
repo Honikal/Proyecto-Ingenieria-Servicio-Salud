@@ -7,10 +7,11 @@ import { FirebaseService } from '../services/firebase';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Area } from '../../models/area.model';
 import { CommonModule } from '@angular/common';
+import { OtpModal } from '../otp-modal/otp-modal';
 
 @Component({
   selector: 'app-manage-users',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, OtpModal],
   templateUrl: './manage-users.html',
   styleUrl: './manage-users.css',
   providers: [provideIcons( { ionEye, ionEyeOff })]
@@ -21,6 +22,11 @@ export class ManageUsers implements OnInit {
   user: User | null = null;
   userForm!: FormGroup;
   areas: Area[] = [];
+
+  //Manejo del otp
+  showOTPModal = false;                     //Modal del OTP
+  isSubmitting = false;                     //Estado del OTP o del código en subida o no
+  private pendingSave = false;              //Trackeamos si ocupamos guardar después de verificación OTP
 
   //Creamos nuestro constructor y de acá extraemos al usuario
   constructor(
@@ -59,7 +65,6 @@ export class ManageUsers implements OnInit {
             area: this.user.area
           })
         }
-
       }
     }
   }
@@ -78,37 +83,55 @@ export class ManageUsers implements OnInit {
     if (!this.user) return;
 
     if (this.isEditing){
-      if (this.userForm.valid){
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-        //Guardamos los cambios editados
-          const parsed = JSON.parse(storedUser);
-          const updatedData = this.userForm.value;
-
-          await this.firebaseService.updateUser(parsed.id, updatedData);
-          alert("Cambios guardados correctamente");
-
-          //Actualizamos los datos de forma local
-          this.user = { ...this.user, ...updatedData }
-          const userData = {
-            id: parsed.id,
-            fullName: this.user?.fullName,
-            email: this.user?.email,
-            isAdmin: this.user?.isAdmin
-          };
-          localStorage.setItem("currentUser", JSON.stringify(userData));
-          this.isEditing = false; //Quitamos el modo de edición
-          this.cdr.detectChanges();
-        }
-      } else {
-        alert("Por favor completa los cargos requeridos");
+      //Estamos en modo de editar y queremos guardar los cambios
+      if (!this.userForm.valid){
+        this.userForm.markAllAsTouched();
+        return;
       }
+
+      //Asignamos el flag que queremos guardar una vez termine la verificación OTP
+      this.pendingSave = true;
+
+      //Mostramos el OTP
+      this.isSubmitting = true;
+      this.showOTPModal = true;
     } else {
-      //Pasamos al modo de edición
+      //Pasamos al modo de edición sin OTP
       this.isEditing = true;
     }
   }
 
+  onCancelEdit(){
+    //Reseteamos a los valores originales
+    if (this.user){
+      this.userForm.patchValue({
+        fullName: this.user.fullName,
+        email: this.user.email,
+        phone: this.user.phone,
+        area: this.user.area
+      })
+    }
+    this.isEditing = false;
+    this.pendingSave = false;
+  }
+
+  //===============Eventos de Modal===============//
+  onOtpVerified(){
+    if (this.pendingSave){
+      this.saveUserChanges();
+    }
+  }
+  onOtpCancelled(){
+    this.showOTPModal = false;
+    this.isSubmitting = false;
+    this.pendingSave  = false;
+  }
+  onOtpError(error: string){
+    console.error('OTP Error:', error);
+    // You can show a global error message if needed
+  }
+
+  //=================Funciones originales=================//
   onDeleteClick(){
     alert(`Eliminamos el usuario en la ubicación: `);
   }
@@ -125,5 +148,42 @@ export class ManageUsers implements OnInit {
     if (!areaId || !this.areas) return 'Sin área';
     const area = this.areas.find(a => a.id === areaId);
     return area ? area.nombre : 'Sin área';
+  }
+
+  private async saveUserChanges(){
+    if (!this.user) return;
+
+    try {
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        //Guardamos los cambios editados
+        const parsed = JSON.parse(storedUser);
+        const updatedData = this.userForm.value;
+
+        await this.firebaseService.updateUser(parsed.id, updatedData);
+        alert("Cambios guardados correctamente");
+
+        //Actualizamos los datos de forma local
+        this.user = { ...this.user, ...updatedData }
+        const userData = {
+          id: parsed.id,
+          fullName: this.user?.fullName,
+          email: this.user?.email,
+          isAdmin: this.user?.isAdmin
+        };
+        localStorage.setItem("currentUser", JSON.stringify(userData));
+        this.isEditing = false; //Quitamos el modo de edición
+        this.cdr.detectChanges();
+
+        this.router.navigate(['/']);
+      }
+    } catch (error) {
+      console.error("Error al registrar:", error);
+      alert("Error al registrar");
+    } finally {
+      this.showOTPModal = false;
+      this.isSubmitting = false;
+      this.pendingSave  = false;
+    }
   }
 }

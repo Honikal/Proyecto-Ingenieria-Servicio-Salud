@@ -72,60 +72,16 @@
     </div>
   </form>
 
-  @if (showOTPModal){
-    <div class="otp-modal-overlay">
-      <div class="otp-modal-container">
-        <div class="otp-modal-header">
-          <h3>Verificación de Correo</h3>
-          <p>Hemos enviado un código de 6 dígitos a tu correo electrónico</p>
-        </div>
-
-        <div class="otp-input-container">
-          <div class="otp-inputs" [formGroup]="otpForm">
-            <div formArrayName="digits">
-              <input 
-                *ngFor="let control of OTPDigits.controls; let idx = index"
-                type="text" 
-                maxlength="1"
-                [formControlName]="idx"
-                (input)="onOtpInput($event, idx)"
-                (keydown)="onOtpKeyDown($event, idx)"
-                (paste)="onOtpPaste($event)"
-                class="otp-input"
-                [class.error]="otpError"
-              >
-            </div>
-          </div>
-          @if (otpError){
-            <div class="otp-error-message">
-              <span>⚠️ {{ otpError }}</span>
-            </div>
-          }
-        </div>
-
-        @if (timeLeft > 0){
-          <div class="otp-timer">
-            ⏰ El código expira en: {{ formatTime(timeLeft) }}
-          </div>
-        }
-        
-        <div class="otp-actions">
-          <button class="btn-primary" (click)="onConfirmOTP()" [disabled]="!isOtpComplete() || timeLeft === 0">
-            Verificar Código
-          </button>
-          <button class="btn-secondary" (click)="onResendOTP()" [disabled]="timeLeft > 0">
-            Reenviar Código
-          </button>
-          <button class="btn-tertiary" (click)="onCancelOTP()">
-            Cancelar
-          </button>
-        </div>
-
-        <div class="otp-footer">
-          <p>¿No recibiste el código? <a (click)="onResendOTP()" [class.disabled]="timeLeft > 0">Reenviar</a></p>
-        </div>
-      </div>
-    </div>
+  @if (showOTPModal) {
+    <app-otp-modal
+      [email]="registerForm.value.email"
+      [purpose]="'Registro'"
+      [title]="'Verificación de Correo'"
+      [description]="'Hemos enviado un código de 6 dígitos a tu correo electrónico'"
+      (verified)="onOtpVerified()"
+      (cancelled)="onOtpCancelled()"
+      (error)="onOtpError($event)">
+    </app-otp-modal>
   }
 
   <a (click)="onLoginClick()">¿Usuario existente? Inicia sesión acá</a>

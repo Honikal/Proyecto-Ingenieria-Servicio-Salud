@@ -53,14 +53,32 @@
         </form>
         
         <div id="button-section">
-            <div class="button" (click)="onEditClick()">
-                {{ isEditing ? 'Guardar Cambios' : 'Editar' }}
+            <div class="button" (click)="onEditClick()" [class.disabled]="isSubmitting">
+                {{ isEditing ? (isSubmitting ? 'Procesando...' : 'Guardar Cambios') : 'Editar' }}
             </div>
-            <div class="button" (click)="onDeleteClick()">
-                Eliminar
-            </div>
+            
+            @if (isEditing) {
+                <div class="button" (click)="onCancelEdit()" [class.disabled]="isSubmitting">
+                    Cancelar
+                </div>
+            } @else {
+                <div class="button" (click)="onDeleteClick()">
+                    Eliminar
+                </div>
+            }
         </div>
-    </div>
+
+    @if (showOTPModal) {
+        <app-otp-modal
+            [email]="userForm.value.email"
+            [purpose]="'Edición de Perfil'"
+            [title]="'Verificación de Cambios'"
+            [description]="'Hemos enviado un código de 6 dígitos a tu correo electrónico para verificar los cambios'"
+            (verified)="onOtpVerified()"
+            (cancelled)="onOtpCancelled()"
+            (error)="onOtpError($event)">
+        </app-otp-modal>
+    }
 
     <div class="button" (click)="volver()">
         Regresar

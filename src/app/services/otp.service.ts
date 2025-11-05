@@ -13,29 +13,29 @@ export class OTPService {
 
     constructor(private http: HttpClient) {}
 
-    requestOTP(email: string){
+    requestOTP(email: string, purpose: string){
         return this.http.post(`${this.API_URL}/auth/request-otp`, 
         {
             email,
-            purpose: "register",
+            purpose
         });
     }
 
-    verifyOTP(pendingId: string, code: string){
+    verifyOTP(pendingId: string, code: string, purpose: string){
         return this.http.post(`${this.API_URL}/auth/verify-otp`, 
         {
             pendingId,
             code, 
-            purpose: "register"
+            purpose
         });
     }
 
-    resendOTP(pendingId: string, email: string){
+    resendOTP(pendingId: string, purpose: string, email: string){
         return this.http.post(`${this.API_URL}/auth/resend-otp`, 
         {
             pendingId,
-            purpose: "register",
-            email,
+            purpose,
+            email
         });
     }
 }
