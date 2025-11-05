@@ -1,0 +1,57 @@
+<div class="login-socio-section">
+  <h1>Iniciar Sesión - Socio</h1>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+    <!-- Correo -->
+    <div class="info-section">
+      <p>Correo electrónico*</p>
+      <div class="input-field">
+        <input
+          type="email"
+          placeholder="ejemplo@correo.com"
+          formControlName="email"
+        />
+      </div>
+      @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+        <small>Ingresa un correo válido</small>
+      }
+    </div>
+
+    <!-- Contraseña -->
+    <div class="info-section">
+      <p>Contraseña*</p>
+      <div class="input-field">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Ingrese su contraseña"
+          formControlName="password"
+        />
+        <button
+          class="toggle-password"
+          type="button"
+          (click)="onPasswordToggle()"
+          aria-label="Mostrar u ocultar contraseña"
+        >
+          @if (showPassword) {
+            <ng-icon name="ionEye"></ng-icon>
+          } @else {
+            <ng-icon name="ionEyeOff"></ng-icon>
+          }
+        </button>
+      </div>
+      @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+        <small>Contraseña requerida</small>
+      }
+    </div>
+
+    <a (click)="onForgetPassword()">¿Olvidaste tu contraseña?</a>
+
+    <!-- Botones -->
+    <div id="buttons-section">
+      <button type="submit" class="button login">Ingresar</button>
+      <button type="button" class="button cancel" (click)="onCancel()">Cancelar</button>
+    </div>
+  </form>
+
+  <a (click)="onRegisterClick()">¿Aún no tienes cuenta? Regístrate aquí</a>
+</div>

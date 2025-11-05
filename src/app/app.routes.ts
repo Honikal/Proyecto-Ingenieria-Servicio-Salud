@@ -13,6 +13,7 @@ import { Component } from '@angular/core';
 import { ListaCursos } from './cursos/lista-cursos/lista-cursos';
 import { RealizarCurso } from './cursos/realizar-curso/realizar-curso';
 import { CrearCursos } from './cursos/crear-cursos/crear-cursos';
+import { LoginSocio } from './socios/login-socio/login-socio';
 
 // dropdown sin implementar
 @Component({
@@ -33,6 +34,7 @@ export const routes: Routes = [
   { path: 'users', component: ManageUsers },
   { path: 'socios', component: ListaSocios },
   { path: 'socios/registrar', component: RegistrarSocio },
+  { path: 'socios/login', component: LoginSocio },
   { path: 'socios/:id', component: GestionarSocio},
   { path: 'ver-curso/:id',component: VerCurso},
   { path: 'realizar-curso/:id',component: RealizarCurso},

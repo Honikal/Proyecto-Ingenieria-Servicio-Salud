@@ -79,6 +79,10 @@ async onLoginClick() {
     this.router.navigate(['/register'])
   }
 
+  onLoginSocioClick(){
+    this.router.navigate(['/socios/login'])
+  }
+
   onForgetPassword(){
     alert("Se redirige a la página encargada de editar el password .. por trabajar")
   }
