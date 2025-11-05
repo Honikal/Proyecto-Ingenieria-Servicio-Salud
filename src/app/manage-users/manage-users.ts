@@ -4,7 +4,7 @@ import { provideIcons } from '@ng-icons/core';
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons'; 
 import { User } from '../../models/user.model'; 
 import { FirebaseService } from '../services/firebase';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormControl, FormArray } from "@angular/forms";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Area } from '../../models/area.model';
 import { CommonModule } from '@angular/common';
 
@@ -21,15 +21,6 @@ export class ManageUsers implements OnInit {
   user: User | null = null;
   userForm!: FormGroup;
   areas: Area[] = [];
-
-  //Manejo del otp
-  pendingId : string = "";                  //ID esperado del usuario que solicita el OTP
-  otpError: string = "";                    //Error a mostrar en caso que aparezcan
-  showOTPModal = false;                     //Modal del OTP
-  timeLeft: number = 120;                   //2 minutos en segundos
-  private timerInterval: any;
-  otpForm: FormGroup;
-
 
   //Creamos nuestro constructor y de acá extraemos al usuario
   constructor(
@@ -48,10 +39,6 @@ export class ManageUsers implements OnInit {
       phone: [''],
       area: ['']
     })
-
-    this.otpForm = this.fb.group({
-      digits: this.fb.array(Array(6).fill(null).map(() => new FormControl('', [Validators.required, Validators.pattern(/^\d*$/)])))
-    });
 
     this.firebaseService.getAreas().subscribe(areas => {
       this.areas = areas;
