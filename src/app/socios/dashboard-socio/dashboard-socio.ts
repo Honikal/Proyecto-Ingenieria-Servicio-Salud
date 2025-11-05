@@ -43,8 +43,8 @@ export class DashboardSocio {
     this.router.navigate(['/mis-cursos']);
   }
 
-  goToProgress() {
-    this.router.navigate(['/progreso']);
+  goToAsociar() {
+    this.router.navigate(['/asociar-miembro']);
   }
 
   goToCertificates() {

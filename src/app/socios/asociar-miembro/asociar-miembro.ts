@@ -1,0 +1,89 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { FirebaseService } from '../../services/firebase';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-asociar-miembro',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './asociar-miembro.html',
+  styleUrls: ['./asociar-miembro.css']
+})
+export class AsociarMiembro {
+  correoUsuario = '';
+  socioActual: any = null;
+  cargando = false;
+  mensaje = '';
+  error = false;
+
+  constructor(
+    private firebaseService: FirebaseService,
+    private router: Router
+  ) {
+    // Cargar socio actual desde localStorage
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      this.socioActual = JSON.parse(storedUser);
+      console.log('Socio actual cargado:', this.socioActual);
+    }
+    else {
+      console.warn('No se encontró socio actual en localStorage.');
+    }
+  }
+
+  async asociarUsuario() {
+    this.mensaje = '';
+    this.error = false;
+
+    if (!this.correoUsuario) {
+      this.mensaje = 'Por favor ingrese un correo válido.';
+      this.error = true;
+      return;
+    }
+
+    this.cargando = true;
+
+    try {
+      const usuario = await this.firebaseService.getUserByEmail(this.correoUsuario);
+      if (!usuario) {
+        this.mensaje = 'No se encontró ningún usuario con ese correo.';
+        this.error = true;
+        return;
+      }
+
+      console.log(usuario.id)
+
+      if (!this.socioActual?.id) {
+        this.mensaje = 'No se encontró la sesión del socio actual.';
+        this.error = true;
+        return;
+      }
+
+      console.log(this.socioActual.id)
+
+      const nuevaRelacion = {
+        idUsuario: usuario.id,
+        idSocio: this.socioActual.id,
+        fechaAsociacion: new Date()
+      };
+
+      await this.firebaseService.addUserXSocio(nuevaRelacion);
+
+      this.mensaje = 'Usuario vinculado exitosamente.';
+      this.error = false;
+      this.correoUsuario = '';
+    } catch (err) {
+      console.error('Error al asociar usuario:', err);
+      this.mensaje = 'Ocurrió un error al asociar el usuario.';
+      this.error = true;
+    } finally {
+      this.cargando = false;
+    }
+  }
+
+  cancelar() {
+    this.router.navigate(['/socios/dashboard-socio']);
+  }
+}

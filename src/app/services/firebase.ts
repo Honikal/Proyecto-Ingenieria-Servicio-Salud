@@ -9,13 +9,18 @@
   import { Modulo } from '../../models/modulo.model';
   import { Pregunta } from '../../models/pregunta.model';
   import * as bcrypt from 'bcryptjs';
+import { Socio } from '../../models/socio.model';
 
   @Injectable({
     providedIn: 'root'
   })
   export class FirebaseService {
+
+    private sociosRef;
     
-    constructor(private firestore: Firestore){}
+    constructor(private firestore: Firestore){
+      this.sociosRef = collection(this.firestore, 'socios');
+    }
 
     async addUser(user: User){
       const hashedPassword = await bcrypt.hash(user.password, 10);
@@ -118,6 +123,39 @@
           )
         )
       );
+    }
+
+    async getUserByEmail(email: string) {
+      try {
+        const usersRef = collection(this.firestore, 'users');
+        const q = query(usersRef, where('email', '==', email));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          return null;
+        }
+
+        const docSnap = snapshot.docs[0];
+        console.log('Usuario encontrado:', docSnap.data());
+        return { id: docSnap.id, ...docSnap.data() };
+      } catch (error) {
+        console.error('Error al obtener usuario por correo:', error);
+        throw error;
+      }
+    }
+
+    async addUserXSocio(relacion: { idUsuario: string; idSocio: string }) {
+      try {
+        const userXSociosRef = collection(this.firestore, 'userxsocios');
+        await addDoc(userXSociosRef, {
+          idUsuario: relacion.idUsuario,
+          idSocio: relacion.idSocio,
+        });
+        console.log('Relación userxsocios creada correctamente.');
+      } catch (error) {
+        console.error('Error al crear relación userxsocios:', error);
+        throw error;
+      }
     }
 
     async getMatricula(idUser: string, idCurso: string) {
