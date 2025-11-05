@@ -9,6 +9,7 @@ import { ListaSocios } from './socios/lista-socios/lista-socios';
 import { RegistrarSocio } from './socios/registrar-socio/registrar-socio';
 import { GestionarSocio } from './socios/gestionar-socio/gestionar-socio';
 import { DashboardSocio } from './socios/dashboard-socio/dashboard-socio';  
+import { SociosMemberList } from './sociosMember-list/sociosMember-list';
 import { VerCurso } from './cursos/ver-curso/ver-curso';
 import { Component } from '@angular/core';
 import { ListaCursos } from './cursos/lista-cursos/lista-cursos';
@@ -37,6 +38,7 @@ export const routes: Routes = [
   { path: 'socios/registrar', component: RegistrarSocio },
   { path: 'socios/login', component: LoginSocio },
   { path: 'socios/dashboard-socio', component: DashboardSocio },
+  { path: 'sociosMember-list', component: SociosMemberList },
   { path: 'socios/:id', component: GestionarSocio},
   { path: 'ver-curso/:id',component: VerCurso},
   { path: 'realizar-curso/:id',component: RealizarCurso},

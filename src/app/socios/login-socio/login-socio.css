@@ -1,4 +1,4 @@
-.login-socio-section {
+.login-section {
   display: flex;
   flex-direction: column;
   margin: 40px auto;
@@ -8,18 +8,15 @@
   padding: 30px 40px;
   background: #fff;
   border-radius: 6px;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
-    sans-serif;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-.login-socio-section h1 {
+.login-section h1 {
   font-size: 1.6rem;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 20px;
   text-align: center;
-  color: #007f8b;
 }
 
 .info-section {
@@ -31,21 +28,15 @@
 .info-section p {
   margin: 0 0 6px;
   font-weight: 500;
-  color: #333;
 }
 
 .input-field {
   display: flex;
   align-items: center;
   border: 1px solid #aaa;
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
   background: #fff;
-  transition: border 0.2s;
-}
-
-.input-field:focus-within {
-  border-color: #0096a5;
 }
 
 .input-field input {
@@ -61,11 +52,10 @@
   background: transparent;
   padding: 0 12px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 1.2rem;
   color: #444;
+  display: flex;
+  align-items: center;
 }
 
 small {
@@ -75,38 +65,38 @@ small {
   display: block;
 }
 
-/* Botones */
 #buttons-section {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-top: 25px;
+  margin-top: 20px;
 }
 
 #buttons-section .button {
   flex: 1;
   text-align: center;
   margin: 0 6px;
-  padding: 12px 0;
-  border-radius: 4px;
+  padding: 10px 0;
+  border: 1px solid #333;
+  border-radius: 3px;
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s;
-  border: none;
-  color: white;
-  font-weight: 500;
 }
 
-#buttons-section .button.login {
-  background: #0096a5;
-}
-#buttons-section .button.login:hover {
-  background: #007f8b;
+#buttons-section .button:hover {
+  background: #f5f5f5;
 }
 
-#buttons-section .button.cancel {
-  background: #888;
+.login-section a {
+  margin-top: 15px;
+  color: #009FB7;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
 }
-#buttons-section .button.cancel:hover {
-  background: #666;
+
+.login-section a:hover {
+  color: #004D5C;
 }

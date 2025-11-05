@@ -1,23 +1,15 @@
-<div class="login-socio-section">
+<div class="login-section">
   <h1>Iniciar Sesión - Socio</h1>
 
-  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-    <!-- Correo -->
+  <form [formGroup]="loginForm">
     <div class="info-section">
-      <p>Correo electrónico*</p>
+      <p>Correo*</p>
       <div class="input-field">
-        <input
-          type="email"
-          placeholder="ejemplo@correo.com"
-          formControlName="email"
-        />
+        <input type="email" placeholder="Ingrese su correo electrónico" formControlName="email"/>
       </div>
-      @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
-        <small>Ingresa un correo válido</small>
-      }
+      @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {<small>Correo inválido</small>}
     </div>
 
-    <!-- Contraseña -->
     <div class="info-section">
       <p>Contraseña*</p>
       <div class="input-field">
@@ -26,32 +18,27 @@
           placeholder="Ingrese su contraseña"
           formControlName="password"
         />
-        <button
-          class="toggle-password"
-          type="button"
-          (click)="onPasswordToggle()"
-          aria-label="Mostrar u ocultar contraseña"
-        >
-          @if (showPassword) {
+        <button class="toggle-password" type="button" (click)="onPasswordToggle()">
+          @if (showPassword){
             <ng-icon name="ionEye"></ng-icon>
           } @else {
             <ng-icon name="ionEyeOff"></ng-icon>
           }
         </button>
       </div>
-      @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
-        <small>Contraseña requerida</small>
-      }
+      @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {<small>Contraseña requerida</small>}
     </div>
 
-    <a (click)="onForgetPassword()">¿Olvidaste tu contraseña?</a>
+    <a (click)="onForgetPassword()">¿Olvidaste la contraseña?</a>
 
-    <!-- Botones -->
     <div id="buttons-section">
-      <button type="submit" class="button login">Ingresar</button>
-      <button type="button" class="button cancel" (click)="onCancel()">Cancelar</button>
+      <div class="button" (click)="onLogin()">
+        Iniciar Sesión
+      </div>
+      <div class="button" (click)="onCancel()">
+        Cancelar
+      </div>
     </div>
   </form>
 
-  <a (click)="onRegisterClick()">¿Aún no tienes cuenta? Regístrate aquí</a>
 </div>

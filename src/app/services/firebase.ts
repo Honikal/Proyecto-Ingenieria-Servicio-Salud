@@ -1,6 +1,6 @@
   import { Injectable } from '@angular/core';
   import { collection, collectionData, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc, deleteDoc, docData } from '@angular/fire/firestore';
-  import { Observable } from 'rxjs';
+  import { from, mergeMap, Observable, toArray } from 'rxjs';
   import { User } from '../../models/user.model';
   import { Area } from '../../models/area.model';
   import { Curso } from '../../models/curso.model';
@@ -86,6 +86,38 @@
       const cursosRef = collection(this.firestore, 'cursos');
       const q = query(cursosRef, where('isActive', '==', true));
       return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
+    }
+
+    getUsersXSocios(): Observable<any[]> {
+      const colRef = collection(this.firestore, 'usersxsocios');
+      return collectionData(colRef, { idField: 'id' }) as Observable<any[]>;
+    }
+
+    getUsersXSociosFull(): Observable<any[]> {
+      const usersXSociosRef = collection(this.firestore, 'usersxsocios');
+
+      return collectionData(usersXSociosRef, { idField: 'id' }).pipe(
+        mergeMap((relations: any[]) =>
+          from(relations).pipe(
+            mergeMap(async (rel) => {
+              const userSnap = await getDoc(doc(this.firestore, `usuarios/${rel.idUser}`));
+              const socioSnap = await getDoc(doc(this.firestore, `socios/${rel.idSocio}`));
+
+              const userData = userSnap.exists() ? userSnap.data() : {};
+              const socioData = socioSnap.exists() ? socioSnap.data() : {};
+
+              return {
+                id: rel.id,
+                idUser: rel.idUser,
+                idSocio: rel.idSocio,
+                userName: userData ? userData['fullName'] || userData['nombre'] || '(sin nombre)' : '(sin usuario)',
+                socioName: socioData ? socioData['nombre'] || socioData['nombreSocio'] || '(sin socio)' : '(sin socio)',
+              };
+            }),
+            toArray()
+          )
+        )
+      );
     }
 
     async getMatricula(idUser: string, idCurso: string) {
