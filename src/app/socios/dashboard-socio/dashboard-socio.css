@@ -1,0 +1,28 @@
+#top-bar {
+  background-color: #2B7A78;
+  color: #ffffff;
+}
+
+#sidebar {
+  background-color: #17252A;
+}
+
+#sidebar li:hover {
+  background-color: #2B7A78;
+}
+
+.card-title {
+  background-color: #3AAFA9;
+}
+
+.user-avatar {
+  background: #17252A;
+}
+
+.user-avatar:hover {
+  background: #2B7A78;
+}
+
+.user-menu {
+  background: #17252A;
+}

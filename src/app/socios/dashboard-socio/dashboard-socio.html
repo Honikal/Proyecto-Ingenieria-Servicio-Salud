@@ -1,0 +1,60 @@
+<!-- Barra superior -->
+<div id="top-bar">
+  <div id="title">DASHBOARD SOCIO</div>
+
+  <div class="button-area">
+    <div class="user-avatar"
+         [ngClass]="{'open': userMenuOpen}"
+         (click)="toggleMenu(false)"
+         tabindex="0">
+      {{ getInitials() }}
+    </div>
+
+    <ul *ngIf="userMenuOpen" class="user-menu" tabindex="0">
+      <li (click)="onProfileClick()">Mi Perfil</li>
+      <li (click)="onLogoutClick()">Cerrar Sesión</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Estructura principal -->
+<div id="layout">
+  <!-- Menú lateral -->
+  <div id="sidebar">
+    <ul>
+      <li (click)="goToDashboard()">Inicio</li>
+      <li (click)="goToCourses()">Mis Cursos</li>
+      <li (click)="goToProgress()">Progreso</li>
+      <li (click)="goToCertificates()">Certificados</li>
+      <li (click)="goToSupport()">Soporte</li>
+    </ul>
+  </div>
+
+  <!-- Contenido principal -->
+  <div id="dashboard">
+    <div class="card">
+      <div class="card-title">Cursos Inscritos</div>
+      <div class="card-value">5</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cursos Completados</div>
+      <div class="card-value">3</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Certificados Obtenidos</div>
+      <div class="card-value">2</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Horas de Aprendizaje</div>
+      <div class="card-value">45</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Puntaje Total</div>
+      <div class="card-value">1200</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Cursos Recomendados</div>
+      <div class="card-value">4</div>
+    </div>
+  </div>
+</div>
