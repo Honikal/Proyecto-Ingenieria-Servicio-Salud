@@ -48,3 +48,4 @@ Thumbs.db
 
 #Environmental
 .env
+serviceAccountKey.json
