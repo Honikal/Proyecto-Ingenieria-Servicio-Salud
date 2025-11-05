@@ -47,4 +47,5 @@ Thumbs.db
 .runtimeconfig.json
 
 #Environmental
-/email_server/.env
+.env
+serviceAccountKey.json

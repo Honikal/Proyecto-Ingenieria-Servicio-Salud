@@ -72,5 +72,17 @@
     </div>
   </form>
 
+  @if (showOTPModal) {
+    <app-otp-modal
+      [email]="registerForm.value.email"
+      [purpose]="'Registro'"
+      [title]="'Verificación de Correo'"
+      [description]="'Hemos enviado un código de 6 dígitos a tu correo electrónico'"
+      (verified)="onOtpVerified()"
+      (cancelled)="onOtpCancelled()"
+      (error)="onOtpError($event)">
+    </app-otp-modal>
+  }
+
   <a (click)="onLoginClick()">¿Usuario existente? Inicia sesión acá</a>
 </div>
