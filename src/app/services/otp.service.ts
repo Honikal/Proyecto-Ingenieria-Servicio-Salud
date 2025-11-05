@@ -13,7 +13,7 @@ export class OTPService {
 
     constructor(private http: HttpClient) {}
 
-    requestOTP(email: string, payload: any){
+    requestOTP(email: string){
         return this.http.post(`${this.API_URL}/auth/request-otp`, 
         {
             email,

@@ -12,7 +12,7 @@ const USER_MAIL = process.env.GMAIL_USER!;
 const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET);
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-export const sendEmail = async (toEmail: string, subject: string, description: string) => {
+export const sendEmail = async (toEmail: string, subject: string, htmlContent: string) => {
     /*Función encargada de enviar un mensaje cualquiera al correo del usuario, para notificar de
     información importante a considerar*/
     try {
@@ -34,7 +34,8 @@ export const sendEmail = async (toEmail: string, subject: string, description: s
             from: `Servicio de Salud Ocupacional Brindado por el tec <${USER_MAIL}>`,
             to: toEmail,
             subject: subject,
-            text: description
+            html: htmlContent,
+            text: `Tu código de verificación es: ${extractCodeFromHTML(htmlContent)}. Por favor ingrésalo en la aplicación.`
         };
 
         const result = await await transporter.sendMail(mailOption);
@@ -43,4 +44,10 @@ export const sendEmail = async (toEmail: string, subject: string, description: s
         console.error("Error enviando el correo desde Backend: ", error);
         throw error;
     }
+}
+
+// Helper function to extract the OTP code from HTML for the plain text fallback
+function extractCodeFromHTML(html: string): string {
+    const match = html.match(/class="otp-code">(\d{6})<\/div>/);
+    return match ? match[1] : 'CÓDIGO NO ENCONTRADO';
 }

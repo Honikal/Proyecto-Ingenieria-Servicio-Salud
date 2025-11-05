@@ -137,3 +137,35 @@ small {
   text-align: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
+
+.otp-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 24px;
+  width: 300px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+.modal-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 12px 0;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.modal-box button {
+  width: 100%;
+  margin: 5px 0;
+}
