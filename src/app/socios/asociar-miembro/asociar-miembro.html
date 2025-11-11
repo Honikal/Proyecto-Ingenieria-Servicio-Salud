@@ -15,11 +15,12 @@
       />
     </div>
 
-    <button type="submit" class="btn btn-primary" [disabled]="cargando || !form.valid">
-      {{ cargando ? 'Procesando...' : 'Vincular Usuario' }}
+    <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+      Vincular Usuario
     </button>
 
-    <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+
+    <button type="button" class="btn btn-secondary" (click)="cancelar()">Volver</button>
 
     <p *ngIf="mensaje" class="mensaje" [class.error]="error">
       {{ mensaje }}

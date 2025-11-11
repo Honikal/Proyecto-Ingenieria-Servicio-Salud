@@ -48,6 +48,7 @@ export class AsociarMiembro {
       if (!usuario) {
         this.mensaje = 'No se encontró ningún usuario con ese correo.';
         this.error = true;
+        alert('No se encontró ningún usuario con ese correo.');
         return;
       }
 
@@ -66,7 +67,16 @@ export class AsociarMiembro {
         idSocio: this.socioActual.id
       };
 
-      await this.firebaseService.addUserXSocio(nuevaRelacion);
+      try {
+        await this.firebaseService.addUserXSocio(nuevaRelacion);
+        alert('Usuario asociado exitosamente.');
+      } catch (error: any) {
+        if (error.message.includes('ya está asociado')) {
+          alert('El usuario ya está asociado con este socio.');
+        } else {
+          alert('Ocurrió un error al asociar el usuario.');
+        }
+      }
 
       this.mensaje = 'Usuario vinculado exitosamente.';
       this.error = false;

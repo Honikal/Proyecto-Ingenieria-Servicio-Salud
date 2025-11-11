@@ -104,7 +104,7 @@
         mergeMap((relations: any[]) =>
           from(relations).pipe(
             mergeMap(async (rel) => {
-              const userSnap = await getDoc(doc(this.firestore, `users/${rel.idUser}`));
+              const userSnap = await getDoc(doc(this.firestore, `users/${rel.idUsuario}`));
               const socioSnap = await getDoc(doc(this.firestore, `socios/${rel.idSocio}`));
 
               const userData = userSnap.exists() ? userSnap.data() : {};
@@ -112,7 +112,7 @@
 
               return {
                 id: rel.id,
-                idUser: rel.idUser,
+                idUsuario: rel.idUsuario,
                 idSocio: rel.idSocio,
                 userName: userData ? userData['fullName'] || userData['nombre'] || '(sin nombre)' : '(sin usuario)',
                 socioName: socioData ? socioData['nombre'] || socioData['nombreSocio'] || '(sin socio)' : '(sin socio)',
@@ -124,6 +124,7 @@
       );
     }
 
+
     getUsersXSocioFull(idSocio: string): Observable<any[]> {
       const relRef = collection(this.firestore, 'usersxsocios');
       const q = query(relRef, where('idSocio', '==', idSocio));
@@ -132,7 +133,7 @@
         mergeMap((relations: any[]) =>
           from(relations).pipe(
             mergeMap(async (rel) => {
-              const userSnap = await getDoc(doc(this.firestore, `users/${rel.idUser}`));
+              const userSnap = await getDoc(doc(this.firestore, `users/${rel.idUsuario}`));
               const socioSnap = await getDoc(doc(this.firestore, `socios/${rel.idSocio}`));
 
               const userData = userSnap.exists() ? userSnap.data() : {};
@@ -140,11 +141,14 @@
 
               return {
                 id: rel.id,
-                idUser: rel.idUser,
+                idUsuario: rel.idUsuario,
                 idSocio: rel.idSocio,
                 userName: userData ? userData['fullName'] || userData['nombre'] || '(sin nombre)' : '(sin usuario)',
+                email: userData?.['email'] || 'Sin correo registrado',
                 socioName: socioData ? socioData['nombre'] || socioData['nombreSocio'] || '(sin socio)' : '(sin socio)',
-                fechaAsociacion: rel['fechaAsociacion'] || null
+                fechaAsociacion: rel['fechaAsociacion'] ? 
+                  new Date(rel['fechaAsociacion'].seconds * 1000).toLocaleString() :
+                  '(sin fecha)'
               };
             }),
             toArray()
@@ -175,16 +179,35 @@
     async addUserXSocio(relacion: { idUsuario: string; idSocio: string }) {
       try {
         const userXSociosRef = collection(this.firestore, 'usersxsocios');
+
+        // Verificar si ya existe la relación
+        const q = query(
+          userXSociosRef,
+          where('idUsuario', '==', relacion.idUsuario),
+          where('idSocio', '==', relacion.idSocio)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+          console.warn('La relación usuario-socio ya existe.');
+          throw new Error('El usuario ya está asociado con este socio.');
+        }
+
+        // Crear nueva relación si no existe
         await addDoc(userXSociosRef, {
           idUsuario: relacion.idUsuario,
           idSocio: relacion.idSocio,
+          fechaAsociacion: new Date(),
         });
+
         console.log('Relación userxsocios creada correctamente.');
       } catch (error) {
         console.error('Error al crear relación userxsocios:', error);
         throw error;
       }
     }
+
 
     async getMatricula(idUser: string, idCurso: string) {
       const matriculasRef = collection(this.firestore, 'matricula');
