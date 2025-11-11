@@ -9,6 +9,10 @@
           <h3>{{ user.userName }}</h3>
           <p>{{ user.email || 'Sin correo registrado' }}</p>
           <p class="fecha">Asociado el: {{ user.fechaAsociacion }}</p>
+
+          <button class="btn-eliminar" (click)="eliminarRelacion(user.id)">
+            Eliminar
+          </button>
         </div>
       </div>
     </div>

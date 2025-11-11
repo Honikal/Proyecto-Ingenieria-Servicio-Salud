@@ -92,3 +92,20 @@
     font-size: 1rem;
   }
 }
+
+.btn-eliminar {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-top: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s ease;
+}
+
+.btn-eliminar:hover {
+  background-color: #c0392b;
+}
+

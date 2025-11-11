@@ -208,6 +208,17 @@
       }
     }
 
+    async deleteUserXSocio(id: string) {
+      try {
+        const relDoc = doc(this.firestore, `usersxsocios/${id}`);
+        await deleteDoc(relDoc);
+        console.log(`✅ Relación ${id} eliminada correctamente`);
+      } catch (error) {
+        console.error('❌ Error al eliminar la relación:', error);
+        throw error;
+      }
+    }
+
 
     async getMatricula(idUser: string, idCurso: string) {
       const matriculasRef = collection(this.firestore, 'matricula');
