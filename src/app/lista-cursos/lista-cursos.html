@@ -1,0 +1,49 @@
+<div class="lista-cursos">
+  <h2>Cursos asociados a {{ socioActual?.nombre }}</h2>
+
+  <ng-container *ngIf="cursoList$ | async as cursoList; else cargando">
+    <div *ngIf="cursoList.length > 0; else vacio" class="lista-cursos">
+
+      <div
+        *ngFor="let curso of cursoList"
+        class="curso-card curso-clickable"
+        (click)="verCurso(curso.id)"
+      >
+        <!-- Imagen -->
+        <div class="avatar">
+          <img
+            [src]="curso.imagen || 'assets/default-logo.png'"
+            alt="{{ curso.nombre }}"
+            (error)="$event.target.src='assets/default-logo.png'"
+          />
+        </div>
+
+        <!-- Info -->
+        <div class="curso-info">
+          <h3>{{ curso.nombre }}</h3>
+
+          <p><strong>Código:</strong> {{ curso.codigo }}</p>
+
+          <p *ngIf="curso.descrip">
+            <strong>Descripción:</strong> {{ curso.descrip }}
+          </p>
+
+          <p *ngIf="curso.tema">
+            <strong>Tema:</strong> {{ curso.tema }}
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <ng-template #cargando>
+    <p>Cargando cursos asociados...</p>
+  </ng-template>
+
+  <ng-template #vacio>
+    <p>No hay cursos asociados a este socio.</p>
+  </ng-template>
+
+  <button id="back-btn" (click)="goBackToDashboard()">Volver</button>
+</div>

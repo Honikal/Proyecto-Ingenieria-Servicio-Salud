@@ -40,7 +40,7 @@ export class DashboardSocio {
   }
 
   goToCourses() {
-    this.router.navigate(['/socios/cursos'])
+    this.router.navigate(['/lista-cursos'])
   }
 
   goToAsociar() {

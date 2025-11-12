@@ -1,14 +1,15 @@
-  import { Injectable } from '@angular/core';
-  import { collection, collectionData, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc, deleteDoc, docData } from '@angular/fire/firestore';
-  import { from, mergeMap, Observable, toArray } from 'rxjs';
-  import { User } from '../../models/user.model';
-  import { Area } from '../../models/area.model';
-  import { Curso } from '../../models/curso.model';
-  import { Pantalla } from '../../models/pantalla.model';
-  import { Plantilla } from '../../models/plantilla.model';
-  import { Modulo } from '../../models/modulo.model';
-  import { Pregunta } from '../../models/pregunta.model';
-  import * as bcrypt from 'bcryptjs';
+import { Injectable } from '@angular/core';
+import {Firestore,collection,collectionData,addDoc,doc,query,where,getDoc,getDocs,updateDoc,deleteDoc,docData} from '@angular/fire/firestore';
+import { Observable, combineLatest, from } from 'rxjs';
+import { map, mergeMap, toArray } from 'rxjs/operators';
+import { User } from '../../models/user.model';
+import { Area } from '../../models/area.model';
+import { Curso } from '../../models/curso.model';
+import { Pantalla } from '../../models/pantalla.model';
+import { Plantilla } from '../../models/plantilla.model';
+import { Modulo } from '../../models/modulo.model';
+import { Pregunta } from '../../models/pregunta.model';
+import * as bcrypt from 'bcryptjs';
 
   @Injectable({
     providedIn: 'root'
@@ -91,6 +92,13 @@
       const q = query(cursosRef, where('isActive', '==', true));
       return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
     }
+	
+	getCursosDeSocio(idSocio: string): Observable<Curso[]> {
+	  const cursosRef = collection(this.firestore, 'cursos');
+	  const q = query(cursosRef, where('idSocio', '==', idSocio));
+
+	  return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
+	}
 
     getUsersXSocios(): Observable<any[]> {
       const colRef = collection(this.firestore, 'usersxsocios');
@@ -372,6 +380,8 @@
 
     return nota;
   }
+  
+  
 
 
   }
