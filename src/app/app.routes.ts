@@ -40,7 +40,7 @@ export const routes: Routes = [
   { path: 'socios', component: ListaSocios },
   { path: 'socios/registrar', component: RegistrarSocio },
   { path: 'socios/login', component: LoginSocio },
-  { path: 'socios/dashboard-socio', component: DashboardSocio },
+  { path: 'socios/dashboard-socio/:idSocio', component: DashboardSocio },
   { path: 'sociosMember-list', component: SociosMemberList },
   { path: 'socios/:id', component: GestionarSocio},
   { path: 'ver-curso/:id',component: VerCurso},
@@ -49,8 +49,8 @@ export const routes: Routes = [
   { path: 'asociar-miembro', component: AsociarMiembro },
   { path: 'lista-asociados', component: ListaAsociados },
   { path: 'lista-cursos-socio', component: ListaCursosSocio },
-  
-  // sin implementar
   { path: 'cursos', component: ListaCursos },
+
+  //sin implementar
   { path: 'podcasts', component: PlaceholderComponent }
 ];

@@ -6,11 +6,15 @@
         <p class="descripcion">{{ curso.descrip }}</p>
 
         <div class="botones">
-          <button class="btn volver" (click)="volver()">⬅ Volver a los cursos</button>
+          <button class="btn volver" (click)="volver()">Volver a los cursos</button>
           <button class="btn blanco" (click)="descargarCertificado()">Descargar Certificado</button>
           <button class="btn azul" (click)="ingresarLeccion()">Ingresar a lección</button>
           @if (isAdmin) {
             <button class="btn rojo" (click)="desactivarCurso()">Desactivar</button>
+          }
+          @else if (isSocio) {
+            <button class="btn rojo" (click)="desactivarCurso()">Desactivar</button>
+            <button class="btn rojo" (click)="eliminarCurso(curso.id, $event)">Eliminar</button>
           }
         </div>
       </div>

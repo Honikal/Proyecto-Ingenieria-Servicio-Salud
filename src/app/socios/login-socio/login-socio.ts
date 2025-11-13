@@ -55,7 +55,7 @@ export class LoginSocio {
         email: socio.email
       }));
 
-      this.router.navigate(['/socios/dashboard-socio']);
+      this.router.navigate(['/socios/dashboard-socio', socio.id]);
     } catch (error) {
       console.error('Error al iniciar sesión de socio:', error);
       alert('Error al iniciar sesión');

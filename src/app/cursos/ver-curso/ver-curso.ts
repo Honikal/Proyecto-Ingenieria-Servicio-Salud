@@ -19,6 +19,7 @@ export class VerCurso implements OnInit {
   cargando = true;
   cuposRestantes: number = 0; 
   isAdmin: boolean = false;
+  isSocio: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -32,9 +33,16 @@ export class VerCurso implements OnInit {
 
     //Verificar si el usuario logueado es admin
     const userData = localStorage.getItem('currentUser');
+    const socioData = localStorage.getItem('currentSocio');
     if (userData) {
       const user = JSON.parse(userData);
       this.isAdmin = user.isAdmin === true;
+      this.isSocio = false;
+    } else if (socioData) {
+      const socio = JSON.parse(socioData);
+      this.isSocio = true;
+      this.isAdmin = false;
+      console.log('Sesión iniciada como socio:', socio);
     }
 
     if (id) {
@@ -442,6 +450,28 @@ export class VerCurso implements OnInit {
       } catch (error) {
         console.error('Error al desactivar el curso:', error);
         Swal.fire('Error', 'No se pudo desactivar el curso.', 'error');
+      }
+    }
+  }
+
+  async eliminarCurso(id: string, event?: Event) {
+    if (event) event.stopPropagation();
+    const confirm = await Swal.fire({
+      title: '¿Eliminar curso?',
+      text: 'Esta acción eliminará el curso permanentemente.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        await this.firebaseService.deleteCurso(id);
+        Swal.fire('Eliminado', 'El curso fue eliminado correctamente.', 'success');
+      } catch (error) {
+        console.error('Error al eliminar el curso:', error);
+        Swal.fire('Error', 'Ocurrió un error al eliminar el curso.', 'error');
       }
     }
   }

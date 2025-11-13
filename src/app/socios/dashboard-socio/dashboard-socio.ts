@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router'; 
 import { CommonModule } from '@angular/common';
 import { Socio } from '../../../models/socio.model';
 
@@ -11,17 +11,29 @@ import { Socio } from '../../../models/socio.model';
   imports: [CommonModule],
 })
 export class DashboardSocio {
-  userMenuOpen: boolean = false;
+  userMenuOpen = false;
   socio: Socio | null = null;
+  idSocio: string | null = null; 
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute 
+  ) {
     const storedSocio = localStorage.getItem('currentSocio');
     if (storedSocio) {
       this.socio = JSON.parse(storedSocio);
     }
   }
 
-  toggleMenu(value: boolean) {
+  ngOnInit() {
+    // 🔹 Leer el parámetro desde la URL
+    this.route.paramMap.subscribe(params => {
+      this.idSocio = params.get('idSocio');
+      console.log('ID del socio actual:', this.idSocio);
+    });
+  }
+
+  toggleMenu() {
     this.userMenuOpen = !this.userMenuOpen;
   }
 
@@ -36,19 +48,35 @@ export class DashboardSocio {
   }
 
   goToDashboard() {
-    this.router.navigate(['/dashboard-socio']);
+    if (this.idSocio) {
+      this.router.navigate([`/socios/dashboard-socio/${this.idSocio}`]);
+    } else {
+      this.router.navigate(['/socios/dashboard-socio']);
+    }
   }
 
   goToCourses() {
-    this.router.navigate(['/lista-cursos-socio']);
+    if (this.idSocio) {
+      this.router.navigate(['/cursos'], { queryParams: { idSocio: this.idSocio } });
+    } else {
+      this.router.navigate(['/cursos']);
+    }
   }
 
   goToAsociar() {
-    this.router.navigate(['/asociar-miembro']);
+    if (this.idSocio) {
+      this.router.navigate(['/asociar-miembro'], { queryParams: { idSocio: this.idSocio } });
+    } else {
+      this.router.navigate(['/asociar-miembro']);
+    }
   }
 
   goToAsociados() {
-    this.router.navigate(['/lista-asociados']);
+    if (this.idSocio) {
+      this.router.navigate(['/lista-asociados'], { queryParams: { idSocio: this.idSocio } });
+    } else {
+      this.router.navigate(['/lista-asociados']);
+    }
   }
 
   goToCertificates() {

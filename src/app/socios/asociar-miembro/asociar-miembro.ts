@@ -92,6 +92,11 @@ export class AsociarMiembro {
   }
 
   cancelar() {
-    this.router.navigate(['/socios/dashboard-socio']);
+    if (this.socioActual?.id) {
+      this.router.navigate(['/socios/dashboard-socio', this.socioActual.id]);
+    } else {
+      // fallback por si no hay sesión activa
+      this.router.navigate(['/']);
+    }
   }
 }

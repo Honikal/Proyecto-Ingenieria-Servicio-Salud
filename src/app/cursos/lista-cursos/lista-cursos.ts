@@ -29,17 +29,15 @@ export class ListaCursos implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    //Leer idSocio desde queryParams (no desde paramMap)
+    // Leer idSocio desde queryParams
     this.route.queryParams.subscribe(params => {
       this.idSocio = params['idSocio'] || null;
 
       if (this.idSocio) {
-        // 🔹 Si viene de un socio, obtener solo sus cursos
         this.firebaseService.getCursosDeSocioActivos(this.idSocio).subscribe(cursos => {
           this.cursosSubject.next(cursos);
         });
       } else {
-        // 🔹 Si no viene de un socio, obtener todos los cursos activos
         this.firebaseService.getCursosActivos().subscribe(cursos => {
           this.cursosSubject.next(cursos);
         });
@@ -81,10 +79,8 @@ export class ListaCursos implements OnInit {
 
   volver() {
     if (this.idSocio) {
-      // 🔹 Si venía desde un socio, volver a la pantalla del socio
-      this.router.navigate(['/socios', this.idSocio]);
+      this.router.navigate(['/socios/dashboard-socio', this.idSocio]);
     } else {
-      // 🔹 Si no, volver al inicio
       this.router.navigate(['/']);
     }
   }

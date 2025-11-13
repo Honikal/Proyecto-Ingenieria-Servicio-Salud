@@ -35,8 +35,13 @@ export class ListaAsociados {
   }
 
   goBackToDashboard() {
-    this.router.navigate(['/socios/dashboard-socio']);
+    if (this.socioActual?.id) {
+      this.router.navigate(['/socios/dashboard-socio', this.socioActual.id]);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
+
 
   onLogoutClick() {
     localStorage.removeItem('currentSocio');
