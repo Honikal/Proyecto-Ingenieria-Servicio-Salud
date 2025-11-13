@@ -229,7 +229,7 @@ export class VerCurso implements OnInit {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(26);
     doc.setTextColor(0, 159, 183);
-    doc.text('CERTIFICADO DE FINALIZACIÓN', pageWidth / 2, 130, { align: 'center' });
+    doc.text('CERTIFICADO DE FINALIZACIÓN DE CURSO', pageWidth / 2, 130, { align: 'center' });
 
     // === NOMBRE DEL USUARIO ===
     doc.setFont('helvetica', 'bold');
@@ -241,7 +241,7 @@ export class VerCurso implements OnInit {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(14);
     doc.text(
-      'Por haber completado satisfactoriamente el curso virtual impartido por:',
+      'Por haber completado satisfactoriamente el curso virtual:',
       pageWidth / 2,
       220,
       { align: 'center' }

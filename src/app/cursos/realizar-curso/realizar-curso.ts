@@ -120,7 +120,7 @@ export class RealizarCurso implements OnInit {
     if (idx >= 0 && idx < this.posicionesPantallas.length - 1) {
       this.pantallaSeleccionada = this.posicionesPantallas[idx + 1];
     } else {
-      alert('¡Curso completado!');
+      alert('No quedan más pantallas');
     }
     this.actualizarHtmlPantalla();
     this.actualizarProgreso();
