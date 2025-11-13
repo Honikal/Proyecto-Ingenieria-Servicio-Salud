@@ -18,7 +18,7 @@ import { CrearCursos } from './cursos/crear-cursos/crear-cursos';
 import { LoginSocio } from './socios/login-socio/login-socio';
 import { AsociarMiembro } from './socios/asociar-miembro/asociar-miembro';
 import { ListaAsociados } from './lista-asociados/lista-asociados';
-import { ListaCursosSocio } from './lista-cursos/lista-cursos';
+import { ListaCursosSocio } from './lista-cursos-socio/lista-cursos-socio';
 
 // dropdown sin implementar
 @Component({
@@ -48,7 +48,7 @@ export const routes: Routes = [
   { path: 'crear-curso', component: CrearCursos },
   { path: 'asociar-miembro', component: AsociarMiembro },
   { path: 'lista-asociados', component: ListaAsociados },
-  { path: 'lista-cursos', component: ListaCursosSocio },
+  { path: 'lista-cursos-socio', component: ListaCursosSocio },
   
   // sin implementar
   { path: 'cursos', component: ListaCursos },

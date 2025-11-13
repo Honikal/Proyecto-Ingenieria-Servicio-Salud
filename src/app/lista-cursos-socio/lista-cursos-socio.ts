@@ -6,9 +6,9 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import Swal from 'sweetalert2'; 
 
 @Component({
-  selector: 'app-curso-list',
-  templateUrl: './lista-cursos.html',
-  styleUrls: ['./lista-cursos.css'],
+  selector: 'app-curso-socio-list',
+  templateUrl: './lista-cursos-socio.html',
+  styleUrls: ['./lista-cursos-socio.css'],
   standalone: true,
   imports: [AsyncPipe, CommonModule]
 })
@@ -57,4 +57,27 @@ export class ListaCursosSocio {
   verCurso(id: string) {
     this.router.navigate(['/ver-curso', id]);
   }
+
+  async eliminarCurso(id: string, event?: Event) {
+    if (event) event.stopPropagation();
+    const confirm = await Swal.fire({
+      title: '¿Eliminar curso?',
+      text: 'Esta acción eliminará el curso permanentemente.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        await this.firebaseService.deleteCurso(id);
+        Swal.fire('Eliminado', 'El curso fue eliminado correctamente.', 'success');
+      } catch (error) {
+        console.error('Error al eliminar el curso:', error);
+        Swal.fire('Error', 'Ocurrió un error al eliminar el curso.', 'error');
+      }
+    }
+  }
+
 }

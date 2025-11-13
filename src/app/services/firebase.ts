@@ -231,9 +231,20 @@ import * as bcrypt from 'bcryptjs';
       try {
         const relDoc = doc(this.firestore, `usersxsocios/${id}`);
         await deleteDoc(relDoc);
-        console.log(`✅ Relación ${id} eliminada correctamente`);
+        console.log(`Relación ${id} eliminada correctamente`);
       } catch (error) {
-        console.error('❌ Error al eliminar la relación:', error);
+        console.error('Error al eliminar la relación:', error);
+        throw error;
+      }
+    }
+
+    async deleteCurso(id: string) {
+      try {
+        const cursoRef = doc(this.firestore, `cursos/${id}`);
+        await deleteDoc(cursoRef);
+        console.log(`Curso ${id} eliminado correctamente.`);
+      } catch (error) {
+        console.error('Error al eliminar curso:', error);
         throw error;
       }
     }

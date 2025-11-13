@@ -1,8 +1,8 @@
-<div class="lista-cursos">
+<div class="lista-cursos-socio">
   <h2>Cursos asociados a {{ socioActual?.nombre }}</h2>
 
   <ng-container *ngIf="cursoList$ | async as cursoList; else cargando">
-    <div *ngIf="cursoList.length > 0; else vacio" class="lista-cursos">
+    <div *ngIf="cursoList.length > 0; else vacio" class="lista-cursos-socio">
 
       <div
         *ngFor="let curso of cursoList"
@@ -31,6 +31,11 @@
           <p *ngIf="curso.tema">
             <strong>Tema:</strong> {{ curso.tema }}
           </p>
+
+          <button class="btn-eliminar" (click)="eliminarCurso(curso.id, $event)">
+            Eliminar curso
+          </button>
+
         </div>
       </div>
 
