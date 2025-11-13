@@ -100,4 +100,8 @@ export class GestionarSocio implements OnInit {
   volver() {
     this.router.navigate(['/socios']);
   }
+
+  cursos() {
+    this.router.navigate(['/cursos'], { queryParams: { idSocio: this.socioId } });
+  }
 }

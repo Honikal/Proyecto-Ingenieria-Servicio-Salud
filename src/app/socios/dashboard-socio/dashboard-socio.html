@@ -3,17 +3,20 @@
   <div id="title">DASHBOARD SOCIO</div>
 
   <div class="button-area">
-    <div class="user-avatar"
-         [ngClass]="{'open': userMenuOpen}"
-         (click)="toggleMenu(false)"
-         tabindex="0">
+    <div 
+      class="user-avatar"
+      [ngClass]="{ 'open': userMenuOpen }"
+      (click)="toggleMenu(false)"
+      tabindex="0">
       {{ getInitials() }}
     </div>
 
-    <ul *ngIf="userMenuOpen" class="user-menu" tabindex="0">
-      <li (click)="onProfileClick()">Mi Perfil</li>
-      <li (click)="onLogoutClick()">Cerrar Sesión</li>
-    </ul>
+    @if (userMenuOpen) {
+      <ul class="user-menu" tabindex="0">
+        <li (click)="onProfileClick()">Mi Perfil</li>
+        <li (click)="onLogoutClick()">Cerrar Sesión</li>
+      </ul>
+    }
   </div>
 </div>
 

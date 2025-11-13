@@ -18,6 +18,7 @@ export class VerCurso implements OnInit {
   curso?: Curso;
   cargando = true;
   cuposRestantes: number = 0; 
+  isAdmin: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -28,6 +29,14 @@ export class VerCurso implements OnInit {
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
+
+    //Verificar si el usuario logueado es admin
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      const user = JSON.parse(userData);
+      this.isAdmin = user.isAdmin === true;
+    }
+
     if (id) {
       this.firebaseService.getCursosActivos().subscribe({
         next: (cursosActivos) => {
@@ -59,7 +68,12 @@ export class VerCurso implements OnInit {
   }
 
   volver() {
-    this.router.navigate(['/cursos']);
+    const idSocio = this.route.snapshot.queryParamMap.get('idSocio');
+    if (idSocio) {
+      this.router.navigate(['/cursos'], { queryParams: { idSocio } });
+    } else {
+      this.router.navigate(['/cursos']);
+    }
   }
 
   async descargarCertificado() {
@@ -83,6 +97,33 @@ export class VerCurso implements OnInit {
       return;
     }
 
+    //NUEVO BLOQUE PARA ADMIN
+    if (this.isAdmin) {
+      const socio = await this.firebaseService.getSocioById(this.curso.idSocio);
+
+      if (!socio) {
+        Swal.fire('Error', 'No se encontró información del socio.', 'error');
+        return;
+      }
+
+      const matriculaPrueba = {
+        fechaFinalizacion: new Date(),
+        calificacion: 100,
+        finalizado: true
+      };
+
+      await Swal.fire({
+        icon: 'info',
+        title: 'Certificado de prueba',
+        text: 'Como administrador, estás generando un certificado de prueba.',
+        confirmButtonText: 'Generar',
+        confirmButtonColor: '#009fb7'
+      });
+
+      await this.generarCertificadoPDF(matriculaPrueba, this.curso, user, socio);
+      return; 
+    }
+
     try {
       const matricula = await this.firebaseService.getMatricula(user.id, this.curso.id);
 
@@ -97,15 +138,14 @@ export class VerCurso implements OnInit {
       }
 
       if (matricula.calificacion >= 70) {
-        const socios = await this.firebaseService.getSociosByUser(user.id);
-        const socio = socios.find(s => s.id === this.curso?.idSocio);
+        const socio = await this.firebaseService.getSocioById(this.curso.idSocio);
+
         if (!socio) {
           Swal.fire('Error', 'No se encontró información del socio.', 'error');
           return;
         }
 
         await this.generarCertificadoPDF(matricula, this.curso, user, socio);
-
       } else {
         Swal.fire({
           icon: 'error',
@@ -195,148 +235,215 @@ export class VerCurso implements OnInit {
     }
   }
 
-  async generarCertificadoPDF(matricula: any, curso: any, user: any, socio: any) {
+  async generarCertificadoPDF(matricula: any, curso: any, usuario: any, socio: any) {
     const doc = new jsPDF('landscape', 'pt', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // === COLORES PRINCIPALES ===
-    const colorAzul: [number, number, number] = [0, 159, 183];
-    const colorSuperior: [number, number, number] = [0, 77, 92];
-    const colorVerde: [number, number, number] =[0, 153, 102];
-    const colorMorado: [number, number, number] = [102, 51, 153];
-    const colorGris: [number, number, number] = [240, 240, 240];
+    // === PALETA DE COLORES ===
+    const colorPrincipal: [number, number, number] = [0, 159, 183];   // #009FB7
+    const colorOscuro: [number, number, number] = [0, 77, 92];        // #004D5C
+    const colorTexto: [number, number, number] = [19, 21, 21];        // #131515
+    const colorFondo: [number, number, number] = [240, 244, 245];     // #f0f4f5
 
-    // === FONDO PRINCIPAL ===
-    doc.setFillColor(240, 240, 240);
+    // === FONDO GENERAL ===
+    doc.setFillColor(...colorFondo);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-    // === BARRA SUPERIOR (ROJA) ===
-    doc.setFillColor(...colorSuperior);
-    doc.rect(0, 0, pageWidth, 80, 'F');
+    // === ENCABEZADO SUPERIOR ===
+    const headerAltura = 70;
+    doc.setFillColor(...colorPrincipal);
+    doc.rect(0, 0, pageWidth, headerAltura, 'F');
 
-    // === LOGO DEL SOCIO ===
+    // === CONTENEDOR BLANCO CENTRAL ===
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(50, 100, pageWidth - 100, pageHeight - 200, 15, 15, 'F');
+
+    // === LOGO DEL SOCIO (CENTRADO ARRIBA) ===
     if (socio.logo) {
       try {
         const logoImg = await this.loadImage(socio.logo);
-        doc.addImage(logoImg, 'PNG', 40, 15, 120, 50);
+        const logoWidth = 100;
+        const logoHeight = 60;
+        doc.addImage(logoImg, 'PNG', (pageWidth - logoWidth) / 2, 120, logoWidth, logoHeight);
       } catch (e) {
         console.warn('Error cargando logo del socio:', e);
       }
     }
 
-    // === TÍTULO PRINCIPAL ===
+    // === NOMBRE DEL SOCIO ===
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(26);
-    doc.setTextColor(0, 159, 183);
-    doc.text('CERTIFICADO DE FINALIZACIÓN DE CURSO', pageWidth / 2, 130, { align: 'center' });
+    doc.setFontSize(22);
+    doc.setTextColor(...colorOscuro);
+    doc.text(socio.nombre || '', pageWidth / 2, 210, { align: 'center' });
+
+    // === TÍTULO 1 ===
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(16);
+    doc.setTextColor(...colorTexto);
+    doc.text('OTORGA EL PRESENTE CERTIFICADO A', pageWidth / 2, 250, { align: 'center' });
 
     // === NOMBRE DEL USUARIO ===
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    doc.setTextColor(0, 0, 0);
-    doc.text(user.fullName, pageWidth / 2, 190, { align: 'center' });
+    doc.setFontSize(30);
+    doc.setTextColor(...colorOscuro);
+    doc.text(usuario.fullName || '', pageWidth / 2, 300, { align: 'center' });
 
     // === TEXTO DE RECONOCIMIENTO ===
+    const fechaFinalizacion = this.formatDate(matricula.fechaFinalizacion);
+    const textoReconocimiento = [
+      'Ha participado en el curso',
+      `"${curso.nombre}"`,
+      'impartido de manera 100% virtual y realizado el',
+      `${fechaFinalizacion},`,
+      `con una duración de ${curso.time}.`
+    ].join(' ');
+
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(14);
-    doc.text(
-      'Por haber completado satisfactoriamente el curso virtual:',
-      pageWidth / 2,
-      220,
-      { align: 'center' }
-    );
+    doc.setTextColor(...colorTexto);
+    doc.text(textoReconocimiento, pageWidth / 2, 350, {
+      align: 'center',
+      maxWidth: pageWidth - 200,
+    });
 
-    // === NOMBRE DEL CURSO ===
+    // === NOTA FINAL ===
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
-    doc.setTextColor(0, 153, 102);
-    doc.text(curso.nombre, pageWidth / 2, 250, { align: 'center' });
+    doc.setTextColor(...colorPrincipal);
+    doc.text(`Evaluación final: ${matricula.calificacion}`, pageWidth / 2, 400, { align: 'center' });
 
-    // === CUADRO DE NOTA Y FECHA ===
-    const boxY = 290;
-    const boxHeight = 100;
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(120, boxY, pageWidth - 240, boxHeight, 10, 10, 'F');
-
-    // Bordes decorativos morados
-    doc.setDrawColor(102, 51, 153);
-    doc.setLineWidth(2);
-    doc.roundedRect(120, boxY, pageWidth - 240, boxHeight, 10, 10, 'S');
-
-    // Nota
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor(102, 51, 153);
-    doc.text(`Nota Final: ${matricula.calificacion}%`, pageWidth / 2, boxY + 40, { align: 'center' });
-
-    // Fecha
-    const fechaStr = this.formatDate(matricula.fechaFinalizacion);
+    // === FECHA DE EMISIÓN ===
+    const fechaEmision = new Date();
+    const fechaEmisionStr = fechaEmision.toLocaleString('es-ES', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Emitido el: ${fechaStr}`, pageWidth / 2, boxY + 70, { align: 'center' });
+    doc.setTextColor(...colorTexto);
+    doc.text(`Emitido el ${fechaEmisionStr}`, pageWidth / 2, 430, { align: 'center' });
 
-    // === FIRMA Y SELLO ===
-    const firmaY = 450;
-    doc.setDrawColor(0, 159, 183);
-    doc.line(pageWidth / 2 - 100, firmaY, pageWidth / 2 + 100, firmaY);
-
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(12);
-    doc.text('Firma', pageWidth / 2, firmaY + 20, { align: 'center' });
-
-    // === LOGO PEQUEÑO ABAJO (SOCIO) ===
-    if (socio.logo) {
-      try {
-        const logoImg = await this.loadImage(socio.logo);
-        doc.addImage(logoImg, 'PNG', pageWidth - 180, pageHeight - 100, 100, 50);
-      } catch (e) {}
-    }
+    // === DECORACIÓN INFERIOR ===
+    doc.setDrawColor(...colorOscuro);
+    doc.setLineWidth(3);
+    doc.line(120, pageHeight - 80, pageWidth - 120, pageHeight - 80);
 
     // === PIE DE PÁGINA ===
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('helvetica', 'italic');
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(
-      `Certificado generado automáticamente por la plataforma de aprendizaje • ${socio.nombre}`,
+      `Certificado emitido por la plataforma en nombre de ${socio.nombre}`,
       pageWidth / 2,
-      pageHeight - 40,
+      pageHeight - 50,
       { align: 'center' }
     );
 
+        // === MARCA DE AGUA PARA ADMIN ===
+    if (this.isAdmin) {
+      // Simula transparencia con un color gris claro
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(60);
+      doc.setTextColor(200, 200, 200); // gris claro
+      doc.text(
+        'SOLO DEMOSTRATIVO',
+        pageWidth / 2,
+        pageHeight / 2,
+        {
+          angle: 0,
+          align: 'center'
+        }
+      );
+
+      // Texto adicional pequeño
+      doc.setFontSize(12);
+      doc.setTextColor(120);
+      doc.text(
+        'Certificado de prueba - emitido por administrador',
+        pageWidth / 2,
+        pageHeight - 20,
+        { align: 'center' }
+      );
+    }
     // === GUARDAR PDF ===
-    doc.save(`${user.fullName}_Certificado_${curso.nombre}.pdf`);
+    const nombreArchivo = `${usuario.fullName}_Certificado_${curso.nombre}.pdf`;
+    doc.save(nombreArchivo);
   }
 
-  // Función auxiliar para cargar imágenes (logo)
-  private loadImage(url: string): Promise<HTMLImageElement> {
+
+  // === Función auxiliar para cargar imágenes ===
+  private async loadImage(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = 'Anonymous';
-      img.onload = () => resolve(img);
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject('No se pudo crear el contexto del canvas.');
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // 🔹 Fondo blanco para evitar el fondo negro en transparencias
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 🔹 Dibuja la imagen sobre el fondo blanco
+        ctx.drawImage(img, 0, 0);
+
+        // 🔹 Devuelve la imagen limpia como Base64
+        resolve(canvas.toDataURL('image/png'));
+      };
       img.onerror = reject;
       img.src = url;
     });
   }
-  private formatDate(date: Date | string | Timestamp): string {
+
+  // === Formatear fecha de finalización (día, mes, año) ===
+  private formatDate(date: any): string {
     let d: Date;
-
-    // Si es un Timestamp de Firebase
-    if (date instanceof Timestamp) {
-      d = date.toDate();
-    } else {
-      d = new Date(date);
-    }
-
-    // Formatear usando la zona horaria local
-    return d.toLocaleString(undefined, {
+    if (date instanceof Timestamp) d = date.toDate();
+    else d = new Date(date);
+    return d.toLocaleDateString('es-ES', {
       day: '2-digit',
-      month: '2-digit',
+      month: 'long',
       year: 'numeric',
-      hour: undefined,
-      minute: undefined,
-      hour12: false
     });
   }
+
+
+  async desactivarCurso() {
+    if (!this.curso) return;
+
+    const confirm = await Swal.fire({
+      title: '¿Desactivar curso?',
+      text: 'Esta acción hará que el curso ya no esté disponible para los usuarios.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, desactivar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33'
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        await this.firebaseService.actualizarCurso(this.curso.id, { isActive: false });
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Curso desactivado',
+          text: 'El curso ha sido desactivado correctamente.',
+          confirmButtonColor: '#009fb7'
+        });
+
+        this.router.navigate(['/cursos'], { queryParams: { idSocio: this.curso.idSocio } });
+      } catch (error) {
+        console.error('Error al desactivar el curso:', error);
+        Swal.fire('Error', 'No se pudo desactivar el curso.', 'error');
+      }
+    }
+  }
+
 }

@@ -11,8 +11,10 @@
         class="search-bar"
         (input)="actualizarFiltro($event.target.value)"
       />
-    <!-- Botón visible solo si el usuario es autor -->
-    <button *ngIf="isAuto$ | async" class="btn add" (click)="crearCurso()">Crear curso</button>
+      <!-- Botón visible solo si el usuario es autor -->
+      @if (isAuto$ | async) {
+        <button class="btn add" (click)="crearCurso()">Crear curso</button>
+      }
     </div>
   </div>
 

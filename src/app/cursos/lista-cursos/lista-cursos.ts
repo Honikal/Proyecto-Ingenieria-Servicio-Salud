@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
-import { map  } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { Curso } from '../../../models/curso.model';
 import { User } from '../../../models/user.model';
 import { FirebaseService } from '../../services/firebase';
@@ -18,17 +18,32 @@ import { FirebaseService } from '../../services/firebase';
 export class ListaCursos implements OnInit {
   private cursosSubject = new BehaviorSubject<Curso[]>([]);
   cursos$!: Observable<Curso[]>;
+  idSocio: string | null = null;
   filtroNombre$ = new BehaviorSubject<string>('');
   isAuto$!: Observable<boolean>;
 
   constructor(
+    private route: ActivatedRoute,
     private firebaseService: FirebaseService, 
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.firebaseService.getCursosActivos().subscribe(cursos => {
-      this.cursosSubject.next(cursos);
+    //Leer idSocio desde queryParams (no desde paramMap)
+    this.route.queryParams.subscribe(params => {
+      this.idSocio = params['idSocio'] || null;
+
+      if (this.idSocio) {
+        // 🔹 Si viene de un socio, obtener solo sus cursos
+        this.firebaseService.getCursosDeSocioActivos(this.idSocio).subscribe(cursos => {
+          this.cursosSubject.next(cursos);
+        });
+      } else {
+        // 🔹 Si no viene de un socio, obtener todos los cursos activos
+        this.firebaseService.getCursosActivos().subscribe(cursos => {
+          this.cursosSubject.next(cursos);
+        });
+      }
     });
 
     this.cursos$ = combineLatest([
@@ -37,7 +52,9 @@ export class ListaCursos implements OnInit {
     ]).pipe(
       map(([cursos, filtro]) => {
         const texto = filtro.toLowerCase();
-        return cursos.filter(c => c.nombre.toLowerCase().includes(texto));
+        return cursos
+          .filter(c => c.nombre.toLowerCase().includes(texto))
+          .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
       })
     );
 
@@ -45,12 +62,10 @@ export class ListaCursos implements OnInit {
     if (userData) {
       const user = JSON.parse(userData);
 
-      // Observable en tiempo real del estado isAuto
       this.isAuto$ = this.firebaseService.getUserRealtime(user.id).pipe(
         map((u: User | null) => u?.isAuto === true)
       );
     } else {
-      // Si no hay usuario, siempre falso
       this.isAuto$ = of(false);
     }
   }
@@ -60,26 +75,25 @@ export class ListaCursos implements OnInit {
   }
 
   verCurso(id: string) {
-    this.router.navigate(['/ver-curso', id]);
+    const queryParams = this.idSocio ? { idSocio: this.idSocio } : {};
+    this.router.navigate(['/ver-curso', id], { queryParams });
   }
 
   volver() {
-    this.router.navigate(['/']);
+    if (this.idSocio) {
+      // 🔹 Si venía desde un socio, volver a la pantalla del socio
+      this.router.navigate(['/socios', this.idSocio]);
+    } else {
+      // 🔹 Si no, volver al inicio
+      this.router.navigate(['/']);
+    }
   }
 
   crearCurso() {
-    this.isAuto$.pipe(
-      map(isAuto => {
-        if (!isAuto) {
-          return false;
-        }
-        return true;
-      })
-    ).subscribe(canCreate => {
-      if (canCreate) {
+    this.isAuto$.pipe(take(1)).subscribe(isAuto => {
+      if (isAuto) {
         this.router.navigate(['/crear-curso']);
       }
     });
   }
-
 }

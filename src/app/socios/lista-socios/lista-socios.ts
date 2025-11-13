@@ -36,7 +36,9 @@ export class ListaSocios implements OnInit {
     ]).pipe(
       map(([socios, filtro]) => {
         const texto = filtro.toLowerCase();
-        return socios.filter(s => s.nombre.toLowerCase().includes(texto));
+        return socios
+          .filter(s => s.nombre.toLowerCase().includes(texto))
+          .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
       })
   );
 
