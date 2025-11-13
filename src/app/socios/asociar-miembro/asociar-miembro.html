@@ -1,0 +1,29 @@
+<section class="vincular-section">
+  <h2>Vincular Usuario</h2>
+  <p>Ingrese el correo del usuario que desea vincular a su cuenta.</p>
+
+  <form (ngSubmit)="asociarUsuario()" #form="ngForm">
+    <div class="input-group">
+      <label for="correo">Correo del usuario</label>
+      <input
+        id="correo"
+        type="email"
+        name="correoUsuario"
+        [(ngModel)]="correoUsuario"
+        placeholder="ejemplo@correo.com"
+        required
+      />
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+      Vincular Usuario
+    </button>
+
+
+    <button type="button" class="btn btn-secondary" (click)="cancelar()">Volver</button>
+
+    <p *ngIf="mensaje" class="mensaje" [class.error]="error">
+      {{ mensaje }}
+    </p>
+  </form>
+</section>

@@ -7,7 +7,7 @@ import { RegistrarSocio } from './registrar-socio/registrar-socio';
 const routes: Routes = [
   { path: '', component: ListaSocios },
   { path: 'registrar', component: RegistrarSocio },
-  { path: ':id', component: GestionarSocio }
+  { path: ':id', component: GestionarSocio },
 ];
 
 @NgModule({

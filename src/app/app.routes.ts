@@ -8,11 +8,17 @@ import { AdminPage } from './admin-page/admin-page';
 import { ListaSocios } from './socios/lista-socios/lista-socios';
 import { RegistrarSocio } from './socios/registrar-socio/registrar-socio';
 import { GestionarSocio } from './socios/gestionar-socio/gestionar-socio';
+import { DashboardSocio } from './socios/dashboard-socio/dashboard-socio';  
+import { SociosMemberList } from './sociosMember-list/sociosMember-list';
 import { VerCurso } from './cursos/ver-curso/ver-curso';
 import { Component } from '@angular/core';
 import { ListaCursos } from './cursos/lista-cursos/lista-cursos';
 import { RealizarCurso } from './cursos/realizar-curso/realizar-curso';
 import { CrearCursos } from './cursos/crear-cursos/crear-cursos';
+import { LoginSocio } from './socios/login-socio/login-socio';
+import { AsociarMiembro } from './socios/asociar-miembro/asociar-miembro';
+import { ListaAsociados } from './lista-asociados/lista-asociados';
+import { ListaCursosSocio } from './lista-cursos/lista-cursos';
 
 // dropdown sin implementar
 @Component({
@@ -33,11 +39,17 @@ export const routes: Routes = [
   { path: 'users', component: ManageUsers },
   { path: 'socios', component: ListaSocios },
   { path: 'socios/registrar', component: RegistrarSocio },
+  { path: 'socios/login', component: LoginSocio },
+  { path: 'socios/dashboard-socio', component: DashboardSocio },
+  { path: 'sociosMember-list', component: SociosMemberList },
   { path: 'socios/:id', component: GestionarSocio},
   { path: 'ver-curso/:id',component: VerCurso},
   { path: 'realizar-curso/:id',component: RealizarCurso},
   { path: 'crear-curso', component: CrearCursos },
-
+  { path: 'asociar-miembro', component: AsociarMiembro },
+  { path: 'lista-asociados', component: ListaAsociados },
+  { path: 'lista-cursos', component: ListaCursosSocio },
+  
   // sin implementar
   { path: 'cursos', component: ListaCursos },
   { path: 'podcasts', component: PlaceholderComponent }

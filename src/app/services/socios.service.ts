@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, collectionData, doc, getDoc, addDoc, updateDoc, deleteDoc, docData } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, getDoc, addDoc, updateDoc, deleteDoc, docData, query, where, getDocs } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Socio } from '../../models/socio.model';
 
@@ -46,5 +46,25 @@ export class SociosService {
   async deleteSocio(id: string): Promise<void> {
     const socioDoc = doc(this.firestore, 'socios', id);
     await deleteDoc(socioDoc);
+  }
+
+  // Iniciar sesión de socio
+  async loginSocio(email: string, password: string): Promise<Socio | null> {
+    try {
+      const q = query(this.sociosRef, where('email', '==', email), where('password', '==', password));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        return null; // Usuario o contraseña incorrectos
+      }
+
+      const docSnap = querySnapshot.docs[0];
+      const data = docSnap.data() as Socio;
+      const socio: Socio = { ...(data as any), id: docSnap.id }; // sin duplicar id
+      return socio;
+    } catch (error) {
+      console.error('Error al intentar iniciar sesión del socio:', error);
+      throw error;
+    }
   }
 }

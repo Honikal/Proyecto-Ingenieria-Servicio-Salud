@@ -1,0 +1,39 @@
+<!-- Cuadro superior -->
+<div id="top-bar">
+  <div id="title">Configuración Usuarios y Socios</div>
+
+  <div class="button-area">
+    <div class="user-avatar" 
+         [ngClass]="{'open': userMenuOpen}" 
+         (click)="toggleMenu()" 
+         tabindex="0">
+      {{ getInitials() }}
+    </div>
+    <ul *ngIf="userMenuOpen" class="user-menu" tabindex="0">
+      <li (click)="onManageClick()">Gestionar Usuario</li>
+      <li (click)="onLogoutClick()">Cerrar Sesión</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Members Section -->
+<div id="members-section">
+  <h2>Lista de Miembros Asociados</h2>
+  <button id="back-btn" (click)="goBackToAdmin()">⬅ Volver</button>
+
+  <table id="members-table">
+    <thead>
+      <tr>
+        <th>Nombre de Usuario</th>
+        <th>Nombre del Socio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of userList$ | async">
+        <td>{{ item.userName }}</td>
+        <td>{{ item.socioName }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>

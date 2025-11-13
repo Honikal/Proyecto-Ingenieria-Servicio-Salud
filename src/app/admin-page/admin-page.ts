@@ -33,12 +33,12 @@ export class AdminPage {
     this.router.navigate(['/socios']);
   }
 
-  goToCourses(): void {
-    this.router.navigate(['/courses']);
+  goToSociosMembers(): void {
+    this.router.navigate(['/sociosMember-list']);
   }
 
-  goToDashboard(): void {
-    this.router.navigate(['/dashboard']);
+  goToCourses(): void {
+    this.router.navigate(['/courses']);
   }
 
   onLogoutClick() {

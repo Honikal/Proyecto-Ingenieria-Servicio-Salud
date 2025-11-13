@@ -1,21 +1,26 @@
-  import { Injectable } from '@angular/core';
-  import { collection, collectionData, Firestore, addDoc, doc, query, where, getDoc, getDocs, updateDoc, deleteDoc, docData } from '@angular/fire/firestore';
-  import { Observable } from 'rxjs';
-  import { User } from '../../models/user.model';
-  import { Area } from '../../models/area.model';
-  import { Curso } from '../../models/curso.model';
-  import { Pantalla } from '../../models/pantalla.model';
-  import { Plantilla } from '../../models/plantilla.model';
-  import { Modulo } from '../../models/modulo.model';
-  import { Pregunta } from '../../models/pregunta.model';
-  import * as bcrypt from 'bcryptjs';
+import { Injectable } from '@angular/core';
+import {Firestore,collection,collectionData,addDoc,doc,query,where,getDoc,getDocs,updateDoc,deleteDoc,docData} from '@angular/fire/firestore';
+import { Observable, combineLatest, from } from 'rxjs';
+import { map, mergeMap, toArray } from 'rxjs/operators';
+import { User } from '../../models/user.model';
+import { Area } from '../../models/area.model';
+import { Curso } from '../../models/curso.model';
+import { Pantalla } from '../../models/pantalla.model';
+import { Plantilla } from '../../models/plantilla.model';
+import { Modulo } from '../../models/modulo.model';
+import { Pregunta } from '../../models/pregunta.model';
+import * as bcrypt from 'bcryptjs';
 
   @Injectable({
     providedIn: 'root'
   })
   export class FirebaseService {
+
+    private sociosRef;
     
-    constructor(private firestore: Firestore){}
+    constructor(private firestore: Firestore){
+      this.sociosRef = collection(this.firestore, 'socios');
+    }
 
     async addUser(user: User){
       const hashedPassword = await bcrypt.hash(user.password, 10);
@@ -87,6 +92,141 @@
       const q = query(cursosRef, where('isActive', '==', true));
       return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
     }
+	
+	getCursosDeSocio(idSocio: string): Observable<Curso[]> {
+	  const cursosRef = collection(this.firestore, 'cursos');
+	  const q = query(cursosRef, where('idSocio', '==', idSocio));
+
+	  return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
+	}
+
+    getUsersXSocios(): Observable<any[]> {
+      const colRef = collection(this.firestore, 'usersxsocios');
+      return collectionData(colRef, { idField: 'id' }) as Observable<any[]>;
+    }
+
+    getUsersXSociosFull(): Observable<any[]> {
+      const usersXSociosRef = collection(this.firestore, 'usersxsocios');
+
+      return collectionData(usersXSociosRef, { idField: 'id' }).pipe(
+        mergeMap((relations: any[]) =>
+          from(relations).pipe(
+            mergeMap(async (rel) => {
+              const userSnap = await getDoc(doc(this.firestore, `users/${rel.idUsuario}`));
+              const socioSnap = await getDoc(doc(this.firestore, `socios/${rel.idSocio}`));
+
+              const userData = userSnap.exists() ? userSnap.data() : {};
+              const socioData = socioSnap.exists() ? socioSnap.data() : {};
+
+              return {
+                id: rel.id,
+                idUsuario: rel.idUsuario,
+                idSocio: rel.idSocio,
+                userName: userData ? userData['fullName'] || userData['nombre'] || '(sin nombre)' : '(sin usuario)',
+                socioName: socioData ? socioData['nombre'] || socioData['nombreSocio'] || '(sin socio)' : '(sin socio)',
+              };
+            }),
+            toArray()
+          )
+        )
+      );
+    }
+
+
+    getUsersXSocioFull(idSocio: string): Observable<any[]> {
+      const relRef = collection(this.firestore, 'usersxsocios');
+      const q = query(relRef, where('idSocio', '==', idSocio));
+
+      return collectionData(q, { idField: 'id' }).pipe(
+        mergeMap((relations: any[]) =>
+          from(relations).pipe(
+            mergeMap(async (rel) => {
+              const userSnap = await getDoc(doc(this.firestore, `users/${rel.idUsuario}`));
+              const socioSnap = await getDoc(doc(this.firestore, `socios/${rel.idSocio}`));
+
+              const userData = userSnap.exists() ? userSnap.data() : {};
+              const socioData = socioSnap.exists() ? socioSnap.data() : {};
+
+              return {
+                id: rel.id,
+                idUsuario: rel.idUsuario,
+                idSocio: rel.idSocio,
+                userName: userData ? userData['fullName'] || userData['nombre'] || '(sin nombre)' : '(sin usuario)',
+                email: userData?.['email'] || 'Sin correo registrado',
+                socioName: socioData ? socioData['nombre'] || socioData['nombreSocio'] || '(sin socio)' : '(sin socio)',
+                fechaAsociacion: rel['fechaAsociacion'] ? 
+                  new Date(rel['fechaAsociacion'].seconds * 1000).toLocaleString() :
+                  '(sin fecha)'
+              };
+            }),
+            toArray()
+          )
+        )
+      );
+    }
+
+    async getUserByEmail(email: string) {
+      try {
+        const usersRef = collection(this.firestore, 'users');
+        const q = query(usersRef, where('email', '==', email));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          return null;
+        }
+
+        const docSnap = snapshot.docs[0];
+        console.log('Usuario encontrado:', docSnap.data());
+        return { id: docSnap.id, ...docSnap.data() };
+      } catch (error) {
+        console.error('Error al obtener usuario por correo:', error);
+        throw error;
+      }
+    }
+
+    async addUserXSocio(relacion: { idUsuario: string; idSocio: string }) {
+      try {
+        const userXSociosRef = collection(this.firestore, 'usersxsocios');
+
+        // Verificar si ya existe la relación
+        const q = query(
+          userXSociosRef,
+          where('idUsuario', '==', relacion.idUsuario),
+          where('idSocio', '==', relacion.idSocio)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+          console.warn('La relación usuario-socio ya existe.');
+          throw new Error('El usuario ya está asociado con este socio.');
+        }
+
+        // Crear nueva relación si no existe
+        await addDoc(userXSociosRef, {
+          idUsuario: relacion.idUsuario,
+          idSocio: relacion.idSocio,
+          fechaAsociacion: new Date(),
+        });
+
+        console.log('Relación userxsocios creada correctamente.');
+      } catch (error) {
+        console.error('Error al crear relación userxsocios:', error);
+        throw error;
+      }
+    }
+
+    async deleteUserXSocio(id: string) {
+      try {
+        const relDoc = doc(this.firestore, `usersxsocios/${id}`);
+        await deleteDoc(relDoc);
+        console.log(`✅ Relación ${id} eliminada correctamente`);
+      } catch (error) {
+        console.error('❌ Error al eliminar la relación:', error);
+        throw error;
+      }
+    }
+
 
     async getMatricula(idUser: string, idCurso: string) {
       const matriculasRef = collection(this.firestore, 'matricula');
@@ -240,6 +380,8 @@
 
     return nota;
   }
+  
+  
 
 
   }
