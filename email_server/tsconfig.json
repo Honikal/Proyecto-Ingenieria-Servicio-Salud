@@ -4,7 +4,9 @@
     "module": "CommonJS",
     "esModuleInterop": true,
     "outDir": "./dist",
+    "rootDir": "./",
     "strict": true
   },
-  "include": ["./*.ts"]
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
