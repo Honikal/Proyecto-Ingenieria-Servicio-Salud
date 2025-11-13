@@ -78,6 +78,16 @@
   background-color: #204d74;
 }
 
+.btn.rojo {
+  background-color: #d33;
+  color: white;
+  border: none;
+}
+
+.btn.rojo:hover {
+  background-color: #b02a2a;
+}
+
 .curso-imagen {
   width: 320px;
   background: white;

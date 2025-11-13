@@ -57,8 +57,6 @@ export class LandingPage {
       this.router.navigate(['/socios']);
     } else if (value === 'cursos') {
       this.router.navigate(['/cursos']);
-    } else if (value === 'podcasts') {
-      this.router.navigate(['/podcasts']);
     }
     this.menuOpen = false;
   }

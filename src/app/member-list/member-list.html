@@ -9,10 +9,12 @@
          tabindex="0">
       {{ getInitials() }}
     </div>
-    <ul *ngIf="userMenuOpen" class="user-menu" tabindex="0">
-      <li (click)="onManageClick()">Gestionar Usuario</li>
-      <li (click)="onLogoutClick()">Cerrar Sesión</li>
-    </ul>
+    @if (userMenuOpen) {
+      <ul class="user-menu" tabindex="0">
+        <li (click)="onManageClick()">Gestionar Usuario</li>
+        <li (click)="onLogoutClick()">Cerrar Sesión</li>
+      </ul>
+    }
   </div>
 </div>
 

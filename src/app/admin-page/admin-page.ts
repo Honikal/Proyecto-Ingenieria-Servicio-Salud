@@ -37,10 +37,6 @@ export class AdminPage {
     this.router.navigate(['/sociosMember-list']);
   }
 
-  goToCourses(): void {
-    this.router.navigate(['/courses']);
-  }
-
   onLogoutClick() {
     localStorage.removeItem('currentUser');
     this.user = null;

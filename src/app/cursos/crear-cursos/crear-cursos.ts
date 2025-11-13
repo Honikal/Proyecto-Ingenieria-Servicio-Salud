@@ -132,7 +132,6 @@ export class CrearCursos implements OnInit {
     } else if (this.paso === 1.5) {
       if (this.modulos.length === 0) {
         alert('Debe agregar al menos un módulo antes de continuar.');
-        this.paso=2;
         return;
       }
       this.pasoAnterior = null;

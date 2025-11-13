@@ -93,12 +93,23 @@ import * as bcrypt from 'bcryptjs';
       return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
     }
 	
-	getCursosDeSocio(idSocio: string): Observable<Curso[]> {
-	  const cursosRef = collection(this.firestore, 'cursos');
-	  const q = query(cursosRef, where('idSocio', '==', idSocio));
+    getCursosDeSocio(idSocio: string): Observable<Curso[]> {
+      const cursosRef = collection(this.firestore, 'cursos');
+      const q = query(cursosRef, where('idSocio', '==', idSocio));
 
-	  return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
-	}
+      return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
+    }
+
+    getCursosDeSocioActivos(idSocio: string): Observable<Curso[]> {
+      const cursosRef = collection(this.firestore, 'cursos');
+      const q = query(
+        cursosRef, 
+        where('idSocio', '==', idSocio),
+        where('isActive', '==', true)
+      );
+
+      return collectionData(q, { idField: 'id' }) as Observable<Curso[]>;
+    }
 
     getUsersXSocios(): Observable<any[]> {
       const colRef = collection(this.firestore, 'usersxsocios');
@@ -299,7 +310,7 @@ import * as bcrypt from 'bcryptjs';
 
     async getSociosByUser(idUser: string) {
       const relRef = collection(this.firestore, 'usersxsocios');
-      const q = query(relRef, where('idUser', '==', idUser));
+      const q = query(relRef, where('idUsuario', '==', idUser));
       const snapshot = await getDocs(q);
       if (snapshot.empty) return [];
 
@@ -316,7 +327,18 @@ import * as bcrypt from 'bcryptjs';
 
       return socios;
     }
+    
+    async getSocioById(idSocio: string) {
+      const socioRef = doc(this.firestore, 'socios', idSocio);
+      const snapshot = await getDoc(socioRef);
 
+      if (!snapshot.exists()) {
+        return null;
+      }
+
+      return { id: snapshot.id, ...(snapshot.data() as any) };
+    }
+    
     async getModulosCurso(idCurso: string): Promise<Modulo[]> {
       const modulosRef = collection(this.firestore, `cursos/${idCurso}/modulo`);
       const snapshot = await getDocs(modulosRef);
@@ -381,7 +403,10 @@ import * as bcrypt from 'bcryptjs';
     return nota;
   }
   
-  
+  async actualizarCurso(id: string, data: any) {
+    const cursoRef = doc(this.firestore, `cursos/${id}`);
+    await updateDoc(cursoRef, data);
+  }
 
 
   }
