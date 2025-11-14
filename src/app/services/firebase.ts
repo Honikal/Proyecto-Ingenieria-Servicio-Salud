@@ -9,6 +9,7 @@ import { Pantalla } from '../../models/pantalla.model';
 import { Plantilla } from '../../models/plantilla.model';
 import { Modulo } from '../../models/modulo.model';
 import { Pregunta } from '../../models/pregunta.model';
+import { Socio } from '../../models/socio.model';
 import * as bcrypt from 'bcryptjs';
 
   @Injectable({
@@ -319,6 +320,11 @@ import * as bcrypt from 'bcryptjs';
       return docRef; 
     }
 
+    getSocios(): Observable<Socio[]> {
+      const sociosRef = collection(this.firestore, 'socios');
+      return collectionData(sociosRef, { idField: 'id' }) as Observable<Socio[]>;
+    }
+
     async getSociosByUser(idUser: string) {
       const relRef = collection(this.firestore, 'usersxsocios');
       const q = query(relRef, where('idUsuario', '==', idUser));
@@ -418,6 +424,20 @@ import * as bcrypt from 'bcryptjs';
     const cursoRef = doc(this.firestore, `cursos/${id}`);
     await updateDoc(cursoRef, data);
   }
-
+  
+  async addLog(log: {
+    usuarioId: string;
+    usuarioNombre?: string;
+    accion: string;
+    coleccion: string;
+    documentoId?: string;
+    detalle?: any;
+  }) {
+    const logRef = collection(this.firestore, 'log');
+    await addDoc(logRef, {
+      ...log,
+      fecha: new Date()
+    });
+  }
 
   }

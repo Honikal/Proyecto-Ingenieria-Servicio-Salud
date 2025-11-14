@@ -79,19 +79,44 @@ export class GestionarSocio implements OnInit {
     if (this.socioForm.valid) {
       const { email, password, isActive } = this.socioForm.value;
 
-      // Solo incluir password si no está vacío
-      const datosActualizar: any = { email, isActive };
-      if (password && password.trim() !== '') {
-        datosActualizar.password = password;
+      // 1. Validar email ya registrado en otro socio
+      if (email !== this.socio?.email) {
+        const exists = await this.sociosService.emailExistsForAnotherUser(email, this.socioId);
+        if (exists) {
+          alert("El correo ingresado ya está registrado por otro socio.");
+          return;
+        }
       }
 
+      // 2. Validar reglas de contraseña (si fue ingresada)
+      if (password && password.trim() !== '') {
+        if (password.length < 8) {
+          alert("La contraseña debe tener al menos 8 caracteres.");
+          return;
+        }
+      }
+
+      // 3. Crear objeto de actualización
+      const datosActualizar: any = {
+        email,
+        isActive
+      };
+
+      if (password && password.trim() !== '') {
+        datosActualizar.password = password; // se hashéa en el servicio
+      }
+
+      // 4. Actualizar en Firestore
       await this.sociosService.updateSocio(this.socioId, datosActualizar);
       alert('Cambios guardados correctamente');
 
-      // actualizar objeto local
-      if (this.socio) this.socio.isActive = isActive;
+      // 5. Actualizar socio local
+      if (this.socio) {
+        this.socio.email = email;
+        this.socio.isActive = isActive;
+      }
 
-      // Limpiar input de password después de guardar
+      // 6. Reset password field
       this.socioForm.get('password')?.reset();
     }
   }
@@ -102,6 +127,8 @@ export class GestionarSocio implements OnInit {
   }
 
   cursos() {
-    this.router.navigate(['/cursos'], { queryParams: { idSocio: this.socioId } });
+    this.router.navigate(['/cursos'], { 
+      queryParams: { idSocio: this.socioId, from: 'user' }
+    });
   }
 }

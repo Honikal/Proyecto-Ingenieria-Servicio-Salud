@@ -7,4 +7,5 @@ export interface Socio {
   telefono: string;
   logo:string;
   isActive:boolean;
+  fecha: Date;
 }

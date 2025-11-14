@@ -32,7 +32,7 @@
                 class="logo"
                 [src]="curso.imagen"
                 alt="{{ curso.nombre }}"
-                (error)="$event.target.src='assets/default-logo.png'"
+                (error)="imagenError($event)"
               />
               <h2>{{ curso.nombre }}</h2>
               <p><strong>Descripción:</strong> {{ curso.descrip }}</p>

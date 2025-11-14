@@ -57,9 +57,9 @@ export class DashboardSocio {
 
   goToCourses() {
     if (this.idSocio) {
-      this.router.navigate(['/cursos'], { queryParams: { idSocio: this.idSocio } });
-    } else {
-      this.router.navigate(['/cursos']);
+      this.router.navigate(['/cursos'], { 
+        queryParams: { idSocio: this.idSocio, from: 'socio' }
+      });
     }
   }
 

@@ -26,11 +26,11 @@
           @for (socio of socios; track socio.id) {
             <div class="card" (click)="verSocio(socio.id)">
                   <div class="card-header">
-                    <img 
-                      class="logo" 
-                      [src]="socio.logo" 
-                      alt="{{ socio.nombre }}" 
-                      (error)="$event.target.src='assets/default-logo.png'" 
+                    <img
+                      class="logo"
+                      [src]="socio.logo"
+                      alt="{{ socio.nombre }}"
+                      (error)="imagenError($event)"
                     />
                     <h2>{{ socio.nombre }}</h2>
                   </div>  

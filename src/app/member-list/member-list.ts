@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirebaseService } from '../services/firebase';
 import { User } from '../../models/user.model';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest, map } from 'rxjs';
 import { AsyncPipe,CommonModule } from '@angular/common'; 
 import { Timestamp } from '@angular/fire/firestore';
 
@@ -14,6 +14,14 @@ import { Timestamp } from '@angular/fire/firestore';
   imports: [AsyncPipe,CommonModule] 
 })
 export class MemberList {
+  //Datos originales de Firebase
+  private usersSubject = new BehaviorSubject<User[]>([]);
+  //Filtro por nombre
+  filtroNombre$ = new BehaviorSubject<string>("");
+  //Paginación
+  page$ = new BehaviorSubject<number>(1);
+  pageSize = 10;
+  //Resultado final después de filtrar + paginar
   userList$: Observable<User[]>;
   userMenuOpen: boolean = false;
   user: User | null = null;
@@ -22,55 +30,81 @@ export class MemberList {
     private router: Router,
     private firebaseService: FirebaseService
   ) {
-    this.userList$ = this.firebaseService.getUsers();
+    // Cargar usuarios desde Firebase
+    this.firebaseService.getUsers().subscribe(users => {
+      this.usersSubject.next(users);
+    });
 
+    // 🔹 Combinar Filtro + Página + Usuarios
+    this.userList$ = combineLatest([
+      this.usersSubject.asObservable(),
+      this.filtroNombre$,
+      this.page$
+    ]).pipe(
+      map(([users, filtro, page]) => {
+        let lista = users;
+
+        // Filtro
+        if (filtro.trim() !== "") {
+          const lower = filtro.toLowerCase();
+          lista = lista.filter(u => u.fullName.toLowerCase().includes(lower));
+        }
+
+        // Ordenar por nombre
+        lista = lista.sort((a, b) =>
+          a.fullName.localeCompare(b.fullName, 'es', { sensitivity: 'base' })
+        );
+
+        // Paginación
+        const start = (page - 1) * this.pageSize;
+        return lista.slice(start, start + this.pageSize);
+      })
+    );
+
+    // Usuario logueado
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       this.user = JSON.parse(storedUser);
     }
   }
 
+  // -------- PAGINACIÓN --------
+  nextPage() {
+    const total = this.usersSubject.getValue().length;
+    const totalPages = Math.ceil(total / this.pageSize);
+    if (this.page$.value < totalPages) this.page$.next(this.page$.value + 1);
+  }
+
+  prevPage() {
+    if (this.page$.value > 1) this.page$.next(this.page$.value - 1);
+  }
+
+  get totalPages(): number {
+    const total = this.usersSubject.getValue().length;
+    return Math.max(1, Math.ceil(total / this.pageSize));
+  }
+
+  // -------- BÚSQUEDA --------
+  actualizarFiltro(value: string) {
+    this.filtroNombre$.next(value);
+    this.page$.next(1); // Reiniciar página
+  }
+  
+  // -------- OTROS MÉTODOS --------
   toggleMenu(value: boolean) {
     this.userMenuOpen = !this.userMenuOpen;
   }
   
   async toggleAuthorization(usuario: User & { id?: string }) {
-    if (!usuario.id) return; 
-
-    // No permitir cambios si es administrador
-    if (usuario.isAdmin) {
-      alert('Los administradores no pueden ser modificados.');
-      return;
-    }
-
-    try {
-      const updatedValue = !usuario.isAuto;
-      await this.firebaseService.updateUser(usuario.id, { isAuto: updatedValue });
-      usuario.isAuto = updatedValue;
-    } catch (error) {
-      console.error('Error al actualizar la autorización:', error);
-    }
+    if (!usuario.id || usuario.isAdmin) return;
+    const updatedValue = !usuario.isAuto;
+    await this.firebaseService.updateUser(usuario.id, { isAuto: updatedValue });
   }
 
   async onDeleteClick(usuario: User & { id?: string }) {
-    if (!usuario.id) return;
-
-    // No permitir eliminar administradores
-    if (usuario.isAdmin) {
-      alert('Los administradores no pueden ser eliminados.');
-      return;
-    }
-
-    const confirmDelete = confirm(`¿Estás seguro que deseas eliminar a ${usuario.fullName}?`);
-    if (!confirmDelete) return;
-
-    try {
-      await this.firebaseService.deleteUser(usuario.id);
-      alert(`${usuario.fullName} ha sido eliminado.`);
-      this.userList$ = this.firebaseService.getUsers(); 
-    } catch (error) {
-      console.error('Error al eliminar usuario:', error);
-    }
+    if (!usuario.id || usuario.isAdmin) return;
+    if (!confirm(`¿Eliminar a ${usuario.fullName}?`)) return;
+    await this.firebaseService.deleteUser(usuario.id);
   }
 
   goBackToAdmin() {
@@ -93,7 +127,7 @@ export class MemberList {
     return parts.slice(0, 2).map((p: string) => p[0].toUpperCase()).join('');
   }
 
-formatDate(date: Date | string | Timestamp): string {
+  formatDate(date: Date | string | Timestamp): string {
     let d: Date;
 
     // Si es un Timestamp de Firebase
@@ -113,4 +147,6 @@ formatDate(date: Date | string | Timestamp): string {
       hour12: false
     });
   }
+
+
 }

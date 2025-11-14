@@ -13,4 +13,5 @@ export interface Curso {
   nombre: string;
   tema: string;
   time: string;
+  fecha: Date;     
 }
