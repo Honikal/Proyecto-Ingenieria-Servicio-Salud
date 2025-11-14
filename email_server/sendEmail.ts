@@ -16,7 +16,7 @@ export async function sendEmail (
     información importante a considerar*/
     try {
         const response = await resend.emails.send({
-            from: ORIGIN_EMAIL || "Servicio Salud <onboarding@resend.dev>",
+            from: "Servicio Salud <onboarding@resend.dev>",
             to: toEmail,
             subject: subject,
             html: htmlContent
