@@ -32,7 +32,7 @@
         <input formControlName="telefono" type="text" placeholder="8888-8888" />
       </div>
       @if (socioForm.get('telefono')?.touched && socioForm.get('telefono')?.invalid) {
-        <small>Ingresa un número de teléfono válido</small>
+        <small>Debe ingresar un número válido (mínimo 8 dígitos)</small>
       }
     </div>
 
@@ -61,13 +61,13 @@
         <input formControlName="logo" type="text" placeholder="https://ejemplo.com/logo.png" />
       </div>
       @if (socioForm.get('logo')?.touched && socioForm.get('logo')?.invalid) {
-        <small>El URL del logo es obligatorio</small>
+        <small>Ingresa un URL válido de imagen (.png, .jpg, .jpeg, .gif, .svg, .webp)</small>
       }
     </div>
 
     <!-- Botones -->
     <div id="buttons-section">
-      <button type="submit" class="button register">Registrar</button>
+      <button type="submit" class="button register" [disabled]="isSubmitting">Registrar</button>
       <button type="button" class="button cancel" (click)="cancelar()">Cancelar</button>
     </div>
   </form>

@@ -19,6 +19,7 @@ export class ListaCursos implements OnInit {
   private cursosSubject = new BehaviorSubject<Curso[]>([]);
   cursos$!: Observable<Curso[]>;
   idSocio: string | null = null;
+  from: string | null = null;
   filtroNombre$ = new BehaviorSubject<string>('');
   isAuto$!: Observable<boolean>;
 
@@ -32,6 +33,7 @@ export class ListaCursos implements OnInit {
     // Leer idSocio desde queryParams
     this.route.queryParams.subscribe(params => {
       this.idSocio = params['idSocio'] || null;
+      this.from = params['from'] || 'user';
 
       if (this.idSocio) {
         this.firebaseService.getCursosDeSocioActivos(this.idSocio).subscribe(cursos => {
@@ -78,18 +80,27 @@ export class ListaCursos implements OnInit {
   }
 
   volver() {
-    if (this.idSocio) {
+    if (!this.idSocio) {
+      this.router.navigate(['/']);
+      return;
+    }
+
+    if (this.from === 'socio') {
       this.router.navigate(['/socios/dashboard-socio', this.idSocio]);
     } else {
-      this.router.navigate(['/']);
+      this.router.navigate(['/socios', this.idSocio]);
     }
   }
-
   crearCurso() {
     this.isAuto$.pipe(take(1)).subscribe(isAuto => {
       if (isAuto) {
         this.router.navigate(['/crear-curso']);
       }
     });
+  }
+
+  imagenError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/imagenError.jpg';
   }
 }

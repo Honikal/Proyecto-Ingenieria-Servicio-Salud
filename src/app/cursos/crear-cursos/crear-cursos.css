@@ -645,3 +645,8 @@ textarea {
   margin-top: 15px;      
   justify-content: flex-start; 
 }
+
+small {
+  color: #e53935; 
+  font-weight: 500;
+}

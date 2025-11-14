@@ -20,6 +20,7 @@ export class RegistrarSocio {
   showPassword = false;
   ionEye = ionEye;
   ionEyeOff = ionEyeOff;
+  isSubmitting = false; // ⬅ evita múltiples clics
 
   constructor(
     private fb: FormBuilder,
@@ -28,11 +29,10 @@ export class RegistrarSocio {
   ) {
     this.socioForm = this.fb.group({
       nombre: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      telefono: ['', Validators.required],
+      email: ['', [Validators.required,Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
+      telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{8,}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      logo: ['', Validators.required],
-      cantidadAsociados: [0] // siempre inicia en 0 y no editable
+      logo: ['', [Validators.required, Validators.pattern(/^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp))$/i)]]
     });
   }
 
@@ -41,22 +41,29 @@ export class RegistrarSocio {
   }
 
   async registrar() {
-    if (this.socioForm.valid) {
-      const socio: Omit<Socio, 'id'> = {
-        ...this.socioForm.value,
-        cantidadAsociados: 0,
-        isActive: true
-      };
-      try {
-        await this.sociosService.createSocio(socio);
-        alert('Socio registrado con éxito');
-        this.router.navigate(['/socios']);
-      } catch (error) {
-        console.error('Error al registrar socio:', error);
-        alert('Error al registrar socio');
-      }
-    } else {
+    if (this.isSubmitting) return; // evita doble envío
+    this.isSubmitting = true;
+
+    if (this.socioForm.invalid) {
       this.socioForm.markAllAsTouched();
+      this.isSubmitting = false;
+      return;
+    }
+    try {
+      await this.sociosService.createSocio(this.socioForm.value);
+      alert('Socio registrado con éxito');
+      this.router.navigate(['/socios']);
+    } catch (error: any) {
+
+      if (error.message === 'EMAIL_EXISTS') {
+        alert('El correo ingresado ya está registrado.');
+      } else {
+        console.error('Error al registrar socio:', error);
+        alert('Error al registrar socio. Intente nuevamente.');
+      }
+
+    } finally {
+      this.isSubmitting = false; // vuelve a habilitar el botón
     }
   }
 

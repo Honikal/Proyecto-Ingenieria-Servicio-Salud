@@ -69,5 +69,9 @@ export class ListaSocios implements OnInit {
       this.router.navigate(['/']);
     }
   }
-
+  
+  imagenError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/imagenError.jpg';
+  }
 }

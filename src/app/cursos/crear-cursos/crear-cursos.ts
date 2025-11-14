@@ -50,6 +50,10 @@ export class CrearCursos implements OnInit {
     nombre: string;
   }[] = [];
 
+  isSavingCurso = false;
+  isAddingModulo = false;
+  isAddingPantalla = false;
+
   @ViewChild('previewFrame') previewFrame!: ElementRef;
 
   constructor(
@@ -64,12 +68,19 @@ export class CrearCursos implements OnInit {
       nombre: ['', Validators.required],
       tema: ['', Validators.required],
       area: ['', Validators.required],
-      codigo: ['', Validators.required],
-      cupos: [1, [Validators.required, Validators.min(1)]],
-      duracion: [''],
-      descripcion: [''],
-      infoGeneral: [''],
-      imagen: [''],
+      codigo: ['',[
+        Validators.required,
+        Validators.pattern(/^[A-Za-z0-9_-]{3,}$/) 
+      ]], // Alfanumérico + guiones
+      cupos: [1,[
+        Validators.required,
+        Validators.min(1),
+        Validators.pattern(/^[0-9]+$/)
+      ]],
+      duracion: ['',[Validators.required]],
+      descripcion: ['', Validators.maxLength(200)], 
+      infoGeneral: ['', Validators.maxLength(500)],
+      imagen: ['',Validators.pattern(/^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp))$/i)],
       isActive: [false],
       idSocio: ['', Validators.required]
     });
@@ -122,7 +133,7 @@ export class CrearCursos implements OnInit {
         const cursoTemp = {
           ...this.cursoForm.value,
           idUser: usuario?.id || '',
-          time: new Date().toISOString()
+          fecha: new Date() 
         };
         localStorage.setItem('cursoTemporal', JSON.stringify(cursoTemp));
         this.paso = 1.5;
@@ -338,20 +349,28 @@ export class CrearCursos implements OnInit {
   }
   
   agregarModuloTemporal() {
-    if (!this.moduloNombre.trim()) {
-      alert('Debe ingresar un nombre para el módulo.');
-      return;
+    if (this.isAddingModulo) return;
+    this.isAddingModulo = true;
+
+    try {
+      if (!this.moduloNombre.trim()) {
+        alert('Debe ingresar un nombre para el módulo.');
+        return;
+      }
+
+      const nuevoModulo: Modulo = {
+        id: this.modulos.length + 1,
+        nombre: this.moduloNombre.trim(),
+        pantallas: []
+      };
+
+      this.modulos.push(nuevoModulo);
+      localStorage.setItem('modulosTemporales', JSON.stringify(this.modulos));
+      this.moduloNombre = '';
+
+    } finally {
+      this.isAddingModulo = false;
     }
-
-    const nuevoModulo: Modulo = {
-      id: this.modulos.length + 1,
-      nombre: this.moduloNombre.trim(),
-      pantallas: []
-    };
-
-    this.modulos.push(nuevoModulo);
-    localStorage.setItem('modulosTemporales', JSON.stringify(this.modulos));
-    this.moduloNombre = '';
   }
 
   eliminarModulo(index: number) {
@@ -362,61 +381,67 @@ export class CrearCursos implements OnInit {
   }
 
   agregarPlantilla() {
-    if (!this.tituloPantalla.trim()) {
-      alert('Debe ingresar un título para la pantalla.');
-      return;
+    if (this.isAddingPantalla) return;
+    this.isAddingPantalla = true;
+    try {
+      if (!this.tituloPantalla.trim()) {
+        alert('Debe ingresar un título para la pantalla.');
+        return;
+      }
+      if (!this.plantillaSeleccionada) {
+        alert('No hay plantilla seleccionada.');
+        return;
+      }
+
+      const modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]') as Modulo[];
+      if (!modulos.length) {
+        alert('Debe crear un módulo antes de agregar una pantalla.');
+        return;
+      }
+
+      const moduloActual = modulos.find(m => m.id === this.moduloSeleccionado?.id);
+      if (!moduloActual) {
+        alert('Debe seleccionar un módulo antes de agregar una pantalla.');
+        return;
+      }
+
+      const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
+      const doc = iframe.contentDocument;
+      const htmlActual = doc ? doc.body.innerHTML : '';
+
+      const nuevaPantalla: Pantalla = {
+        nombre: this.tituloPantalla.trim(),
+        css: this.plantillaSeleccionada.css,
+        html: htmlActual,
+        pos: (moduloActual.pantallas?.length || 0) + 1
+      };
+
+      moduloActual.pantallas.push(nuevaPantalla);
+
+      const indiceModulo = modulos.findIndex(m => m.id === moduloActual.id);
+      modulos[indiceModulo] = moduloActual;
+
+      localStorage.setItem('modulosTemporales', JSON.stringify(modulos));
+
+      console.log('📌 Módulos actuales y sus pantallas:');
+      modulos.forEach(m => {
+        console.log(`Módulo: ${m.nombre}`);
+        m.pantallas?.forEach(p => console.log(` - Pantalla: ${p.nombre}`));
+      });
+
+      if (this.moduloSeleccionado?.id === moduloActual.id) {
+        this.moduloSeleccionado.pantallas = moduloActual.pantallas;
+      }
+
+      this.pantallaSeleccionada = null;
+      this.tituloPantalla = '';
+      this.plantillaSeleccionada = this.plantillaOriginal;
+      setTimeout(() => this.cargarPlantilla(), 0);
+      
+      alert(`Pantalla "${nuevaPantalla.nombre}" agregada al módulo "${moduloActual.nombre}".`);
+    } finally {
+      this.isAddingPantalla = false;
     }
-    if (!this.plantillaSeleccionada) {
-      alert('No hay plantilla seleccionada.');
-      return;
-    }
-
-    const modulos = JSON.parse(localStorage.getItem('modulosTemporales') || '[]') as Modulo[];
-    if (!modulos.length) {
-      alert('Debe crear un módulo antes de agregar una pantalla.');
-      return;
-    }
-
-    const moduloActual = modulos.find(m => m.id === this.moduloSeleccionado?.id);
-    if (!moduloActual) {
-      alert('Debe seleccionar un módulo antes de agregar una pantalla.');
-      return;
-    }
-
-    const iframe = this.previewFrame.nativeElement as HTMLIFrameElement;
-    const doc = iframe.contentDocument;
-    const htmlActual = doc ? doc.body.innerHTML : '';
-
-    const nuevaPantalla: Pantalla = {
-      nombre: this.tituloPantalla.trim(),
-      css: this.plantillaSeleccionada.css,
-      html: htmlActual,
-      pos: (moduloActual.pantallas?.length || 0) + 1
-    };
-
-    moduloActual.pantallas.push(nuevaPantalla);
-
-    const indiceModulo = modulos.findIndex(m => m.id === moduloActual.id);
-    modulos[indiceModulo] = moduloActual;
-
-    localStorage.setItem('modulosTemporales', JSON.stringify(modulos));
-
-    console.log('📌 Módulos actuales y sus pantallas:');
-    modulos.forEach(m => {
-      console.log(`Módulo: ${m.nombre}`);
-      m.pantallas?.forEach(p => console.log(` - Pantalla: ${p.nombre}`));
-    });
-
-    if (this.moduloSeleccionado?.id === moduloActual.id) {
-      this.moduloSeleccionado.pantallas = moduloActual.pantallas;
-    }
-
-    this.pantallaSeleccionada = null;
-    this.tituloPantalla = '';
-    this.plantillaSeleccionada = this.plantillaOriginal;
-    setTimeout(() => this.cargarPlantilla(), 0);
-    
-    alert(`Pantalla "${nuevaPantalla.nombre}" agregada al módulo "${moduloActual.nombre}".`);
   }
 
   agregarModulo() {
@@ -574,6 +599,9 @@ export class CrearCursos implements OnInit {
   }
 
   async guardarCurso() {
+    if (this.isSavingCurso) return;
+    this.isSavingCurso = true;
+
     try {
       const cursoTemp = JSON.parse(localStorage.getItem('cursoTemporal') || '{}');
       if (!cursoTemp) {
@@ -583,6 +611,23 @@ export class CrearCursos implements OnInit {
 
       if (!this.modulos.length) {
         alert('Debe agregar al menos un módulo con pantallas.');
+        return;
+      }
+
+      // VALIDAR QUE CADA MÓDULO TENGA AL MENOS 1 PANTALLA
+      const modulosInvalidos = this.modulos.filter(m => !m.pantallas || m.pantallas.length === 0);
+
+      if (modulosInvalidos.length > 0) {
+        const nombres = modulosInvalidos.map(m => m.nombre).join(', ');
+        alert(`Los siguientes módulos no tienen pantallas: ${nombres}. Cada módulo debe tener al menos una pantalla.`);
+        return;
+      }
+
+      // VALIDAR QUE EXISTAN PREGUNTAS EN EL EXAMEN
+      const verificarExamen = JSON.parse(localStorage.getItem('examenTemporal') || '[]');
+
+      if (!verificarExamen || verificarExamen.length === 0) {
+        alert('Debe agregar al menos una pregunta al examen antes de guardar el curso.');
         return;
       }
 
@@ -599,11 +644,22 @@ export class CrearCursos implements OnInit {
         idSocio: cursoTemp.idSocio,
         imagen: cursoTemp.imagen,
         isActive: Boolean(cursoTemp.isActive),
-        time: cursoTemp.time
+        time: cursoTemp.duracion,
+        fecha: new Date(cursoTemp.fecha)
       };
 
       // Guardar curso
       const cursoRef = await this.firebaseService.addDoc('cursos', cursoData);
+
+      // Registrar log de creación de curso
+      await this.firebaseService.addLog({
+        usuarioId: cursoData.idUser,
+        usuarioNombre: this.usuarioActual.nombre || this.usuarioActual.fullName || '',
+        accion: `Creó curso "${cursoData.nombre}"`,
+        coleccion: 'cursos',
+        documentoId: cursoRef.id,
+        detalle: cursoData
+      });
 
       // Guardar módulos y pantallas
       for (const modulo of this.modulos) {
@@ -642,6 +698,8 @@ export class CrearCursos implements OnInit {
     } catch (error) {
       console.error('Error guardando el curso:', error);
       alert('Ocurrió un error al guardar el curso. Revise la consola.');
+    }finally {
+      this.isSavingCurso = false;
     }
   }
   

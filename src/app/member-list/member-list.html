@@ -3,14 +3,11 @@
   <div id="title">Configuración Usuarios</div>
 
   <div class="button-area">
-    <div class="user-avatar" 
-         [ngClass]="{'open': userMenuOpen}" 
-         (click)="toggleMenu(false)" 
-         tabindex="0">
+    <div class="user-avatar" [ngClass]="{'open': userMenuOpen}" (click)="toggleMenu(false)">
       {{ getInitials() }}
     </div>
     @if (userMenuOpen) {
-      <ul class="user-menu" tabindex="0">
+      <ul class="user-menu">
         <li (click)="onManageClick()">Gestionar Usuario</li>
         <li (click)="onLogoutClick()">Cerrar Sesión</li>
       </ul>
@@ -18,33 +15,43 @@
   </div>
 </div>
 
-<!-- Members Section -->
 <div id="members-section">
-    <h2>Lista de Miembros</h2>
-    <button id="back-btn" (click)="goBackToAdmin()">⬅ Volver</button>
+  <h2>Listado de Miembros</h2>
+  <div class="actions-row">
+    <div class="left">
+      <button id="back-btn" (click)="goBackToAdmin()">⬅ Volver</button>
+    </div>
 
-<!-- Members Table -->
+    <input 
+      type="text"
+      placeholder="Buscar por nombre"
+      class="search-bar"
+      (input)="actualizarFiltro($event.target.value)"
+    />
+  </div>
+
+  <!-- Tabla -->
   <table id="members-table">
     <thead>
       <tr>
         <th>Nombre</th>
         <th>Contacto</th>
         <th>Email</th>
-        <th>Fecha de Creación</th> 
+        <th>Fecha de Creación</th>
         <th>Autorización</th>
         <th>Acciones</th>
       </tr>
     </thead>
+
     <tbody>
-      @for (usuario of userList$ | async; track $index) {
+      @for (usuario of userList$ | async; track usuario.id) {
         <tr>
-          <td data-label="Nombre">{{ usuario.fullName }}</td>
-          <td data-label="Contacto">{{ usuario.phone }}</td>
-          <td data-label="Email">{{ usuario.email }}</td>
-          <td data-label="Fecha de Creación">
-            {{ formatDate(usuario.createdAt) }}
-          </td>
-          <td data-label="Autorización">
+          <td>{{ usuario.fullName }}</td>
+          <td>{{ usuario.phone }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>{{ formatDate(usuario.createdAt) }}</td>
+
+          <td>
             <button 
               [ngClass]="usuario.isAuto ? 'authorized-btn' : 'unauthorized-btn'"
               (click)="toggleAuthorization(usuario)"
@@ -52,11 +59,11 @@
               {{ usuario.isAuto ? 'Autorizado' : 'No Autorizado' }}
             </button>
           </td>
-          <td data-label="Acciones">
-            <button 
-              class="delete-btn" 
-              (click)="onDeleteClick(usuario)"
-              [disabled]="usuario.isAdmin">
+
+          <td>
+            <button class="delete-btn" 
+                    (click)="onDeleteClick(usuario)"
+                    [disabled]="usuario.isAdmin">
               Eliminar
             </button>
           </td>
@@ -65,9 +72,12 @@
     </tbody>
   </table>
 
-  <!-- Pagination -->
+  <!-- PAGINACIÓN -->
   <div id="pagination">
-    <span>1 / 10</span>
-    <button>&gt;</button>
+    <button (click)="prevPage()">&lt;</button>
+
+    <span>{{ page$ | async }} / {{ totalPages }}</span>
+
+    <button (click)="nextPage()">&gt;</button>
   </div>
 </div>

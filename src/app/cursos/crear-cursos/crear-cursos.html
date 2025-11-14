@@ -50,7 +50,7 @@
             <label>Código del curso:</label>
             <input type="text" placeholder="Código único del curso" formControlName="codigo"/>
             <small *ngIf="cursoForm.get('codigo')?.touched && cursoForm.get('codigo')?.invalid">
-              Código requerido
+              Código inválido (mínimo 3 caracteres, solo letras, números, _ o -)
             </small>
           </div>
 
@@ -58,13 +58,16 @@
             <label>Cupos:</label>
             <input type="number" min="1" formControlName="cupos"/>
             <small *ngIf="cursoForm.get('cupos')?.touched && cursoForm.get('cupos')?.invalid">
-              Debe ser mayor a 0
+              Debe ser un número mayor o igual a 1
             </small>
           </div>
 
           <div class="input-group">
             <label>Duración:</label>
             <input type="text" placeholder="Ej. 3h, 2 semanas" formControlName="duracion"/>
+            <small *ngIf="cursoForm.get('duracion')?.touched && cursoForm.get('duracion')?.invalid">
+              Debe ingresar una duración aproximada del curso
+            </small>
           </div>
         </div>
 
@@ -73,16 +76,25 @@
           <div class="input-group">
             <label>Descripción:</label>
             <textarea placeholder="Breve descripción del curso" formControlName="descripcion"></textarea>
+            <small *ngIf="cursoForm.get('descripcion')?.touched && cursoForm.get('descripcion')?.invalid">
+              Máximo 200 caracteres
+            </small>
           </div>
 
           <div class="input-group">
             <label>Info general:</label>
             <textarea placeholder="Información adicional" formControlName="infoGeneral"></textarea>
+            <small *ngIf="cursoForm.get('descripcion')?.touched && cursoForm.get('descripcion')?.invalid">
+              Máximo 500 caracteres
+            </small>
           </div>
 
           <div class="input-group">
             <label>Imagen URL:</label>
             <input type="text" placeholder="URL de la imagen" formControlName="imagen"/>
+            <small *ngIf="cursoForm.get('imagen')?.touched && cursoForm.get('imagen')?.invalid">
+              Debe ser una URL válida que termine en png, jpg, jpeg, gif, svg o webp
+            </small>
           </div>
 
           <div class="input-group">
@@ -228,9 +240,9 @@
   <!-- Acciones: Volver, Guardar y nuevos botones -->
   <div class="acciones">
     <button class="btn back" (click)="paso = 2">Volver</button>
-    <button class="btn add" (click)="guardarCurso()">Guardar Curso</button>
-    <button class="btn add" (click)="agregarPlantilla()">Agregar pantalla</button>
-    <button class="btn add" (click)="agregarModulo()">Agregar módulo</button>
+    <button class="btn add" (click)="guardarCurso()" [disabled]="isSavingCurso">Guardar Curso</button>
+    <button class="btn add" (click)="agregarPlantilla()" [disabled]="isAddingPantalla">Agregar Pantalla</button>
+    <button class="btn add" (click)="agregarModuloTemporal()" [disabled]="isAddingModulo">Agregar Módulo</button>
     <button class="btn add" (click)="generarExamen()">Generar Examen</button> <!-- 🆕 -->
   </div>
 </div>
