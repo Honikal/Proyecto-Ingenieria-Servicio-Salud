@@ -1,6 +1,4 @@
 import admin from 'firebase-admin';
-import fs from 'fs';
-import path from 'path';
 import bycrypt from 'bcryptjs';
 import { sendEmail } from "./sendEmail"
 import dotenv from 'dotenv';
@@ -9,11 +7,14 @@ import { renderOTPTemplate } from './templates/templateUtils';
 
 dotenv.config();
 
-const svcPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH!;
-if (!svcPath) throw new Error("FIREBASE_SERVICE_ACCOUNT_PATH no preparado")
+// 🔹 Get service account from env (Render or .env)
+const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+if (!serviceAccountJson) {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON not provided");
+}
 
-//Intentamos parsear el JSON, utilizando la librería fs y path, para leer el path del serviceAccountKey
-const serviceAccount = JSON.parse(fs.readFileSync(path.resolve(svcPath), "utf-8"));
+// 🔹 Parse the JSON string
+const serviceAccount = JSON.parse(serviceAccountJson);
 
 //Checamos que la aplicación esté en existencia
 if (!admin.apps.length) {
