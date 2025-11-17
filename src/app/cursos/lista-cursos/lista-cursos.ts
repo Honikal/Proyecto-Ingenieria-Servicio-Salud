@@ -7,6 +7,7 @@ import { map, take } from 'rxjs/operators';
 import { Curso } from '../../../models/curso.model';
 import { User } from '../../../models/user.model';
 import { FirebaseService } from '../../services/firebase';
+import { ionAdd } from '@ng-icons/ionicons';
 
 @Component({
   selector: 'app-lista-cursos',
@@ -22,6 +23,8 @@ export class ListaCursos implements OnInit {
   from: string | null = null;
   filtroNombre$ = new BehaviorSubject<string>('');
   isAuto$!: Observable<boolean>;
+  isAdmin: boolean = false;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -61,6 +64,7 @@ export class ListaCursos implements OnInit {
     const userData = localStorage.getItem('currentUser');
     if (userData) {
       const user = JSON.parse(userData);
+      this.isAdmin = user.isAdmin === true;
 
       this.isAuto$ = this.firebaseService.getUserRealtime(user.id).pipe(
         map((u: User | null) => u?.isAuto === true)
@@ -75,8 +79,14 @@ export class ListaCursos implements OnInit {
   }
 
   verCurso(id: string) {
-    const queryParams = this.idSocio ? { idSocio: this.idSocio } : {};
-    this.router.navigate(['/ver-curso', id], { queryParams });
+    if(this.isAdmin){
+      const queryParams = this.idSocio ? { idSocio: this.idSocio, from: 'user' } : {};
+      this.router.navigate(['/ver-curso', id], { queryParams });
+    }else{
+      const queryParams = this.idSocio ? { idSocio: this.idSocio, from: 'socio' } : {};
+      this.router.navigate(['/ver-curso', id], { queryParams });
+    }
+
   }
 
   volver() {

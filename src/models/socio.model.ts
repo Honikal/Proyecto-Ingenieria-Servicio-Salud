@@ -1,5 +1,5 @@
 export interface Socio {
-  id: string;
+  id?: string;
   nombre: string;
   cantidadAsociados: number;
   email: string;

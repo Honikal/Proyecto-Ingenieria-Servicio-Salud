@@ -78,10 +78,20 @@ export class CrearCursos implements OnInit {
         Validators.pattern(/^[0-9]+$/)
       ]],
       duracion: ['',[Validators.required]],
+      nota: [70,[
+        Validators.required,
+        Validators.min(1),
+        Validators.pattern(/^[0-9]+$/)
+      ]],
       descripcion: ['', Validators.maxLength(200)], 
       infoGeneral: ['', Validators.maxLength(500)],
       imagen: ['',Validators.pattern(/^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp))$/i)],
       isActive: [false],
+      intentos: [1,[
+        Validators.required,
+        Validators.min(1),
+        Validators.pattern(/^[0-9]+$/)
+      ]],
       idSocio: ['', Validators.required]
     });
   }
@@ -638,6 +648,8 @@ export class CrearCursos implements OnInit {
         codigo: cursoTemp.codigo,
         cantPersonas: 0,
         cupos: Number(cursoTemp.cupos),
+        intentos: Number(cursoTemp.intentos),
+        nota: Number(cursoTemp.nota),
         descrip: cursoTemp.descripcion,
         infoGeneral: cursoTemp.infoGeneral,
         idUser: cursoTemp.idUser,

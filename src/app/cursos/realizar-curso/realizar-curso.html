@@ -3,7 +3,7 @@
     
     <!-- Encabezado -->
     <div class="header">
-      <button class="btn back" (click)="volver()">⬅ Volver</button>
+      <button class="btn-back" (click)="volver()">⬅ Volver</button>
       <h2>{{ curso.nombre }}</h2>
       <div class="progreso">
         <span>Progreso: {{ progreso }}%</span>
@@ -16,21 +16,37 @@
     <div class="contenido">
       <!-- Panel lateral -->
       <div class="sidebar">
-        <img [src]="curso.imagen" alt="Imagen del curso" class="imagen-curso">
-
-        <button class="btn add" (click)="mostrarExamen()">Examen</button>
+        <img 
+          class="imagen-curso"
+          [src]="curso.imagen" 
+          alt="Imagen del curso"
+          (error)="imagenError($event)" 
+        />
+        <button class="btn-add" (click)="mostrarExamen()">Examen</button>
         
-        @for (modulo of modulos; track modulo.nombre) {
-          <h4>{{ modulo.nombre }}</h4>
-          @for (p of modulo.pantallas; track p.nombre) {
-            <div 
-              class="pantalla-item"
-              [class.activa]="pantallaSeleccionada === p"
-              (click)="seleccionarPantalla(p)">
-              {{ p.nombre }}
+        @for (modulo of modulos; track modulo.id) {
+
+          <div class="modulo-header" (click)="toggleModulo(modulo.id)">
+            <h4>{{ modulo.nombre }}</h4>
+            <span class="flecha">
+              {{ modulosAbiertos[modulo.id] ? "▲" : "▼" }}
+            </span>
+          </div>
+
+          @if (modulosAbiertos[modulo.id]) {
+            <div class="pantallas-lista">
+              @for (p of modulo.pantallas; track p.nombre) {
+                <div 
+                  class="pantalla-item"
+                  [class.activa]="pantallaSeleccionada === p"
+                  (click)="seleccionarPantalla(p)">
+                  {{ p.nombre }}
+                </div>
+              }
             </div>
           }
         }
+
       </div>
 
       <div class="pantalla-info">
@@ -38,21 +54,40 @@
           <div class="examen-layout">
             <h2>Examen del curso</h2>
 
+            <p>
+              Intentos: 
+              <strong>{{ intentosRealizados }}</strong> /
+              <strong>{{ intentosMaximos }}</strong>
+            </p>
+
+            <!-- Caso: ya NO tiene intentos -->
+            @if (intentosRealizados >= intentosMaximos && notaFinal !== null) {
+              <p class="reprobado">
+                Ya no tienes intentos disponibles para este examen.
+              </p>
+            }
+
             @if (cursoFinalizado === true) {
               <div class="resultado-examen">
                 <h3>Tu calificación final: {{ notaFinal }}%</h3>
                 @if (notaFinal !== null) {
-                  @if (notaFinal >= 70) {
+                  @if (notaFinal >= curso.nota) {
                     <p class="aprobado">¡Felicidades, aprobaste el examen!</p>
                   } @else {
-                    <p class="reprobado">No alcanzaste la nota mínima.</p>
+                    <p class="reprobado">No alcanzaste la nota mínima ({{ curso.nota }}%).</p>
                   }
-                  <button (click)="volver()">Volver al curso</button>
+                  <!-- Puede reintentar si no agotó intentos -->
+                  @if (intentosRealizados < intentosMaximos) {
+                    <button class="volver-btn" (click)="reiniciarExamen()">
+                      Volver a intentar
+                    </button>
+                  }
+                  <button class="volver-btn" (click)="volver()">Volver al curso</button>
                 }
               </div>
             }
 
-            @if (notaFinal === null) {
+            @if (notaFinal === null && intentosRealizados < intentosMaximos) {
               <div class="scroll-preguntas">
                 @for (pregunta of preguntasExamen; track pregunta.id) {
                   <div class="pregunta-preview">
@@ -72,7 +107,7 @@
                   </div>
                 }
               </div>
-              <button class="continuar-btn" (click)="enviarExamen()">Enviar examen</button>
+              <button class="continuar-btn" (click)="enviarExamen()"[disabled]="isAdmin">Enviar examen</button>
             }
           </div>
         } @else {

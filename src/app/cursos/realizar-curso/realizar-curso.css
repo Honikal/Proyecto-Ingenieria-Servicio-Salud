@@ -98,14 +98,27 @@
 .continuar-btn:hover {
   background-color: #027c8f;
 }
-
-.btn.back {
+  
+.btn-back {
   background: #6c757d;
   color: #fff;
 }
 
-.btn.back:hover {
+.btn-back:hover {
   background: #565e64;
+}
+
+.btn-add {
+  background: #009fb7;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-add:hover {
+  background: #027c8f;
 }
 
 .botones-navegacion {
@@ -288,4 +301,108 @@
 .resultado-examen .reprobado {
   color: #dc3545;
   font-weight: bold;
+}
+/* ====== Encabezado módulo (select / acordeón) ====== */
+.modulo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #91dfeb;               /* armoniza con sidebar */
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 8px;
+  user-select: none;
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.modulo-header:hover {
+  background: #71cbdb;
+  transform: translateY(-1px);
+}
+
+.modulo-header h4 {
+  margin: 0;
+  font-size: 0.98rem;
+  color: #004d61;
+  font-weight: 600;
+}
+
+/* flecha pequeña a la derecha */
+.flecha {
+  font-size: 12px;
+  color: #004d61;
+  width: 28px;
+  text-align: center;
+  opacity: 0.85;
+}
+
+/* lista de pantallas dentro del módulo (indentada) */
+.pantallas-lista {
+  margin-left: 6px;
+  margin-top: 8px;
+  padding-left: 6px;
+  border-left: 2px solid rgba(0,159,183,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* item de pantalla (estilo coherente con resto) */
+.pantalla-item {
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  background: #fff;
+  color: #0a0a0a;
+  text-align: left;
+  transition: background 0.15s ease, transform 0.08s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.pantalla-item:hover {
+  background: #e8f8fb;
+  transform: translateY(-1px);
+}
+
+/* estado activo (pantalla seleccionada) */
+.pantalla-item.activa {
+  background: linear-gradient(90deg, #009fb7, #007e93);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 6px 14px rgba(0,159,183,0.12);
+}
+
+/* si la pantalla está bloqueada o no disponible */
+.pantalla-item.bloqueada {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* transición suave al abrir/cerrar lista (height animado) */
+.pantallas-lista-collapsible {
+  overflow: hidden;
+  transition: max-height 0.28s ease, opacity 0.2s ease;
+  max-height: 800px; /* suficientemente grande cuando está abierto */
+  opacity: 1;
+}
+.pantallas-lista-collapsible.cerrado {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Ajustes para mobile: la sidebar puede colapsar visualmente */
+@media (max-width: 900px) {
+  .modulo-header {
+    padding: 10px;
+  }
+  .pantalla-item {
+    padding: 8px;
+    font-size: 0.95rem;
+  }
 }
