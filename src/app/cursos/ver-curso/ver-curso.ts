@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FirebaseService } from '../../services/firebase';
 import { Curso } from '../../../models/curso.model';
+import { User } from '../../../models/user.model';
 import Swal from 'sweetalert2';
 import jsPDF from 'jspdf';
 import { Timestamp } from '@angular/fire/firestore';
@@ -20,6 +21,8 @@ export class VerCurso implements OnInit {
   cuposRestantes: number = 0; 
   isAdmin: boolean = false;
   isSocio: boolean = false;
+  idSocio: string | null = null;
+  from: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -29,6 +32,10 @@ export class VerCurso implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.idSocio = params['idSocio'] || null;
+      this.from = params['from'] || 'user';
+    });
     const id = this.route.snapshot.paramMap.get('id');
 
     //Verificar si el usuario logueado es admin
@@ -76,17 +83,18 @@ export class VerCurso implements OnInit {
   }
 
   volver() {
-    const idSocio = this.route.snapshot.queryParamMap.get('idSocio');
-    if (idSocio) {
-      this.router.navigate(['/cursos'], { queryParams: { idSocio } });
-    } else {
-      this.router.navigate(['/cursos']);
+    if(this.isAdmin){
+      const queryParams = this.idSocio ? { idSocio: this.idSocio, from: 'user' } : {};
+      this.router.navigate(['/cursos'], { queryParams });
+    }else{
+      const queryParams = this.idSocio ? { idSocio: this.idSocio, from: 'socio' } : {};
+      this.router.navigate(['/cursos'], { queryParams });
     }
   }
 
   async descargarCertificado() {
     const userData = localStorage.getItem('currentUser');
-    if (!userData) {
+    if (!userData && !this.isSocio) {
       await Swal.fire({
         icon: 'warning',
         title: 'Inicie sesión',
@@ -98,7 +106,7 @@ export class VerCurso implements OnInit {
       return;
     }
 
-    const user = JSON.parse(userData);
+    const user = userData !== null ? JSON.parse(userData) : null;
 
     if (!this.curso) {
       Swal.fire('Error', 'No se ha cargado la información del curso.', 'error');
@@ -106,7 +114,7 @@ export class VerCurso implements OnInit {
     }
 
     //NUEVO BLOQUE PARA ADMIN
-    if (this.isAdmin) {
+    if (this.isAdmin || this.isSocio) {
       const socio = await this.firebaseService.getSocioById(this.curso.idSocio);
 
       if (!socio) {
@@ -120,15 +128,37 @@ export class VerCurso implements OnInit {
         finalizado: true
       };
 
-      await Swal.fire({
-        icon: 'info',
-        title: 'Certificado de prueba',
-        text: 'Como administrador, estás generando un certificado de prueba.',
-        confirmButtonText: 'Generar',
-        confirmButtonColor: '#009fb7'
-      });
+      if(this.isAdmin){
+        await Swal.fire({
+          icon: 'info',
+          title: 'Certificado de prueba',
+          text: 'Como administrador, estás generando un certificado de prueba.',
+          confirmButtonText: 'Generar',
+          confirmButtonColor: '#009fb7'
+        });
+        await this.generarCertificadoPDF(matriculaPrueba, this.curso, user, socio);
+      }else{
+        await Swal.fire({
+          icon: 'info',
+          title: 'Certificado de prueba',
+          text: 'Como socio, estás generando un certificado de prueba.',
+          confirmButtonText: 'Generar',
+          confirmButtonColor: '#009fb7'
+        });
+        const userTemporal: User = {
+          id: 'temp-user',
+          fullName: 'Usuario de Prueba',
+          email: 'prueba@sistema.com',
+          area: 'N/A',
+          phone: 'N/A',
+          password: '',
+          isAdmin: false,
+          isAuto: false,
+          createdAt: new Date()
+        };
 
-      await this.generarCertificadoPDF(matriculaPrueba, this.curso, user, socio);
+        await this.generarCertificadoPDF(matriculaPrueba, this.curso, userTemporal, socio);
+      }
       return; 
     }
 
@@ -190,6 +220,30 @@ export class VerCurso implements OnInit {
     if (!this.curso) {
       Swal.fire('Error', 'No se ha cargado la información del curso.', 'error');
       return;
+    }
+
+    if (this.isAdmin || this.isSocio) {
+      if(this.isAdmin){
+        await Swal.fire({
+          icon: 'info',
+          title: 'Ingresando al curso como administrador',
+          text: 'Como administrador, estás visualizando el curso y no podrá realizar el examen.',
+          confirmButtonText: 'Ingresar',
+          confirmButtonColor: '#009fb7'
+        });
+        this.router.navigate(['/realizar-curso', this.curso.id]);
+      }else{
+        const idSocio = this.route.snapshot.queryParamMap.get('idSocio');
+        await Swal.fire({
+          icon: 'info',
+          title: 'Ingresando al curso como socio',
+          text: 'Como socio, estás visualizando el curso y no podrá realizar el examen.',
+          confirmButtonText: 'Ingresar',
+          confirmButtonColor: '#009fb7'
+        });
+        this.router.navigate(['/realizar-curso', this.curso.id], { queryParams: { idSocio } });
+      }
+        return;
     }
 
     try {
@@ -350,7 +404,7 @@ export class VerCurso implements OnInit {
     );
 
         // === MARCA DE AGUA PARA ADMIN ===
-    if (this.isAdmin) {
+    if (this.isAdmin || this.isSocio) {
       // Simula transparencia con un color gris claro
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(60);
@@ -475,5 +529,9 @@ export class VerCurso implements OnInit {
       }
     }
   }
-
+  
+  imagenError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/imagenError.jpg';
+  }
 }

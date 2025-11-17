@@ -23,7 +23,7 @@
         <img 
           [src]="curso.imagen" 
           alt="{{ curso.nombre }}" 
-          (error)="$event.target.src='assets/default-logo.png'"
+          (error)="imagenError($event)"
         />
         <table>
           <tr>
@@ -37,6 +37,14 @@
           <tr>
             <td><strong>Cupos disponibles</strong></td>
             <td>{{ cuposRestantes }}</td>
+          </tr>
+          <tr>
+            <td><strong>Intentos de Examen</strong></td>
+            <td>{{ curso.intentos }}</td>
+          </tr>
+          <tr>
+            <td><strong>Nota Aprobación</strong></td>
+            <td>{{ curso.nota }}</td>
           </tr>     
         </table>
       </div>

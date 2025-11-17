@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { provideIcons } from '@ng-icons/core'; 
 import { ionEye, ionEyeOff } from '@ng-icons/ionicons'; 
 import { User } from '../../models/user.model'; 
+import { Socio } from '../../models/socio.model';
 import { FirebaseService } from '../services/firebase';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Area } from '../../models/area.model';
@@ -19,8 +20,13 @@ import { OtpModal } from '../otp-modal/otp-modal';
 export class ManageUsers implements OnInit {
   isEditing = false; //Función para definir si actualmente se está editando
   showPassword = false;
+
   user: User | null = null;
+  socio: Socio | null = null;    // si es socio
+
   userForm!: FormGroup;
+  socioForm!: FormGroup;
+
   areas: Area[] = [];
 
   //Manejo del otp
@@ -38,13 +44,22 @@ export class ManageUsers implements OnInit {
 
   //La lógica de inicialización irá en el código de ngOnInit
   async ngOnInit(){
-    //Creamos el form del usuario
+    // FORMULARIO PARA USUARIO NORMAL
     this.userForm = this.fb.group({
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
       area: ['']
     })
+
+    // FORMULARIO PARA SOCIO
+    this.socioForm = this.fb.group({
+      nombre: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      telefono: [''],
+      password: [''],
+      logo: ['']
+    });
 
     this.firebaseService.getAreas().subscribe(areas => {
       this.areas = areas;
@@ -67,6 +82,27 @@ export class ManageUsers implements OnInit {
         }
       }
     }
+
+    // 2️⃣ SI NO HAY USER → buscar SOCIO
+    const storedSocio = localStorage.getItem('currentSocio');
+    if (storedSocio) {
+      const parsed = JSON.parse(storedSocio);
+
+      if (parsed.id) {
+        this.socio = await this.firebaseService.getSocio(parsed.id);
+        this.cdr.detectChanges();
+
+        if (this.socio) {
+          this.socioForm.patchValue({
+            nombre: this.socio.nombre,
+            email: this.socio.email,
+            telefono: this.socio.telefono,
+            password: this.socio.password,
+            logo: this.socio.logo
+          });
+        }
+      }
+    }
   }
 
   onPasswordToggle(){
@@ -74,43 +110,53 @@ export class ManageUsers implements OnInit {
   }
 
   getInitials() : string | null{
-    if (!this.user?.fullName) return null;
-    const parts = this.user.fullName.split(' ');
-    return parts.slice(0, 2).map((p : string) => p[0].toUpperCase()).join('');
+    const name = this.user?.fullName || this.socio?.nombre;
+    if (!name) return null;
+    const parts = name.split(' ');
+    return parts.slice(0, 2).map(p => p[0].toUpperCase()).join('');
   }
 
-  async onEditClick(){
-    if (!this.user) return;
+  async onEditClick() {
+    if (!this.user && !this.socio) return;
 
-    if (this.isEditing){
-      //Estamos en modo de editar y queremos guardar los cambios
-      if (!this.userForm.valid){
-        this.userForm.markAllAsTouched();
+    if (this.isEditing) {
+      const form = this.user ? this.userForm : this.socioForm;
+
+      if (!form.valid) {
+        form.markAllAsTouched();
         return;
       }
 
-      //Asignamos el flag que queremos guardar una vez termine la verificación OTP
       this.pendingSave = true;
 
-      //Mostramos el OTP
       this.isSubmitting = true;
       this.showOTPModal = true;
+
     } else {
-      //Pasamos al modo de edición sin OTP
       this.isEditing = true;
     }
   }
 
-  onCancelEdit(){
-    //Reseteamos a los valores originales
-    if (this.user){
+  onCancelEdit() {
+    if (this.user) {
       this.userForm.patchValue({
         fullName: this.user.fullName,
         email: this.user.email,
         phone: this.user.phone,
         area: this.user.area
-      })
+      });
     }
+
+    if (this.socio) {
+      this.socioForm.patchValue({
+        nombre: this.socio.nombre,
+        email: this.socio.email,
+        telefono: this.socio.telefono,
+        password: this.socio.password,
+        logo: this.socio.logo
+      });
+    }
+
     this.isEditing = false;
     this.pendingSave = false;
   }
@@ -139,7 +185,9 @@ export class ManageUsers implements OnInit {
   volver() {
     if (this.user?.isAdmin) {
       this.router.navigate(['/admin']);
-    } else {
+    } else if(this.socio) {
+      this.router.navigate(['/socios/dashboard-socio', this.socio.id]);
+    }else{
       this.router.navigate(['/']);
     }
   }
@@ -150,40 +198,94 @@ export class ManageUsers implements OnInit {
     return area ? area.nombre : 'Sin área';
   }
 
-  private async saveUserChanges(){
-    if (!this.user) return;
+private async saveUserChanges() {
 
-    try {
+  try {
+
+    /* =====================================================
+       ===============   USUARIO NORMAL   ==================
+       ===================================================== */
+    if (this.user) {
+
       const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        //Guardamos los cambios editados
-        const parsed = JSON.parse(storedUser);
-        const updatedData = this.userForm.value;
+      if (!storedUser) return;
 
-        await this.firebaseService.updateUser(parsed.id, updatedData);
-        alert("Cambios guardados correctamente");
+      const parsed = JSON.parse(storedUser);
+      const updatedData = this.userForm.value;
 
-        //Actualizamos los datos de forma local
-        this.user = { ...this.user, ...updatedData }
-        const userData = {
-          id: parsed.id,
-          fullName: this.user?.fullName,
-          email: this.user?.email,
-          isAdmin: this.user?.isAdmin
-        };
-        localStorage.setItem("currentUser", JSON.stringify(userData));
-        this.isEditing = false; //Quitamos el modo de edición
-        this.cdr.detectChanges();
+      // Guardar en Firestore
+      await this.firebaseService.updateUser(parsed.id, updatedData);
 
-        this.router.navigate(['/']);
-      }
-    } catch (error) {
-      console.error("Error al registrar:", error);
-      alert("Error al registrar");
-    } finally {
+      alert("Cambios guardados correctamente");
+
+      // Actualizar objeto local
+      this.user = { ...this.user, ...updatedData };
+
+      // Actualizar localStorage
+      const newLS = {
+        id: parsed.id,
+        fullName: this.user?.fullName,
+        email: this.user?.email,
+        isAdmin: this.user?.isAdmin
+      };
+      localStorage.setItem("currentUser", JSON.stringify(newLS));
+
+      this.isEditing = false;
+      this.cdr.detectChanges();
+
       this.showOTPModal = false;
       this.isSubmitting = false;
-      this.pendingSave  = false;
+      this.pendingSave = false;
+
+      this.router.navigate(['/']);
+      return;
     }
+
+
+
+    /* =====================================================
+       =====================   SOCIO   ======================
+       ===================================================== */
+    if (this.socio) {
+
+      const storedSocio = localStorage.getItem('currentSocio');
+      if (!storedSocio) return;
+
+      const parsed = JSON.parse(storedSocio);
+      const updatedData = this.socioForm.value;
+
+      // Guardar en Firestore
+      await this.firebaseService.updateSocio(parsed.id, updatedData);
+
+      alert("Cambios guardados correctamente");
+
+      // Actualizar objeto local
+      this.socio = { ...this.socio, ...updatedData };
+
+      // Actualizar localStorage
+      const newLS = {
+        id: parsed.id,
+        nombre: this.socio?.nombre,
+        email: this.socio?.email,
+        logo: this.socio?.logo
+      };
+      localStorage.setItem("currentSocio", JSON.stringify(newLS));
+
+      this.isEditing = false;
+      this.cdr.detectChanges();
+
+      this.showOTPModal = false;
+      this.isSubmitting = false;
+      this.pendingSave = false;
+
+      this.router.navigate(['/']);
+      return;
+    }
+
+  } catch (error) {
+    console.error("Error al guardar cambios:", error);
+    alert("Error al guardar los cambios");
   }
+}
+
 }

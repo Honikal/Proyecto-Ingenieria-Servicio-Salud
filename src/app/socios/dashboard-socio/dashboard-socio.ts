@@ -44,7 +44,7 @@ export class DashboardSocio {
   }
 
   onProfileClick() {
-    this.router.navigate(['/perfil-socio']);
+    this.router.navigate(['/users']);
   }
 
   goToDashboard() {

@@ -68,9 +68,25 @@ import * as bcrypt from 'bcryptjs';
       return { id: snapshot.id, ...(snapshot.data() as User) };
     }
 
+    async getSocio(socioID: string) {
+      const socioRef = doc(this.firestore, 'socios', socioID);
+      const snapshot = await getDoc(socioRef);
+
+      if (!snapshot.exists()) {
+        return null;
+      }
+
+      return { id: snapshot.id, ...(snapshot.data() as Socio) };
+    }
+
     async updateUser(userID: string, updatedData: Partial<User>){
       const userRef = doc(this.firestore, 'users', userID);
       await updateDoc(userRef, updatedData);
+    }
+
+    async updateSocio(socioID: string, updatedData: Partial<Socio>){
+      const socioRef = doc(this.firestore, 'socios', socioID);
+      await updateDoc(socioRef, updatedData);
     }
 
     getUsers(): Observable<User[]> {
@@ -278,7 +294,8 @@ import * as bcrypt from 'bcryptjs';
         finalizado: false,
         fechaMatricula: new Date(),     
         fechaFinalizacion: null,       
-        calificacion: -1               
+        calificacion: -1,
+        intentos: 0,               
       };
 
       await addDoc(matriculasRef, nuevaMatricula);
@@ -380,45 +397,56 @@ import * as bcrypt from 'bcryptjs';
       });
     }
 
-  async enviarExamen(idUser: string, idCurso: string, respuestasUsuario: { [idPregunta: string]: string }) {
+  async enviarExamen(idUser: string, idCurso: string, respuestas: any): Promise<number> {
 
-    const preguntasRef = collection(this.firestore, `cursos/${idCurso}/preguntas`);
-    const snapshot = await getDocs(preguntasRef);
-    const preguntas = snapshot.docs.map(d => ({ id: d.id, ...(d.data() as Pregunta) }));
+    // 1. Traer curso para saber el máximo de intentos
+    const cursoRef = doc(this.firestore, 'cursos', idCurso);
+    const cursoSnap = await getDoc(cursoRef);
+    if (!cursoSnap.exists()) throw new Error('Curso no encontrado');
 
-    if (preguntas.length === 0) {
-      throw new Error('No hay preguntas disponibles para este examen.');
+    const curso = cursoSnap.data() as Curso;
+    const intentosMax = curso.intentos ?? 1;
+
+    // 2. Traer matrícula del usuario
+    const matricula = await this.getMatricula(idUser, idCurso);
+    if (!matricula) throw new Error('Matrícula no encontrada');
+
+    const matriculaRef = doc(this.firestore, 'matricula', matricula.id);
+
+    // 3. Validar intentos
+    if (matricula.intentos >= intentosMax) {
+      throw new Error("Has alcanzado el número máximo de intentos");
     }
-    // Calcular nota en servidor
+
+    // 4. Traer preguntas del examen
+    const preguntas = await this.getExamenCurso(idCurso);
+
+    // 5. Calcular nota
     let correctas = 0;
-    for (const pregunta of preguntas) {
-      const respuestaUsuario = respuestasUsuario[pregunta.id];
-      if (respuestaUsuario && respuestaUsuario === pregunta.res) {
-        correctas++;
-      }
-    }
+    preguntas.forEach(p => {
+      if (!p.id) return; // <-- evita el error, ignora preguntas sin id
+      if (respuestas[p.id] === p.res) correctas++;
+    });
 
     const nota = Math.round((correctas / preguntas.length) * 100);
 
-    const matriculaRef = collection(this.firestore, 'matricula');
-    const q = query(matriculaRef, where('idUser', '==', idUser), where('idCurso', '==', idCurso));
-    const snapshotMatricula = await getDocs(q);
+    // 6. Determinar si se mejora la nota
+    const mejorNota = matricula.calificacion ? 
+                      Math.max(matricula.calificacion, nota) : 
+                      nota;
 
-    if (!snapshotMatricula.empty) {
-      const docMatricula = snapshotMatricula.docs[0];
-      const ref = doc(this.firestore, 'matricula', docMatricula.id);
+    // 7. Actualizar matrícula
+    await updateDoc(matriculaRef, {
+      intentos: matricula.intentos + 1,
+      calificacion: mejorNota,
+      finalizado: true,
+      fechaFinalizacion: Date()
+    });
 
-      await updateDoc(ref, {
-        finalizado: true,
-        calificacion: nota,
-        fechaFinalizacion: new Date()
-      });
-    } else {
-      console.warn('Usuario no matriculado en el curso'); 
-    }
-
+    // Devuelvo la nota del último examen (no la mejor)
     return nota;
   }
+
   
   async actualizarCurso(id: string, data: any) {
     const cursoRef = doc(this.firestore, `cursos/${id}`);
@@ -440,4 +468,6 @@ import * as bcrypt from 'bcryptjs';
     });
   }
 
+
+  
   }

@@ -69,6 +69,14 @@
               Debe ingresar una duración aproximada del curso
             </small>
           </div>
+
+          <div class="input-group">
+            <label>Nota mínima:</label>
+            <input type="number" min="1" formControlName="nota"/>
+            <small *ngIf="cursoForm.get('nota')?.touched && cursoForm.get('nota')?.invalid">
+              Debe ser un número mayor o igual a 1
+            </small>
+          </div>
         </div>
 
         <!-- Columna derecha -->
@@ -103,6 +111,14 @@
               <option [value]="true">Activo</option>
               <option [value]="false">Inactivo</option>
             </select>
+          </div>
+
+          <div class="input-group">
+            <label>Intentos:</label>
+            <input type="number" min="1" formControlName="intentos"/>
+            <small *ngIf="cursoForm.get('intentos')?.touched && cursoForm.get('intentos')?.invalid">
+              Debe ser un número mayor o igual a 1
+            </small>
           </div>
 
           <div class="input-group">

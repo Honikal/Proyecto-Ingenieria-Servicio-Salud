@@ -8,7 +8,6 @@ import { Modulo } from '../../../models/modulo.model';
 import { Pantalla } from '../../../models/pantalla.model';
 import { Pregunta } from '../../../models/pregunta.model';
 import { NgZone } from '@angular/core';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-realizar-curso',
@@ -30,7 +29,12 @@ export class RealizarCurso implements OnInit {
   respuestasUsuario: { [idPregunta: string]: string } = {};
   notaFinal: number | null = null;
   cursoFinalizado: boolean = false;
-
+  matricula: any = null;
+  intentosRealizados: number = 0;
+  intentosMaximos: number = 0;
+  modulosAbiertos: { [idModulo: number]: boolean } = {};
+  isAdmin: boolean = false;
+  isSocio: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -56,18 +60,27 @@ export class RealizarCurso implements OnInit {
         }
 
         this.curso = curso;
-      // Obtener matrícula del usuario
+        // Obtener matrícula del usuario
         const userData = localStorage.getItem('currentUser');
+        const idSocio = this.route.snapshot.queryParamMap.get('idSocio');
         if (userData) {
           const user = JSON.parse(userData);
+          this.isAdmin = user.isAdmin === true;
           const matricula = await this.firebaseService.getMatricula(user.id, curso.id);
+
           if (matricula) {
+            this.matricula = matricula;
+            this.intentosRealizados = matricula.intentos ?? 0;
+            this.intentosMaximos = curso.intentos ?? 1;
             this.cursoFinalizado = matricula.finalizado || false;
             if (this.cursoFinalizado) {
               this.notaFinal = matricula.calificacion ?? null;
             }
           }
         }
+
+        this.isSocio = !!idSocio;
+        console.log('Sesión iniciada como socio:', this.isSocio);
 
         // Obtener módulos del curso
         this.modulos = await this.firebaseService.getModulosCurso(curso.id);
@@ -76,6 +89,10 @@ export class RealizarCurso implements OnInit {
         // Ordenar pantallas dentro de cada módulo por "pos"
         this.modulos.forEach(mod => {
           mod.pantallas.sort((a, b) => a.pos - b.pos);
+        });
+
+        this.modulos.forEach(m => {
+          this.modulosAbiertos[m.id] = false; // todos cerrados
         });
 
         if (curso) {
@@ -180,7 +197,14 @@ export class RealizarCurso implements OnInit {
 
   mostrarExamen() {
     this.mostrandoExamen = true;
-    this.pantallaSeleccionada = undefined; // ocultar pantallas normales
+
+    // si ya no le quedan intentos
+    if (this.intentosRealizados >= this.intentosMaximos) {
+      this.notaFinal = this.matricula?.calificacion ?? 0;
+      this.cursoFinalizado = true;
+    }
+
+    this.pantallaSeleccionada = undefined;
   }
   
   seleccionarRespuesta(preguntaId: string, opcion: string) {
@@ -189,81 +213,37 @@ export class RealizarCurso implements OnInit {
 
   async enviarExamen() {
     if (!this.curso) return;
-    if (this.preguntasExamen.length === 0) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Sin preguntas',
-        text: 'No hay preguntas para calificar en este examen.',
-        confirmButtonText: 'Aceptar'
-      });
-      return;
-    }
+    if (this.intentosRealizados >= this.intentosMaximos) return;
 
     try {
       this.cargando = true;
+
       const userData = localStorage.getItem('currentUser');
-      if (!userData) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo identificar al usuario.',
-          confirmButtonText: 'Aceptar'
-        });
-        this.cargando = false;
-        return;
-      }
+      if (!userData) return;
 
       const user = JSON.parse(userData);
-      const nota = await this.firebaseService.enviarExamen(user.id, this.curso.id, this.respuestasUsuario);
+
+      const nota = await this.firebaseService.enviarExamen(
+        user.id,
+        this.curso.id,
+        this.respuestasUsuario
+      );
 
       this.zone.run(() => {
+
+        this.intentosRealizados++;
         this.notaFinal = nota;
         this.cargando = false;
         this.mostrandoExamen = true;
+        this.cursoFinalizado = true;
         this.cdRef.detectChanges();
-
-        if (nota >= 70) {
-          Swal.fire({
-            icon: 'success',
-            title: '¡Examen aprobado!',
-            html: `
-              <p>Tu calificación final es: <strong>${nota}%</strong></p>
-              <p>¡Felicidades, has pasado el examen!</p>
-            `,
-            confirmButtonText: 'Volver al curso',
-            confirmButtonColor: '#3085d6'
-          }).then(() => {
-            this.volver();
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Examen reprobado',
-            html: `
-              <p>Tu calificación final es: <strong>${nota}%</strong></p>
-              <p>No alcanzaste la nota mínima. Inténtalo de nuevo.</p>
-            `,
-            confirmButtonText: 'Volver al curso',
-            confirmButtonColor: '#d33'
-          }).then(() => {
-            this.volver();
-          });
-        }
       });
 
-    } catch (error) {
-      console.error('Error al enviar examen:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Ocurrió un error al calificar el examen.',
-        confirmButtonText: 'Aceptar'
-      });
+    } catch (e) {
+      console.error(e);
       this.cargando = false;
     }
   }
-
-
 
   volver() {
     if (this.curso) {
@@ -272,4 +252,21 @@ export class RealizarCurso implements OnInit {
       this.router.navigate(['/']);
     }
   }
+
+  reiniciarExamen() {
+    this.respuestasUsuario = {};
+    this.notaFinal = null;
+    this.mostrandoExamen = true;
+    this.cursoFinalizado = false;
+  }
+
+  imagenError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/imagenError.jpg';
+  }
+
+  toggleModulo(idModulo: number) {
+    this.modulosAbiertos[idModulo] = !this.modulosAbiertos[idModulo];
+  }
+
 }

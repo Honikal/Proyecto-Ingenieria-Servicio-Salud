@@ -5,4 +5,5 @@ export interface Matricula {
   fechaMatricula: Date;
   fechaFinalizacion: Date;
   calificacion: number; 
+  intentos: number;
 }

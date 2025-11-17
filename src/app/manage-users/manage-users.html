@@ -1,86 +1,163 @@
 <div id="menu-gestion">
+
     <div class="usuario-section">
+
+        <!-- iniciales -->
         <div id="usuario-logo">
-            {{ getInitials() || '??'}}
+            {{ getInitials() || '??' }}
         </div>
-        <form [formGroup]="userForm">
+
+
+        <!-- ==================== FORMULARIO USUARIO ==================== -->
+        <form *ngIf="user" [formGroup]="userForm">
             <table>
                 <tr>
                     <td>Nombre:</td>
                     <td class="user-info">
                         @if (!isEditing) {
-                            <span>{{user?.fullName}}</span>
+                            <span>{{ user.fullName }}</span>
                         } @else {
-                            <input type="text" formControlName="fullName"/>
+                            <input type="text" formControlName="fullName">
                         }
                     </td>
                 </tr>
+
                 <tr>
                     <td>Correo:</td>
                     <td class="user-info">
                         @if (!isEditing) {
-                            <span>{{user?.email}}</span>
+                            <span>{{ user.email }}</span>
                         } @else {
-                            <input type="email" formControlName="email"/>
+                            <input type="email" formControlName="email">
                         }
                     </td>
                 </tr>
+
                 <tr>
                     <td>Teléfono:</td>
                     <td class="user-info">
                         @if (!isEditing) {
-                            <span>{{user?.phone}}</span>
+                            <span>{{ user.phone }}</span>
                         } @else {
-                            <input type="tel" formControlName="phone"/>
+                            <input type="tel" formControlName="phone">
                         }
                     </td>
                 </tr>
+
                 <tr>
                     <td>Área:</td>
                     <td class="user-info">
                         @if (!isEditing) {
-                        <span>{{ getAreaName(user?.area) }}</span>
+                            <span>{{ getAreaName(user.area) }}</span>
                         } @else {
-                        <select formControlName="area">
-                            <option *ngFor="let area of areas" [value]="area.id">
-                            {{ area.nombre }}
-                            </option>
-                        </select>
+                            <select formControlName="area">
+                                <option *ngFor="let area of areas" [value]="area.id">
+                                    {{ area.nombre }}
+                                </option>
+                            </select>
                         }
                     </td>
                 </tr>
             </table>
         </form>
-        
+
+        <!-- ==================== FORMULARIO SOCIO ==================== -->
+        <form *ngIf="socio" [formGroup]="socioForm">
+            <table>
+
+                <tr>
+                    <td>Nombre:</td>
+                    <td class="user-info">
+                        @if (!isEditing) {
+                            <span>{{ socio.nombre }}</span>
+                        } @else {
+                            <input type="text" formControlName="nombre">
+                        }
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Correo:</td>
+                    <td class="user-info">
+                        @if (!isEditing) {
+                            <span>{{ socio.email }}</span>
+                        } @else {
+                            <input type="email" formControlName="email">
+                        }
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Teléfono:</td>
+                    <td class="user-info">
+                        @if (!isEditing) {
+                            <span>{{ socio.telefono }}</span>
+                        } @else {
+                            <input type="tel" formControlName="telefono">
+                        }
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Contraseña:</td>
+                    <td class="user-info">
+                        @if (!isEditing) {
+                            <span>********</span>
+                        } @else {
+                            <input type="text" formControlName="password">
+                        }
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Logo:</td>
+                    <td class="user-info">
+                        @if (!isEditing) {
+                            <span>{{ socio.logo }}</span>
+                        } @else {
+                            <input type="text" formControlName="logo">
+                        }
+                    </td>
+                </tr>
+
+            </table>
+        </form>
+
+
+        <!-- BOTONES -->
         <div id="button-section">
             <div class="button" (click)="onEditClick()" [class.disabled]="isSubmitting">
                 {{ isEditing ? (isSubmitting ? 'Procesando...' : 'Guardar Cambios') : 'Editar' }}
             </div>
-            
+
             @if (isEditing) {
                 <div class="button" (click)="onCancelEdit()" [class.disabled]="isSubmitting">
                     Cancelar
                 </div>
             } @else {
-                <div class="button" (click)="onDeleteClick()">
+                <div *ngIf="user" class="button" (click)="onDeleteClick()">
                     Eliminar
                 </div>
             }
         </div>
 
-    @if (showOTPModal) {
-        <app-otp-modal
-            [email]="userForm.value.email"
-            [purpose]="'Edición de Perfil'"
-            [title]="'Verificación de Cambios'"
-            [description]="'Hemos enviado un código de 6 dígitos a tu correo electrónico para verificar los cambios'"
-            (verified)="onOtpVerified()"
-            (cancelled)="onOtpCancelled()"
-            (error)="onOtpError($event)">
-        </app-otp-modal>
-    }
+        <!-- MODAL OTP -->
+        @if (showOTPModal) {
+            <app-otp-modal
+                [email]="user ? userForm.value.email : socioForm.value.email"
+                [purpose]="'Edición de Perfil'"
+                [title]="'Verificación de Cambios'"
+                [description]="'Hemos enviado un código de 6 dígitos a tu correo electrónico para verificar los cambios'"
+                (verified)="onOtpVerified()"
+                (cancelled)="onOtpCancelled()"
+                (error)="onOtpError($event)">
+            </app-otp-modal>
+        }
 
-    <div class="button" (click)="volver()">
-        Regresar
+        <div class="button" (click)="volver()">
+            Regresar
+        </div>
+
     </div>
+
 </div>
