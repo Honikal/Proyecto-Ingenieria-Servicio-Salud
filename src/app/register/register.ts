@@ -50,22 +50,10 @@ export class Register {
     this.showPassword = !this.showPassword;
   }
 
-  /*
   async onSignUpClick() {
     if (this.registerForm.valid) {
       try {
         await this.firebaseService.addUser(this.registerForm.value);
-
-        //Correo de notificación de ingreso al sistema
-        this.emailService.sendEmailNotification(
-          this.registerForm.value.email,
-          "Bienvenido a la Aplicación de Salud Ocupacional del TEC",
-          "Este es un correo de prueba, si funciona, entonces estaremos salvados"
-        ).subscribe({
-          next: (resp) => console.log("✅ Email enviado desde Angular", resp),
-          error: (err) => console.error("❌ Error enviando email desde Angular", err) 
-        });
-
         console.log("Usuario agregado correctamente:");
         this.router.navigate(['/login']);
       } catch (error) {
@@ -76,8 +64,8 @@ export class Register {
       this.registerForm.markAllAsTouched();
     }
   }
-  */
 
+  /*
   async onSignUpClick() {
     //Validamos el formulario
     if (!this.registerForm.valid) {
@@ -89,6 +77,7 @@ export class Register {
     this.isSubmitting = true;
     this.showOTPModal = true;
   }
+  */
 
   //===============Eventos de Modal===============//
   onOtpVerified(){
