@@ -116,6 +116,42 @@ export class ManageUsers implements OnInit {
     return parts.slice(0, 2).map(p => p[0].toUpperCase()).join('');
   }
 
+  async onEditClick(){
+    if (!this.user) return;
+
+    if (this.isEditing){
+      if (this.userForm.valid){
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+        //Guardamos los cambios editados
+          const parsed = JSON.parse(storedUser);
+          const updatedData = this.userForm.value;
+
+          await this.firebaseService.updateUser(parsed.id, updatedData);
+          alert("Cambios guardados correctamente");
+
+          //Actualizamos los datos de forma local
+          this.user = { ...this.user, ...updatedData }
+          const userData = {
+            id: parsed.id,
+            fullName: this.user?.fullName,
+            email: this.user?.email,
+            isAdmin: this.user?.isAdmin
+          };
+          localStorage.setItem("currentUser", JSON.stringify(userData));
+          this.isEditing = false; //Quitamos el modo de edición
+          this.cdr.detectChanges();
+        }
+      } else {
+        alert("Por favor completa los cargos requeridos");
+      }
+    } else {
+      //Pasamos al modo de edición
+      this.isEditing = true;
+    }
+  }
+
+  /* 
   async onEditClick() {
     if (!this.user && !this.socio) return;
 
@@ -136,6 +172,7 @@ export class ManageUsers implements OnInit {
       this.isEditing = true;
     }
   }
+  */
 
   onCancelEdit() {
     if (this.user) {

@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc && npm run copy-templates",
-    "copy-templates": "cp -r /templates dist/templates",
+    "copy-templates": "mkdir -p dist/templates && cp templates/*.html dist/templates/",
     "start": "node dist/server.js",
     "dev": "ts-node server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
